@@ -3,7 +3,6 @@ package com.epam.esm.service.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.CertificatePatch;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
@@ -183,41 +182,41 @@ class CertificateServiceImplTest {
   @Test
   void readAllCertificateDaoReadAllInvocation() {
     Certificate certificate = givenCertificate1();
-    when(certificateDao.readAll(any())).thenReturn(List.of(certificate));
+    when(certificateDao.readAll()).thenReturn(List.of(certificate));
 
     certificateService.readAll(any());
 
-    verify(certificateDao).readAll(any());
+    verify(certificateDao).readAll();
   }
 
   @Test
   void readAllCertificateDaoReadCertificateTagsInvocation() {
     Certificate certificate = givenCertificate1();
-    when(certificateDao.readAll(any())).thenReturn(List.of(certificate));
+    when(certificateDao.readAll()).thenReturn(List.of(certificate));
 
     certificateService.readAll(any());
 
     verify(certificateDao).readCertificateTags(anyLong());
   }
 
-  @Test
-  void updateCertificateDaoUpdatePatchInvocation() {
-    CertificatePatch certificate = new CertificatePatch();
-    when(certificateDao.updatePatch(any())).thenReturn(ONE_UPDATED_ROW);
-
-    certificateService.updatePatch(certificate);
-
-    verify(certificateDao).updatePatch(any());
-  }
-
-  @Test
-  void updateCertificateDaoUpdatePatchException() {
-    CertificatePatch certificate = new CertificatePatch();
-    when(certificateDao.updatePatch(any())).thenReturn(NO_UPDATED_ROWS);
-
-    assertThrows(
-        ResourceValidationException.class, () -> certificateService.updatePatch(certificate));
-  }
+//  @Test
+//  void updateCertificateDaoUpdatePatchInvocation() {
+//    CertificatePatch certificate = new CertificatePatch();
+//    when(certificateDao.updatePatch(any())).thenReturn(ONE_UPDATED_ROW);
+//
+//    certificateService.updatePatch(certificate);
+//
+//    verify(certificateDao).updatePatch(any());
+//  }
+//
+//  @Test
+//  void updateCertificateDaoUpdatePatchException() {
+//    CertificatePatch certificate = new CertificatePatch();
+//    when(certificateDao.updatePatch(any())).thenReturn(NO_UPDATED_ROWS);
+//
+//    assertThrows(
+//        ResourceValidationException.class, () -> certificateService.updatePatch(certificate));
+//  }
 
   @Test
   void updatePut() {

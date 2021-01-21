@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     implementation project(':api')
-    implementation project(':dao')
+    implementation project(':repository')
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

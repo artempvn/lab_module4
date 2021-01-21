@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     implementation project(':api')
-    implementation project(':dao')
+    implementation project(':repository')
     implementation project(':service')
     implementation project(':controller')
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'

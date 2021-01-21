@@ -1,7 +1,8 @@
 package com.epam.esm.service;
 
+
+
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.CertificatePatch;
 import com.epam.esm.entity.CertificatesRequest;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public interface CertificateService {
    * @param certificate the certificate
    * @return the certificate
    */
-  CertificatePatch updatePatch(CertificatePatch certificate);
+  Certificate updatePatch(Certificate certificate);
 
   /**
    * Delete.

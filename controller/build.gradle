@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     implementation project(':api')
-    implementation project(':dao')
+    implementation project(':repository')
     implementation project(':service')
     testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
     testImplementation group: 'org.hamcrest', name: 'hamcrest-library', version: '2.2'

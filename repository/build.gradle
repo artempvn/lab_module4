@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.4.2'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+group 'com.epam.esm'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.4.27.Final'
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
+}
+
+test {
+    useJUnitPlatform()
+}
