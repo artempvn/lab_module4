@@ -19,10 +19,7 @@ repositories {
 }
 
 dependencies {
-    implementation project(':api')
-    implementation project(':repository')
-    implementation project(':service')
-    implementation project(':controller')
+    implementation project(':certificate')
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'

@@ -1,7 +1,4 @@
 rootProject.name = 'lab3'
-include 'api'
-include 'service'
-include 'controller'
+include 'certificate'
 include 'main'
-include 'repository'
 
