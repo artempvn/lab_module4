@@ -5,13 +5,16 @@ import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.TagAction;
+import com.epam.esm.exception.ResourceIsBoundException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.exception.ResourcesValidationException;
 import com.epam.esm.service.TagActionService;
 import com.epam.esm.service.TagService;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +33,7 @@ class TagServiceImplTest {
   TagActionService addTagService = new AddTagActionServiceImpl(tagDao, certificateDao);
   TagActionService removeTagService = new RemoveTagActionServiceImpl(tagDao, certificateDao);
   TagService tagService =
-      new TagServiceImpl(tagDao, certificateDao, List.of(addTagService, removeTagService));
+      new TagServiceImpl(tagDao, List.of(addTagService, removeTagService));
 
   @Test
   void createTagDaoReadInvocation() {
@@ -96,17 +99,7 @@ class TagServiceImplTest {
   }
 
   @Test
-  void deleteCertificateDaoDeleteCertificateTagsByTagIdInvocation() {
-    when(tagDao.delete(anyLong())).thenReturn(ONE_DELETED_ROW);
-
-    tagService.delete(TAG_ID);
-
-    verify(certificateDao).deleteCertificateTagsByTagId(TAG_ID);
-  }
-
-  @Test
   void deleteTagDaoDeleteInvocation() {
-    when(tagDao.delete(anyLong())).thenReturn(ONE_DELETED_ROW);
 
     tagService.delete(TAG_ID);
 
@@ -114,10 +107,10 @@ class TagServiceImplTest {
   }
 
   @Test
-  void deleteTagDaoDeleteException() {
-    when(tagDao.delete(anyLong())).thenReturn(NO_DELETED_ROW);
+  void deleteTagDaoDeleteBoundException() {
+    doThrow(DataIntegrityViolationException.class).when(tagDao).delete(anyLong());
 
-    assertThrows(ResourceValidationException.class, () -> tagService.delete(TAG_ID));
+    assertThrows(ResourceIsBoundException.class, () -> tagService.delete(TAG_ID));
   }
 
   @Test

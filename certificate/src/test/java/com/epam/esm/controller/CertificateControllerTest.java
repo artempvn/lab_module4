@@ -59,13 +59,13 @@ class CertificateControllerTest {
     session.close();
   }
 
-//  @Test
-//  void readCertificatePositiveStatusCheck() throws Exception {
-//    Certificate certificate1 = givenExistingCertificate1();
-//    certificateDao.create(certificate1);
-//
-//    mockMvc.perform(get("/certificates/{id}", certificate1.getId())).andExpect(status().isOk());
-//  }
+  @Test
+  void readCertificatePositiveStatusCheck() throws Exception {
+    Certificate certificate1 = givenExistingCertificate1();
+    certificateDao.create(certificate1);
+
+    mockMvc.perform(get("/certificates/{id}", certificate1.getId())).andExpect(status().isOk());
+  }
 
   @Test
   void readCertificateNegativeStatusCheck() throws Exception {
@@ -76,23 +76,23 @@ class CertificateControllerTest {
         .andExpect(status().isNotFound());
   }
 
-//  @Test
-//  void readCertificatePositiveValueCheck() throws Exception {
-//    Certificate certificate1 = givenExistingCertificate1();
-//    Tag tag1 = givenExistingTag1();
-//    Tag tag2 = givenExistingTag2();
-//    tagDao.create(tag1);
-//    tagDao.create(tag2);
-//    certificate1.setId(null);
-//    certificateDao.create(certificate1);
-//    certificateDao.addTag(tag1.getId(), certificate1.getId());
-//    certificateDao.addTag(tag2.getId(), certificate1.getId());
-//    certificate1.setTags(List.of(tag1, tag2));
-//
-//    mockMvc
-//        .perform(get("/certificates/{id}", certificate1.getId()))
-//        .andExpect(content().json(new ObjectMapper().writeValueAsString(certificate1)));
-//  }
+  @Test
+  void readCertificatePositiveValueCheck() throws Exception {
+    Certificate certificate1 = givenExistingCertificate1();
+    Tag tag1 = givenExistingTag1();
+    Tag tag2 = givenExistingTag2();
+    tagDao.create(tag1);
+    tagDao.create(tag2);
+    certificate1.setId(null);
+    certificateDao.create(certificate1);
+    certificateDao.addTag(tag1.getId(), certificate1.getId());
+    certificateDao.addTag(tag2.getId(), certificate1.getId());
+    certificate1.setTags(List.of(tag1, tag2));
+
+    mockMvc
+        .perform(get("/certificates/{id}", certificate1.getId()))
+        .andExpect(content().json(new ObjectMapper().writeValueAsString(certificate1)));
+  }
 
   @Test
   void readCertificatesStatusCheck() throws Exception {
@@ -103,7 +103,7 @@ class CertificateControllerTest {
 
     mockMvc.perform(get("/certificates")).andExpect(status().isOk());
   }
-//
+
   @Test
   void readCertificatesValueCheck() throws Exception {
     Certificate certificate1 = givenExistingCertificate1();

@@ -7,6 +7,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import org.junit.jupiter.api.Test;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,123 +37,6 @@ class CertificateServiceImplTest {
   }
 
   @Test
-  void createNoTagsTagDaoReadInvocation() {
-    Certificate certificate = givenCertificate1();
-    when(certificateDao.create(any())).thenReturn(certificate);
-
-    certificateService.create(certificate);
-
-    verify(tagDao, never()).read(any());
-  }
-
-  @Test
-  void createNoTagsTagDaoCreateInvocation() {
-    Certificate certificate = givenCertificate1();
-    when(certificateDao.create(any())).thenReturn(certificate);
-
-    certificateService.create(certificate);
-
-    verify(tagDao, never()).create(any());
-  }
-
-  @Test
-  void createNoTagsCertificateDaoAddTagInvocation() {
-    Certificate certificate = givenCertificate1();
-    when(certificateDao.create(any())).thenReturn(certificate);
-
-    certificateService.create(certificate);
-
-    verify(certificateDao, never()).addTag(anyLong(), anyLong());
-  }
-
-  @Test
-  void createWithTagsExistedTagDaoReadInvocation() {
-    Certificate certificate = givenCertificate2();
-    Certificate certificateOutput = givenCertificate2();
-    certificateOutput.setTags(null);
-    Tag tag = givenTag();
-    when(certificateDao.create(any())).thenReturn(certificateOutput);
-    when(tagDao.read(any())).thenReturn(Optional.of(tag));
-
-    certificateService.create(certificate);
-
-    verify(tagDao).read(any());
-  }
-
-  @Test
-  void createWithTagsExistedTagDaoCreateInvocation() {
-    Certificate certificate = givenCertificate2();
-    Certificate certificateOutput = givenCertificate2();
-    certificateOutput.setTags(null);
-    Tag tag = givenTag();
-    when(certificateDao.create(any())).thenReturn(certificateOutput);
-    when(tagDao.read(any())).thenReturn(Optional.of(tag));
-
-    certificateService.create(certificate);
-
-    verify(tagDao, never()).create(any());
-  }
-
-  @Test
-  void createWithTagsExistedCertificateDaoAddTagInvocation() {
-    Certificate certificate = givenCertificate2();
-    Certificate certificateOutput = givenCertificate2();
-    certificateOutput.setTags(null);
-    Tag tag = givenTag();
-    when(certificateDao.create(any())).thenReturn(certificateOutput);
-    when(tagDao.read(any())).thenReturn(Optional.of(tag));
-
-    certificateService.create(certificate);
-
-    verify(certificateDao).addTag(anyLong(), anyLong());
-  }
-
-  @Test
-  void createWithTagsNotExistedTagDaoReadInvocation() {
-    Certificate certificate = givenCertificate2();
-    Certificate certificateOutput = givenCertificate2();
-    certificateOutput.setTags(null);
-    Tag tag = givenTag();
-    when(certificateDao.create(any())).thenReturn(certificateOutput);
-    when(tagDao.read(any())).thenReturn(Optional.empty());
-    when(tagDao.create(any())).thenReturn(tag);
-
-    certificateService.create(certificate);
-
-    verify(tagDao).read(any());
-  }
-
-  @Test
-  void createWithTagsNotExistedTagDaoCreateInvocation() {
-    Certificate certificate = givenCertificate2();
-    Certificate certificateOutput = givenCertificate2();
-    certificateOutput.setTags(null);
-    Tag tag = givenTag();
-    when(certificateDao.create(any())).thenReturn(certificateOutput);
-    when(tagDao.read(any())).thenReturn(Optional.empty());
-    when(tagDao.create(any())).thenReturn(tag);
-
-    certificateService.create(certificate);
-
-    verify(tagDao).create(any());
-  }
-
-  @Test
-  void createWithTagsNotExistedCertificateDaoAddTagInvocation() {
-    Certificate certificate = givenCertificate2();
-    Certificate certificateOutput = givenCertificate2();
-    certificateOutput.setTags(null);
-    Tag tag = givenTag();
-    when(certificateDao.create(any())).thenReturn(certificateOutput);
-    when(tagDao.read(any())).thenReturn(Optional.empty());
-    when(tagDao.create(any())).thenReturn(tag);
-
-    certificateService.create(certificate);
-
-    verify(certificateDao).addTag(anyLong(), anyLong());
-  }
-
-  @Test
   void readExistedCertificateDaoReadInvocation() {
     Certificate certificate = givenCertificate1();
     when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));
@@ -160,16 +44,6 @@ class CertificateServiceImplTest {
     certificateService.read(certificate.getId());
 
     verify(certificateDao).read(certificate.getId());
-  }
-
-  @Test
-  void readExistedCertificateDaoReadCertificateTagsInvocation() {
-    Certificate certificate = givenCertificate1();
-    when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));
-
-    certificateService.read(certificate.getId());
-
-    verify(certificateDao).readCertificateTags(certificate.getId());
   }
 
   @Test
@@ -211,7 +85,6 @@ class CertificateServiceImplTest {
   @Test
   void updatePut() {
     Certificate certificate = givenCertificate1();
-    when(certificateDao.update(any())).thenReturn(ONE_UPDATED_ROW);
 
     certificateService.updatePut(certificate);
 
@@ -221,117 +94,18 @@ class CertificateServiceImplTest {
   @Test
   void updatePutNotExistedCertificateDaoDeleteCertificateTagsByCertificateIdInvocation() {
     Certificate certificate = givenCertificate1();
-    when(certificateDao.update(any())).thenReturn(NO_UPDATED_ROWS);
+    doThrow(ObjectOptimisticLockingFailureException.class).when(certificateDao).update(any());
 
     assertThrows(
         ResourceValidationException.class, () -> certificateService.updatePut(certificate));
   }
 
   @Test
-  void updatePutExistedCertificateDaoDeleteCertificateTagsByCertificateIdInvocation() {
-    Certificate certificate = givenCertificate1();
-    when(certificateDao.update(any())).thenReturn(ONE_UPDATED_ROW);
-
-    certificateService.updatePut(certificate);
-
-    verify(certificateDao).deleteCertificateTagsByCertificateId(anyLong());
-  }
-
-  @Test
-  void deleteCertificateDaoDeleteCertificateTagsByCertificateIdInvocation() {
-    when(certificateDao.delete(anyLong())).thenReturn(ONE_UPDATED_ROW);
-
-    certificateService.delete(ID);
-
-    verify(certificateDao).deleteCertificateTagsByCertificateId(ID);
-  }
-
-  @Test
   void deleteCertificateDaoDeleteInvocation() {
-    when(certificateDao.delete(anyLong())).thenReturn(ONE_UPDATED_ROW);
 
     certificateService.delete(ID);
 
     verify(certificateDao).delete(ID);
-  }
-
-  @Test
-  void deleteCertificateDaoDeleteException() {
-    when(certificateDao.delete(anyLong())).thenReturn(NO_UPDATED_ROWS);
-
-    assertThrows(ResourceValidationException.class, () -> certificateService.delete(ID));
-  }
-
-  @Test
-  void addTagsToDbNoTagsTagDaoRead() {
-    Certificate certificate = givenCertificate1();
-
-    certificateService.addTagsToDb(certificate);
-
-    verify(tagDao, never()).read(any());
-  }
-
-  @Test
-  void addTagsToDbNoTagsTagDaoCreate() {
-    Certificate certificate = givenCertificate1();
-
-    certificateService.addTagsToDb(certificate);
-
-    verify(tagDao, never()).create(any());
-  }
-
-  @Test
-  void addTagsToDbNoTagsCertificateDaoAddTag() {
-    Certificate certificate = givenCertificate1();
-
-    certificateService.addTagsToDb(certificate);
-
-    verify(certificateDao, never()).addTag(anyLong(), anyLong());
-  }
-
-  @Test
-  void addTagsToDbWithTagTagDaoRead() {
-    Certificate certificate = givenCertificate2();
-    Tag tag = givenTag();
-    when(tagDao.read(any())).thenReturn(Optional.of(tag));
-
-    certificateService.addTagsToDb(certificate);
-
-    verify(tagDao).read(any());
-  }
-
-  @Test
-  void addTagsToDbWithExistedTagTagDaoCreate() {
-    Certificate certificate = givenCertificate1();
-    Tag tag = givenTag();
-    when(tagDao.read(any())).thenReturn(Optional.of(tag));
-
-    certificateService.addTagsToDb(certificate);
-
-    verify(tagDao, never()).create(any());
-  }
-
-  @Test
-  void addTagsToDbWithTagCertificateDaoAddTag() {
-    Certificate certificate = givenCertificate2();
-    Tag tag = givenTag();
-    when(tagDao.read(any())).thenReturn(Optional.of(tag));
-
-    certificateService.addTagsToDb(certificate);
-
-    verify(certificateDao).addTag(anyLong(), anyLong());
-  }
-
-  @Test
-  void addTagsToDbWithUnexistedTagTagDaoCreate() {
-    Certificate certificate = givenCertificate2();
-    Tag tag = givenTag();
-    when(tagDao.read(any())).thenReturn(Optional.empty());
-    when(tagDao.create(any())).thenReturn(tag);
-
-    certificateService.addTagsToDb(certificate);
-
-    verify(tagDao).create(any());
   }
 
   private static Certificate givenCertificate1() {

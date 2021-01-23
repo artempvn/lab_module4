@@ -14,19 +14,13 @@ public interface CertificateDao {
 
   List<Certificate> readAll();
 
-  int update(Certificate certificate);
+  void update(Certificate certificate);
 
-  int delete(long id);
+  void delete(long id);
 
   void addTag(long tagId, long certificateId);
 
   int removeTag(long tagId, long certificateId);
-
-  List<Tag> readCertificateTags(long certificateId);
-
-  void deleteCertificateTagsByTagId(long tagId);
-
-  void deleteCertificateTagsByCertificateId(long certificateId);
 
   int updatePatch(Certificate certificate);
 }

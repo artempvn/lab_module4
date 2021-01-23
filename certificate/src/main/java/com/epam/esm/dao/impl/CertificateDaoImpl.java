@@ -4,11 +4,10 @@ import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.HibernateSessionFactoryUtil;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
@@ -28,9 +27,7 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public Certificate create(Certificate certificate) {
     Session session = sessionFactory.getSessionFactory().openSession();
-//    session.beginTransaction();
     session.save(certificate);
-//    session.getTransaction().commit();
     session.close();
     return certificate;
   }
@@ -38,7 +35,7 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public Optional<Certificate> read(long id) {
     Session session = sessionFactory.getSessionFactory().openSession();
-    Optional<Certificate> certificate =Optional.ofNullable( session.get(Certificate.class, id));
+    Optional<Certificate> certificate = Optional.ofNullable(session.get(Certificate.class, id));
     session.close();
     return certificate;
   }
@@ -51,48 +48,41 @@ public class CertificateDaoImpl implements CertificateDao {
     return certificates;
   }
 
-
   @Override
-  public int update(Certificate certificate) {
+  public void update(Certificate certificate) {
     Session session = sessionFactory.getSessionFactory().openSession();
     session.beginTransaction();
-    String hql =
-        "update  Certificate set name = :name , description= :description, duration = :duration,"
-            + " price= :price, createDate = :creationDate, lastUpdateDate= :lastUpdateDate where id= :id ";
-    Query q = session.createQuery(hql);
-    q.setParameter("id", certificate.getId());
-    q.setParameter("name", certificate.getName());
-    q.setParameter("description", certificate.getDescription());
-    q.setParameter("duration", certificate.getDuration());
-    q.setParameter("price", certificate.getPrice());
-    q.setParameter("creationDate", certificate.getCreateDate());
-    q.setParameter("lastUpdateDate", certificate.getLastUpdateDate());
-    int result = q.executeUpdate();
+    session.update(certificate);
     session.getTransaction().commit();
     session.close();
-    return result;
   }
 
   @Override
-  public int delete(long id) {
+  public void delete(long id) {
     Session session = sessionFactory.getSessionFactory().openSession();
     session.beginTransaction();
-    String hql = "delete from Certificate where id = :id";
-    Query q = session.createQuery(hql).setParameter("id", id);
-    int result = q.executeUpdate();
+    Optional<Certificate> certificate = Optional.ofNullable(session.get(Certificate.class, id));
+    certificate.ifPresentOrElse(
+        session::delete,
+        () -> {
+          throw ResourceValidationException.validationWithCertificateId(id).get();
+        });
     session.getTransaction().commit();
     session.close();
-    return result;
   }
 
   @Override
   public void addTag(long tagId, long certificateId) {
     Session session = sessionFactory.getSessionFactory().openSession();
     session.beginTransaction();
-    Certificate certificate = session.get(Certificate.class, certificateId);
-    Tag tag = session.get(Tag.class, tagId);
-    certificate.getTags().add(tag);
-    session.update(certificate);
+    String sql =
+        "INSERT INTO certificates_tags(tag_id,certificate_id) VALUES (:tag_id,:certificate_id)";
+    Query q =
+        session
+            .createNativeQuery(sql)
+            .setParameter("tag_id", tagId)
+            .setParameter("certificate_id", certificateId);
+    q.executeUpdate();
     session.getTransaction().commit();
     session.close();
   }
@@ -101,48 +91,20 @@ public class CertificateDaoImpl implements CertificateDao {
   public int removeTag(long tagId, long certificateId) {
     Session session = sessionFactory.getSessionFactory().openSession();
     session.beginTransaction();
-    Certificate certificate = session.get(Certificate.class, certificateId);
-    Tag tag = session.get(Tag.class, tagId);
-    certificate.getTags().remove(tag);
-    session.update(certificate);
+    String sql =
+        "DELETE FROM certificates_tags WHERE tag_id=:tag_id AND certificate_id=:certificate_id ";
+    Query q =
+        session
+            .createNativeQuery(sql)
+            .setParameter("tag_id", tagId)
+            .setParameter("certificate_id", certificateId);
+    int result = q.executeUpdate();
     session.getTransaction().commit();
     session.close();
-    return 1; // TODO set to void later
+    return result;
   }
 
-  @Override
-  public List<Tag> readCertificateTags(long certificateId) {
-    Session session = sessionFactory.getSessionFactory().openSession();
-    session.beginTransaction();
-    Certificate certificate = session.get(Certificate.class, certificateId);
-    return certificate.getTags();
-  }
-
-  @Override
-  public void deleteCertificateTagsByTagId(long tagId) {
-    Session session = sessionFactory.getSessionFactory().openSession();
-    session.beginTransaction();
-    String sql = "DELETE FROM certificates_tags WHERE tag_id= :id";
-    Query q = session.createNativeQuery(sql).setParameter("id", tagId);
-    q.executeUpdate();
-    session.getTransaction().commit();
-    session.close();
-  }
-
-  @Override
-  public void deleteCertificateTagsByCertificateId(long certificateId) {
-    Session session = sessionFactory.getSessionFactory().openSession();
-    session.beginTransaction();
-    Certificate certificate = session.get(Certificate.class, certificateId);
-    if (certificate != null) {
-      certificate.setTags(Collections.emptyList());
-      session.update(certificate);
-    }
-    session.getTransaction().commit();
-    session.close();
-  }
-
-  @Override
+  @Override // TODO refactor
   public int updatePatch(Certificate certificate) {
     Session session = sessionFactory.getSessionFactory().openSession();
     session.beginTransaction();

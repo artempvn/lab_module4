@@ -15,7 +15,7 @@ public interface TagDao {
 
   List<Tag> readAll();
 
-  int delete(long id);
+  void delete(long id);
 
   Optional<Tag> read(String name);
 }

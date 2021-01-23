@@ -3,17 +3,16 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.HibernateSessionFactoryUtil;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,16 +21,17 @@ public class TagDaoImpl implements TagDao {
 
   private final HibernateSessionFactoryUtil sessionFactory;
 
-  //  @PersistenceContext
-  //  EntityManager entityManager;
-  //
-  //  protected Session getCurrentSession()  {
-  //    return entityManager.unwrap(Session.class);
-  //  }
+    @PersistenceContext
+    EntityManager entityManager;
+
+    protected Session getCurrentSession()  {
+      return entityManager.unwrap(Session.class);
+    }
 
   public TagDaoImpl(HibernateSessionFactoryUtil sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
+
 
   @Override
   public Tag create(Tag tag) {
@@ -61,15 +61,17 @@ public class TagDaoImpl implements TagDao {
   }
 
   @Override
-  public int delete(long id) {
+  public void delete(long id) {
     Session session = sessionFactory.getSessionFactory().openSession();
     session.beginTransaction();
-    String hql = "delete from Tag where id = :id";
-    Query q = session.createQuery(hql).setParameter("id", id);
-    int result = q.executeUpdate();
+    Optional<Tag> tag=Optional.ofNullable(session.get(Tag.class,id));
+    tag.ifPresentOrElse(
+        session::delete,
+        () -> {
+          throw ResourceValidationException.validationWithTagId(id).get();
+        });
     session.getTransaction().commit();
     session.close();
-    return result;
   }
 
   @Override

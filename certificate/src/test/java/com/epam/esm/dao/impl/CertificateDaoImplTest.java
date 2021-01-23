@@ -5,12 +5,15 @@ import com.epam.esm.dao.HibernateSessionFactoryUtil;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,7 +28,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("dev")
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @AutoConfigureTestDatabase
 @SpringBootTest
 class CertificateDaoImplTest {
@@ -45,7 +47,6 @@ class CertificateDaoImplTest {
     session.getTransaction().commit();
     session.close();
   }
-
 
   @Test
   void create() {
@@ -95,7 +96,18 @@ class CertificateDaoImplTest {
     certificateDao.update(expectedCertificate);
 
     Certificate actualCertificate = certificateDao.read(expectedCertificate.getId()).get();
-    assertEquals(expectedCertificate, actualCertificate);
+    assertEquals(expectedCertificate.getName(), actualCertificate.getName());
+  }
+
+  @Test
+  void updateNotExisted() {
+    Certificate certificate1 = givenExistingCertificate1();
+    Certificate expectedCertificate =
+        Certificate.builder().id(certificate1.getId()).name("new name").build();
+
+    assertThrows(
+        ObjectOptimisticLockingFailureException.class,
+        () -> certificateDao.update(expectedCertificate));
   }
 
   @Test
@@ -109,90 +121,45 @@ class CertificateDaoImplTest {
     assertTrue(actualCertificate.isEmpty());
   }
 
-//  @Test
-//  void readTags() {
-//    Certificate certificate2 = givenExistingCertificate2();
-//    Tag tag1 = givenExistingTag1();
-//    Tag tag2 = givenExistingTag2();
-//    certificateDao.create(certificate2);
-//    tagDao.create(tag1);
-//    tagDao.create(tag2);
-//    certificateDao.addTag(tag1.getId(), certificate2.getId());
-//    certificateDao.addTag(tag2.getId(), certificate2.getId());
-//
-//    List<Tag> expectedTags = List.of(tag1, tag2);
-//
-//    List<Tag> actualTags = certificateDao.readCertificateTags(certificate2.getId());
-//    assertEquals(expectedTags, actualTags);
-//  }
+  @Test
+  void deleteNotExisted() {
+    Certificate certificate1 = givenExistingCertificate1();
 
-//  @Test
-//  void addTag() {
-//    Certificate certificate1 = givenExistingCertificate1();
-//    Tag tag1 = givenExistingTag1();
-//    certificateDao.create(certificate1);
-//    tagDao.create(tag1);
-//    List<Tag> expectedTags = List.of(tag1);
-//
-//    certificateDao.addTag(tag1.getId(), certificate1.getId());
-//
-//    List<Tag> actualTags = certificateDao.readCertificateTags(certificate1.getId());
-//    assertEquals(expectedTags, actualTags);
-//  }
-//
-//  @Test
-//  void removeTag() {
-//    Certificate certificate2 = givenExistingCertificate2();
-//    Tag tag1 = givenExistingTag1();
-//    Tag tag2 = givenExistingTag2();
-//    certificateDao.create(certificate2);
-//    tagDao.create(tag1);
-//    tagDao.create(tag2);
-//    certificateDao.addTag(tag1.getId(), certificate2.getId());
-//    certificateDao.addTag(tag2.getId(), certificate2.getId());
-//    List<Tag> expectedTags = List.of(tag1);
-//
-//    certificateDao.removeTag(tag2.getId(), certificate2.getId());
-//
-//    List<Tag> actualTags = certificateDao.readCertificateTags(certificate2.getId());
-//    assertEquals(expectedTags, actualTags);
-//  }
-//
-//  @Test
-//  void deleteCertificateTagsByTagId() {
-//    Certificate certificate2 = givenExistingCertificate2();
-//    Tag tag1 = givenExistingTag1();
-//    Tag tag2 = givenExistingTag2();
-//    certificateDao.create(certificate2);
-//    tagDao.create(tag1);
-//    tagDao.create(tag2);
-//    certificateDao.addTag(tag1.getId(), certificate2.getId());
-//    certificateDao.addTag(tag2.getId(), certificate2.getId());
-//    List<Tag> expectedTags = List.of(tag1);
-//
-//    certificateDao.deleteCertificateTagsByTagId(tag2.getId());
-//
-//    List<Tag> actualTags = certificateDao.readCertificateTags(certificate2.getId());
-//    assertEquals(expectedTags, actualTags);
-//  }
-//
-//  @Test
-//  void deleteCertificateTagsByCertificateId() {
-//    Certificate certificate2 = givenExistingCertificate2();
-//    Tag tag1 = givenExistingTag1();
-//    Tag tag2 = givenExistingTag2();
-//    certificateDao.create(certificate2);
-//    tagDao.create(tag1);
-//    tagDao.create(tag2);
-//    certificateDao.addTag(tag1.getId(), certificate2.getId());
-//    certificateDao.addTag(tag2.getId(), certificate2.getId());
-//    List<Tag> expectedTags = Collections.emptyList();
-//
-//    certificateDao.deleteCertificateTagsByCertificateId(certificate2.getId());
-//
-//    List<Tag> actualTags = certificateDao.readCertificateTags(certificate2.getId());
-//    assertEquals(expectedTags, actualTags);
-//  }
+    assertThrows(
+        ResourceValidationException.class, () -> certificateDao.delete(certificate1.getId()));
+  }
+
+    @Test
+    void addTag() {
+      Certificate certificate1 = givenExistingCertificate1();
+      Tag tag1 = givenExistingTag1();
+      certificateDao.create(certificate1);
+      tagDao.create(tag1);
+      List<Tag> expectedTags = List.of(tag1);
+
+      certificateDao.addTag(tag1.getId(), certificate1.getId());
+
+      List<Tag> actualTags = certificateDao.read(certificate1.getId()).get().getTags();
+      assertEquals(expectedTags, actualTags);
+    }
+
+    @Test
+    void removeTag() {
+      Certificate certificate2 = givenExistingCertificate2();
+      Tag tag1 = givenExistingTag1();
+      Tag tag2 = givenExistingTag2();
+      certificateDao.create(certificate2);
+      tagDao.create(tag1);
+      tagDao.create(tag2);
+      certificateDao.addTag(tag1.getId(), certificate2.getId());
+      certificateDao.addTag(tag2.getId(), certificate2.getId());
+      List<Tag> expectedTags = List.of(tag1);
+
+      certificateDao.removeTag(tag2.getId(), certificate2.getId());
+
+      List<Tag> actualTags = certificateDao.read(certificate2.getId()).get().getTags();
+      assertEquals(expectedTags, actualTags);
+    }
 
   //  @Test
   //  void updatePatch() {

@@ -30,7 +30,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("dev")
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @AutoConfigureTestDatabase
 @SpringBootTest
 class TagControllerTest {
@@ -39,8 +38,7 @@ class TagControllerTest {
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
   @Autowired TagController tagController;
-  @Autowired
-  HibernateSessionFactoryUtil factoryUtil;
+  @Autowired HibernateSessionFactoryUtil factoryUtil;
 
   @BeforeEach
   public void setup() {
@@ -175,8 +173,7 @@ class TagControllerTest {
     Tag tag1 = givenExistingTag1();
     tagDao.create(tag1);
 
-    mockMvc.perform(delete("/tags/{id}", tag1.getId()))
-            .andExpect(status().isNoContent());
+    mockMvc.perform(delete("/tags/{id}", tag1.getId())).andExpect(status().isNoContent());
   }
 
   @Test

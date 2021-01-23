@@ -30,6 +30,11 @@ public class ResourceException extends RuntimeException {
     return () -> new ResourceValidationException(message, id);
   }
 
+  public static Supplier<ResourceException> isBound(Long id) {
+    String message = String.format("Resource has bounds with another resources, id = %s", id);
+    return () -> new ResourceIsBoundException(message, id);
+  }
+
   public ResourceException(String message, Long resourceId) {
     super(message);
     this.resourceId = resourceId;
