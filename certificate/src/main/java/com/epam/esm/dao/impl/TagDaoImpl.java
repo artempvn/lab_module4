@@ -6,7 +6,14 @@ import com.epam.esm.entity.Tag;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +22,13 @@ public class TagDaoImpl implements TagDao {
 
   private final HibernateSessionFactoryUtil sessionFactory;
 
+  //  @PersistenceContext
+  //  EntityManager entityManager;
+  //
+  //  protected Session getCurrentSession()  {
+  //    return entityManager.unwrap(Session.class);
+  //  }
+
   public TagDaoImpl(HibernateSessionFactoryUtil sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
@@ -22,9 +36,7 @@ public class TagDaoImpl implements TagDao {
   @Override
   public Tag create(Tag tag) {
     Session session = sessionFactory.getSessionFactory().openSession();
-    session.beginTransaction();
     session.save(tag);
-    session.getTransaction().commit();
     session.close();
     return tag;
   }
@@ -32,15 +44,18 @@ public class TagDaoImpl implements TagDao {
   @Override
   public Optional<Tag> read(long id) {
     Session session = sessionFactory.getSessionFactory().openSession();
-    Tag tag = session.get(Tag.class, id);
+    Optional<Tag> tag = Optional.ofNullable(session.get(Tag.class, id));
     session.close();
-    return Optional.ofNullable(tag);
+    return tag;
   }
 
   @Override
   public List<Tag> readAll() {
     Session session = sessionFactory.getSessionFactory().openSession();
-    List<Tag> tags = session.createQuery("from Tag ").list();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaQuery<Tag> criteria = builder.createQuery(Tag.class);
+    criteria.from(Tag.class);
+    List<Tag> tags = session.createQuery(criteria).list();
     session.close();
     return tags;
   }

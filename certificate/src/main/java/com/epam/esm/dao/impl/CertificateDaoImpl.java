@@ -7,6 +7,8 @@ import com.epam.esm.entity.Tag;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
@@ -26,9 +28,9 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public Certificate create(Certificate certificate) {
     Session session = sessionFactory.getSessionFactory().openSession();
-    session.beginTransaction();
+//    session.beginTransaction();
     session.save(certificate);
-    session.getTransaction().commit();
+//    session.getTransaction().commit();
     session.close();
     return certificate;
   }
@@ -36,9 +38,9 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public Optional<Certificate> read(long id) {
     Session session = sessionFactory.getSessionFactory().openSession();
-    Certificate certificate = session.get(Certificate.class, id);
+    Optional<Certificate> certificate =Optional.ofNullable( session.get(Certificate.class, id));
     session.close();
-    return Optional.ofNullable(certificate);
+    return certificate;
   }
 
   @Override
@@ -48,6 +50,7 @@ public class CertificateDaoImpl implements CertificateDao {
     session.close();
     return certificates;
   }
+
 
   @Override
   public int update(Certificate certificate) {
