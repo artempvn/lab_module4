@@ -1,20 +1,22 @@
 package com.epam.esm.dao;
 
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.CertificateDtoWithTags;
+import com.epam.esm.entity.CertificateDtoWithoutTags;
+import com.epam.esm.entity.CertificatesRequest;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CertificateDao {
 
-  Certificate create(Certificate certificate);
+  Certificate create(CertificateDtoWithTags certificate);
 
   Optional<Certificate> read(long id);
 
-  List<Certificate> readAll();
+  List<Certificate> readAll(CertificatesRequest request);
 
-  void update(Certificate certificate);
+  void update(CertificateDtoWithTags certificate);
 
   void delete(long id);
 
@@ -22,5 +24,5 @@ public interface CertificateDao {
 
   int removeTag(long tagId, long certificateId);
 
-  int updatePatch(Certificate certificate);
+  void updatePatch(CertificateDtoWithoutTags certificate);
 }

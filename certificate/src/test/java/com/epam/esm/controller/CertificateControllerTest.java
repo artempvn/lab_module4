@@ -4,8 +4,9 @@ import com.epam.esm.advice.ResourceAdvice;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.HibernateSessionFactoryUtil;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.CertificateDtoWithTags;
+import com.epam.esm.entity.CertificateDtoWithoutTags;
+import com.epam.esm.entity.TagDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
 import org.junit.jupiter.api.AfterEach;
@@ -16,20 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("dev")
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @AutoConfigureTestDatabase
 @SpringBootTest
 class CertificateControllerTest {
@@ -37,8 +35,7 @@ class CertificateControllerTest {
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
   @Autowired CertificateController certificateController;
-  @Autowired
-  HibernateSessionFactoryUtil factoryUtil;
+  @Autowired HibernateSessionFactoryUtil factoryUtil;
 
   @BeforeEach
   public void setup() {
@@ -61,15 +58,15 @@ class CertificateControllerTest {
 
   @Test
   void readCertificatePositiveStatusCheck() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
-    certificateDao.create(certificate1);
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    long id = certificateDao.create(certificate1).getId();
 
-    mockMvc.perform(get("/certificates/{id}", certificate1.getId())).andExpect(status().isOk());
+    mockMvc.perform(get("/certificates/{id}", id)).andExpect(status().isOk());
   }
 
   @Test
   void readCertificateNegativeStatusCheck() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
 
     mockMvc
         .perform(get("/certificates/{id}", certificate1.getId()))
@@ -78,26 +75,28 @@ class CertificateControllerTest {
 
   @Test
   void readCertificatePositiveValueCheck() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
-    Tag tag1 = givenExistingTag1();
-    Tag tag2 = givenExistingTag2();
-    tagDao.create(tag1);
-    tagDao.create(tag2);
-    certificate1.setId(null);
-    certificateDao.create(certificate1);
-    certificateDao.addTag(tag1.getId(), certificate1.getId());
-    certificateDao.addTag(tag2.getId(), certificate1.getId());
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    TagDto tag1 = givenExistingTag1();
+    TagDto tag2 = givenExistingTag2();
+    long tagId1 = tagDao.create(tag1).getId();
+    long tagId2 = tagDao.create(tag2).getId();
+    long certificateId = certificateDao.create(certificate1).getId();
+    certificate1.setId(certificateId);
+    certificateDao.addTag(tagId1, certificateId);
+    certificateDao.addTag(tagId2, certificateId);
+    tag1.setId(tagId1);
+    tag2.setId(tagId2);
     certificate1.setTags(List.of(tag1, tag2));
 
     mockMvc
-        .perform(get("/certificates/{id}", certificate1.getId()))
+        .perform(get("/certificates/{id}", certificateId))
         .andExpect(content().json(new ObjectMapper().writeValueAsString(certificate1)));
   }
 
   @Test
   void readCertificatesStatusCheck() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
-    Certificate certificate2 = givenExistingCertificate1();
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateDtoWithTags certificate2 = givenExistingCertificate1();
     certificateDao.create(certificate1);
     certificateDao.create(certificate2);
 
@@ -106,53 +105,39 @@ class CertificateControllerTest {
 
   @Test
   void readCertificatesValueCheck() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
-    Certificate certificate2 = givenExistingCertificate1();
-    certificateDao.create(certificate1);
-    certificateDao.create(certificate2);
-    Tag tag1 = givenExistingTag1();
-    Tag tag2 = givenExistingTag2();
-    tagDao.create(tag1);
-    tagDao.create(tag2);
-    certificateDao.addTag(tag1.getId(), certificate1.getId());
-    certificateDao.addTag(tag2.getId(), certificate1.getId());
-    certificate1.setTags(List.of(tag1, tag2));
-    certificate2.setTags(Collections.emptyList());
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateDtoWithTags certificate2 = givenExistingCertificate2();
+    long certificateId1 = certificateDao.create(certificate1).getId();
+    long certificateId2 = certificateDao.create(certificate2).getId();
+    CertificateDtoWithoutTags c1 = givenExistingCertificate1WT();
+    CertificateDtoWithoutTags c2 = givenExistingCertificate2WT();
+    c1.setId(certificateId1);
+    c2.setId(certificateId2);
 
     mockMvc
         .perform(get("/certificates"))
-        .andExpect(
-            content()
-                .json(new ObjectMapper().writeValueAsString(List.of(certificate1, certificate2))));
+        .andExpect(content().json(new ObjectMapper().writeValueAsString(List.of(c1, c2))));
   }
 
   @Test
   void readAll() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
-    Certificate certificate2 = givenExistingCertificate2();
-    certificateDao.create(certificate1);
-    certificateDao.create(certificate2);
-    Tag tag1 = givenExistingTag1();
-    Tag tag2 = givenExistingTag2();
-    tagDao.create(tag1);
-    tagDao.create(tag2);
-    certificateDao.addTag(tag1.getId(), certificate1.getId());
-    certificateDao.addTag(tag2.getId(), certificate1.getId());
-    certificateDao.addTag(tag1.getId(), certificate2.getId());
-    certificateDao.addTag(tag2.getId(), certificate2.getId());
-    certificate1.setTags(List.of(tag1, tag2));
-    certificate2.setTags(List.of(tag1, tag2));
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateDtoWithTags certificate2 = givenExistingCertificate2();
+    long certificateId1 = certificateDao.create(certificate1).getId();
+    long certificateId2 = certificateDao.create(certificate2).getId();
+    CertificateDtoWithoutTags c1 = givenExistingCertificate1WT();
+    CertificateDtoWithoutTags c2 = givenExistingCertificate2WT();
+    c1.setId(certificateId1);
+    c2.setId(certificateId2);
 
     mockMvc
-        .perform(get("/certificates"))
-        .andExpect(
-            content()
-                .json(new ObjectMapper().writeValueAsString(List.of(certificate1, certificate2))));
+        .perform(get("/certificates?name=cert"))
+        .andExpect(content().json(new ObjectMapper().writeValueAsString(List.of(c1, c2))));
   }
 
   @Test
   void createCertificateStatusCheck() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
     certificate1.setId(null);
 
     mockMvc
@@ -165,9 +150,9 @@ class CertificateControllerTest {
 
   @Test
   void createCertificateValueCheck() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
     certificate1.setId(null);
-    Certificate certificateWithId = givenExistingCertificate1();
+    CertificateDtoWithTags certificateWithId = givenExistingCertificate1();
 
     mockMvc
         .perform(
@@ -183,13 +168,13 @@ class CertificateControllerTest {
 
   @Test
   void updateCertificatePutPositiveStatusCheck() throws Exception {
-    Certificate certificate = givenExistingCertificate1();
-    certificateDao.create(certificate);
-    Certificate certificateUpdate = givenNewCertificateForUpdatePutId1();
+    CertificateDtoWithTags certificate = givenExistingCertificate1();
+    long id = certificateDao.create(certificate).getId();
+    CertificateDtoWithTags certificateUpdate = givenNewCertificateForUpdatePutId1();
 
     mockMvc
         .perform(
-            put("/certificates/{id}", certificate.getId())
+            put("/certificates/{id}", id)
                 .content(new ObjectMapper().writeValueAsString(certificateUpdate))
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
@@ -197,7 +182,7 @@ class CertificateControllerTest {
 
   @Test
   void updateCertificatePutNegativeStatusCheck() throws Exception {
-    Certificate certificateUpdate = givenNewCertificateForUpdateId1();
+    CertificateDtoWithTags certificateUpdate = givenNewCertificateForUpdateId1();
 
     mockMvc
         .perform(
@@ -209,91 +194,97 @@ class CertificateControllerTest {
 
   @Test
   void updateCertificatePutPositiveValueCheck() throws Exception {
-    Certificate certificate = givenExistingCertificate1();
-    certificateDao.create(certificate);
-    Certificate certificateUpdate = givenNewCertificateForUpdatePutId1();
-    certificateUpdate.setId(certificate.getId());
+    CertificateDtoWithTags certificate = givenExistingCertificate1();
+    long id = certificateDao.create(certificate).getId();
+    CertificateDtoWithTags certificateUpdate = givenNewCertificateForUpdatePutId1();
+    certificateUpdate.setId(id);
 
     mockMvc
         .perform(
-            put("/certificates/{id}", certificate.getId())
+            put("/certificates/{id}", id)
                 .content(new ObjectMapper().writeValueAsString(certificateUpdate))
                 .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(content().json(new ObjectMapper().writeValueAsString(certificateUpdate)));
+        .andExpect(jsonPath("$.id").value(id))
+        .andExpect(jsonPath("$.name").value(certificateUpdate.getName()))
+        .andExpect(jsonPath("$.description").value(certificateUpdate.getDescription()))
+        .andExpect(jsonPath("$.price").value(certificateUpdate.getPrice()))
+        .andExpect(jsonPath("$.duration").value(certificateUpdate.getDuration()));
   }
 
-//    @Test
-//    void updateCertificatePatchPositiveStatusCheck() throws Exception {
-//      Certificate certificate = givenExistingCertificate1();
-//      certificateDao.create(certificate);
-//      Certificate certificateUpdate = givenNewCertificateForUpdateId1();
-//
-//      mockMvc
-//          .perform(
-//              patch("/certificates/{id}", certificate.getId())
-//                  .content(new ObjectMapper().writeValueAsString(certificateUpdate))
-//                  .contentType(MediaType.APPLICATION_JSON))
-//          .andExpect(status().isOk());
-//    }
-  //
-  //  @Test
-  //  void updateCertificatePatchNegativeStatusCheck() throws Exception {
-  //    Certificate certificateUpdate = givenNewCertificateForUpdateId1();
-  //
-  //    mockMvc
-  //        .perform(
-  //            patch("/certificates/{id}", certificateUpdate.getId())
-  //                .content(new ObjectMapper().writeValueAsString(certificateUpdate))
-  //                .contentType(MediaType.APPLICATION_JSON))
-  //        .andExpect(status().isBadRequest());
-  //  }
-
-//  @Test
-//  void updateCertificatePatchPositiveValueCheck() throws Exception {
-//    Certificate certificate = givenExistingCertificate1();
-//    certificateDao.create(certificate);
-//    Certificate certificateUpdate = givenNewCertificateForUpdateId1();
-//
-//    mockMvc
-//        .perform(
-//            patch("/certificates/{id}", certificate.getId())
-//                .content(new ObjectMapper().writeValueAsString(certificateUpdate))
-//                .contentType(MediaType.APPLICATION_JSON))
-//        .andExpect(content().json(new ObjectMapper().writeValueAsString(certificateUpdate)));
-//  }
-//
   @Test
-  void deleteCertificateStatusCheck() throws Exception {
-    Certificate certificate = givenExistingCertificate1();
-    certificateDao.create(certificate);
+  void updateCertificatePatchPositiveStatusCheck() throws Exception {
+    CertificateDtoWithTags certificate = givenExistingCertificate1();
+    long id = certificateDao.create(certificate).getId();
+    CertificateDtoWithoutTags certificateUpdate = givenExistingCertificate2WT();
+    certificateUpdate.setId(id);
 
     mockMvc
-        .perform(delete("/certificates/{id}", certificate.getId()))
-        .andExpect(status().isNoContent());
+        .perform(
+            patch("/certificates/{id}", id)
+                .content(new ObjectMapper().writeValueAsString(certificateUpdate))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  void updateCertificatePatchNegativeStatusCheck() throws Exception {
+    CertificateDtoWithoutTags certificateUpdate = givenExistingCertificate1WT();
+
+    mockMvc
+        .perform(
+            patch("/certificates/{id}", certificateUpdate.getId())
+                .content(new ObjectMapper().writeValueAsString(certificateUpdate))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void updateCertificatePatchPositiveValueCheck() throws Exception {
+    CertificateDtoWithTags certificate = givenExistingCertificate1();
+    long id = certificateDao.create(certificate).getId();
+    CertificateDtoWithoutTags certificateUpdate = givenExistingCertificate2WT();
+    certificateUpdate.setId(id);
+
+    mockMvc
+        .perform(
+            patch("/certificates/{id}", id)
+                .content(new ObjectMapper().writeValueAsString(certificateUpdate))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(id))
+        .andExpect(jsonPath("$.name").value(certificateUpdate.getName()))
+        .andExpect(jsonPath("$.description").value(certificateUpdate.getDescription()))
+        .andExpect(jsonPath("$.price").value(certificateUpdate.getPrice()))
+        .andExpect(jsonPath("$.duration").value(certificateUpdate.getDuration()));
+  }
+
+  @Test
+  void deleteCertificateStatusCheck() throws Exception {
+    CertificateDtoWithTags certificate = givenExistingCertificate1();
+    long id = certificateDao.create(certificate).getId();
+
+    mockMvc.perform(delete("/certificates/{id}", id)).andExpect(status().isNoContent());
   }
 
   @Test
   void deleteCertificateValueCheck() throws Exception {
-    Certificate certificate = givenExistingCertificate1();
-    certificateDao.create(certificate);
+    CertificateDtoWithTags certificate = givenExistingCertificate1();
+    long id = certificateDao.create(certificate).getId();
 
-    mockMvc.perform(delete("/certificates/{id}", certificate.getId()));
-    mockMvc
-        .perform(get("/certificates/{id}", certificate.getId()))
-        .andExpect(status().isNotFound());
+    mockMvc.perform(delete("/certificates/{id}", id));
+    mockMvc.perform(get("/certificates/{id}", id)).andExpect(status().isNotFound());
   }
 
   @Test
   void deleteCertificateNegative() throws Exception {
-    Certificate certificate = givenExistingCertificate1();
+    CertificateDtoWithTags certificate = givenExistingCertificate1();
 
     mockMvc
         .perform(delete("/certificates/{id}", certificate.getId()))
         .andExpect(status().isBadRequest());
   }
 
-  private static Certificate givenExistingCertificate1() {
-    return Certificate.builder()
+  private static CertificateDtoWithTags givenExistingCertificate1() {
+    return CertificateDtoWithTags.builder()
         .id(1L)
         .name("first certificate")
         .description("first description")
@@ -304,20 +295,44 @@ class CertificateControllerTest {
         .build();
   }
 
-  private static Certificate givenExistingCertificate2() {
-    return Certificate.builder()
+  private static CertificateDtoWithTags givenExistingCertificate2() {
+    return CertificateDtoWithTags.builder()
         .id(2L)
         .name("second certificate")
         .description("second description")
-        .price(2.33)
-        .duration(10)
+        //        .price(2.33)
+        //        .duration(10)
         .createDate(LocalDateTime.of(2020, 12, 25, 15, 0, 0))
         .lastUpdateDate(LocalDateTime.of(2021, 1, 5, 14, 0, 0))
         .build();
   }
 
-  private static Certificate givenNewCertificateForUpdatePutId1() {
-    return Certificate.builder()
+  private static CertificateDtoWithoutTags givenExistingCertificate1WT() {
+    return CertificateDtoWithoutTags.builder()
+        .id(1L)
+        .name("first certificate")
+        .description("first description")
+        .price(1.33)
+        .duration(5)
+        .createDate(LocalDateTime.of(2020, 12, 25, 15, 30, 10))
+        .lastUpdateDate(LocalDateTime.of(2020, 12, 30, 16, 30, 0))
+        .build();
+  }
+
+  private static CertificateDtoWithoutTags givenExistingCertificate2WT() {
+    return CertificateDtoWithoutTags.builder()
+        .id(2L)
+        .name("second certificate")
+        .description("second description")
+        //        .price(2.33)
+        //        .duration(10)
+        .createDate(LocalDateTime.of(2020, 12, 25, 15, 0, 0))
+        .lastUpdateDate(LocalDateTime.of(2021, 1, 5, 14, 0, 0))
+        .build();
+  }
+
+  private static CertificateDtoWithTags givenNewCertificateForUpdatePutId1() {
+    return CertificateDtoWithTags.builder()
         .id(1L)
         .name("new name")
         .description("first description")
@@ -326,15 +341,15 @@ class CertificateControllerTest {
         .build();
   }
 
-  private static Certificate givenNewCertificateForUpdateId1() {
-    return Certificate.builder().id(1L).name("new name").build();
+  private static CertificateDtoWithTags givenNewCertificateForUpdateId1() {
+    return CertificateDtoWithTags.builder().id(1L).name("new name").build();
   }
 
-  private static Tag givenExistingTag1() {
-    return Tag.builder().id(1L).name("first tag").build();
+  private static TagDto givenExistingTag1() {
+    return TagDto.builder().id(1L).name("first tag").build();
   }
 
-  private static Tag givenExistingTag2() {
-    return Tag.builder().id(2L).name("second tag").build();
+  private static TagDto givenExistingTag2() {
+    return TagDto.builder().id(2L).name("second tag").build();
   }
 }

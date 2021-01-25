@@ -15,6 +15,11 @@ public class Tag {
 
   public Tag() {}
 
+  public Tag(TagDto dto) {
+    this.id = dto.getId();
+    this.name = dto.getName();
+  }
+
   private Tag(Builder builder) {
     id = builder.id;
     name = builder.name;

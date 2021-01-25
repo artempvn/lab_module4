@@ -4,9 +4,9 @@ import com.epam.esm.advice.ResourceAdvice;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.HibernateSessionFactoryUtil;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.CertificateDtoWithTags;
 import com.epam.esm.entity.TagAction;
+import com.epam.esm.entity.TagDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
 import org.junit.jupiter.api.AfterEach;
@@ -17,12 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase
 @SpringBootTest
 class TagControllerTest {
-  public static final int FIRST_ID = 1;
   MockMvc mockMvc;
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
@@ -61,34 +58,34 @@ class TagControllerTest {
 
   @Test
   void readTagPositiveStatusCheck() throws Exception {
-    Tag tag1 = givenExistingTag1();
-    tagDao.create(tag1);
+    TagDto tag1 = givenExistingTag1();
+    long tagId = tagDao.create(tag1).getId();
 
-    mockMvc.perform(get("/tags/{id}", tag1.getId())).andExpect(status().isOk());
+    mockMvc.perform(get("/tags/{id}", tagId)).andExpect(status().isOk());
   }
 
   @Test
   void readTagPositiveValueCheck() throws Exception {
-    Tag tag1 = givenExistingTag1();
-    tagDao.create(tag1);
+    TagDto tag1 = givenExistingTag1();
+    long id = tagDao.create(tag1).getId();
 
     mockMvc
-        .perform(get("/tags/{id}", tag1.getId()))
-        .andExpect(jsonPath("$.id").value(tag1.getId()))
+        .perform(get("/tags/{id}", id))
+        .andExpect(jsonPath("$.id").value(id))
         .andExpect(jsonPath("$.name").value(tag1.getName()));
   }
 
   @Test
   void readTagNegativeStatusCheck() throws Exception {
-    Tag tag1 = givenExistingTag1();
+    TagDto tag1 = givenExistingTag1();
 
     mockMvc.perform(get("/tags/{id}", tag1.getId())).andExpect(status().isNotFound());
   }
 
   @Test
   void readTagsStatusCheck() throws Exception {
-    Tag tag1 = givenExistingTag1();
-    Tag tag2 = givenExistingTag2();
+    TagDto tag1 = givenExistingTag1();
+    TagDto tag2 = givenExistingTag2();
     tagDao.create(tag1);
     tagDao.create(tag2);
 
@@ -97,10 +94,12 @@ class TagControllerTest {
 
   @Test
   void readTagsValueCheck() throws Exception {
-    Tag tag1 = givenExistingTag1();
-    Tag tag2 = givenExistingTag2();
-    tagDao.create(tag1);
-    tagDao.create(tag2);
+    TagDto tag1 = givenExistingTag1();
+    TagDto tag2 = givenExistingTag2();
+    long tagId1 = tagDao.create(tag1).getId();
+    long tagId2 = tagDao.create(tag2).getId();
+    tag1.setId(tagId1);
+    tag2.setId(tagId2);
 
     mockMvc
         .perform(get("/tags"))
@@ -109,7 +108,7 @@ class TagControllerTest {
 
   @Test
   void createTagStatusCheck() throws Exception {
-    Tag tag1 = givenExistingTag1();
+    TagDto tag1 = givenExistingTag1();
     tag1.setId(null);
 
     mockMvc
@@ -122,7 +121,7 @@ class TagControllerTest {
 
   @Test
   void createTagValueCheck() throws Exception {
-    Tag tag1 = givenExistingTag1();
+    TagDto tag1 = givenExistingTag1();
     tag1.setId(null);
 
     mockMvc
@@ -136,13 +135,12 @@ class TagControllerTest {
 
   @Test
   void processTagAction() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
-    certificateDao.create(certificate1);
-    Tag tag1 = givenExistingTag1();
-    tagDao.create(tag1);
-    certificateDao.addTag(tag1.getId(), certificate1.getId());
-    TagAction tagAction =
-        new TagAction(TagAction.ActionType.REMOVE, certificate1.getId(), tag1.getId());
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    long certificateId = certificateDao.create(certificate1).getId();
+    TagDto tag1 = givenExistingTag1();
+    long tagId = tagDao.create(tag1).getId();
+    certificateDao.addTag(tagId, certificateId);
+    TagAction tagAction = new TagAction(TagAction.ActionType.REMOVE, certificateId, tagId);
 
     mockMvc
         .perform(
@@ -154,11 +152,10 @@ class TagControllerTest {
 
   @Test
   void processTagActionNegative() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
-    certificateDao.create(certificate1);
-    Tag tag1 = givenExistingTag1();
-    TagAction tagAction =
-        new TagAction(TagAction.ActionType.ADD, certificate1.getId(), tag1.getId());
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    long id = certificateDao.create(certificate1).getId();
+    TagDto tag1 = givenExistingTag1();
+    TagAction tagAction = new TagAction(TagAction.ActionType.ADD, id, tag1.getId());
 
     mockMvc
         .perform(
@@ -170,15 +167,15 @@ class TagControllerTest {
 
   @Test
   void deleteTagStatusCheck() throws Exception {
-    Tag tag1 = givenExistingTag1();
-    tagDao.create(tag1);
+    TagDto tag1 = givenExistingTag1();
+    long tagId = tagDao.create(tag1).getId();
 
-    mockMvc.perform(delete("/tags/{id}", tag1.getId())).andExpect(status().isNoContent());
+    mockMvc.perform(delete("/tags/{id}", tagId)).andExpect(status().isNoContent());
   }
 
   @Test
   void deleteTagStatusCheckAfterRequest() throws Exception {
-    Tag tag1 = givenExistingTag1();
+    TagDto tag1 = givenExistingTag1();
     tagDao.create(tag1);
 
     mockMvc.perform(delete("/tags/{id}", tag1.getId()));
@@ -188,21 +185,21 @@ class TagControllerTest {
 
   @Test
   void deleteTagNegative() throws Exception {
-    Tag tag1 = givenExistingTag1();
+    TagDto tag1 = givenExistingTag1();
 
     mockMvc.perform(delete("/tags/{id}", tag1.getId())).andExpect(status().isBadRequest());
   }
 
-  private static Tag givenExistingTag1() {
-    return Tag.builder().id(1L).name("first tag").build();
+  private static TagDto givenExistingTag1() {
+    return TagDto.builder().id(1L).name("first tag").build();
   }
 
-  private static Tag givenExistingTag2() {
-    return Tag.builder().id(2L).name("second tag").build();
+  private static TagDto givenExistingTag2() {
+    return TagDto.builder().id(2L).name("second tag").build();
   }
 
-  private static Certificate givenExistingCertificate1() {
-    return Certificate.builder()
+  private static CertificateDtoWithTags givenExistingCertificate1() {
+    return CertificateDtoWithTags.builder()
         .id(1L)
         .name("first certificate")
         .description("first description")

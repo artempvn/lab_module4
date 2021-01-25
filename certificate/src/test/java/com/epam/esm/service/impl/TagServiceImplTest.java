@@ -5,6 +5,7 @@ import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.TagAction;
+import com.epam.esm.entity.TagDto;
 import com.epam.esm.exception.ResourceIsBoundException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
@@ -14,7 +15,6 @@ import com.epam.esm.service.TagService;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -31,14 +31,13 @@ class TagServiceImplTest {
   TagDao tagDao = mock(TagDao.class);
   CertificateDao certificateDao = mock(CertificateDao.class);
   TagActionService addTagService = new AddTagActionServiceImpl(tagDao, certificateDao);
-  TagActionService removeTagService = new RemoveTagActionServiceImpl(tagDao, certificateDao);
-  TagService tagService =
-      new TagServiceImpl(tagDao, List.of(addTagService, removeTagService));
+  TagActionService removeTagService = new RemoveTagActionServiceImpl(certificateDao);
+  TagService tagService = new TagServiceImpl(tagDao, List.of(addTagService, removeTagService));
 
   @Test
   void createTagDaoReadInvocation() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
-    when(tagDao.read(tag.getName())).thenReturn(Optional.of(tag));
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
+    when(tagDao.read(tag.getName())).thenReturn(Optional.of(new Tag(tag)));
 
     tagService.create(tag);
 
@@ -47,8 +46,8 @@ class TagServiceImplTest {
 
   @Test
   void createIfExistedTagDaoCreateInvocation() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
-    when(tagDao.read(tag.getName())).thenReturn(Optional.of(tag));
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
+    when(tagDao.read(tag.getName())).thenReturn(Optional.of(new Tag(tag)));
 
     tagService.create(tag);
 
@@ -60,7 +59,7 @@ class TagServiceImplTest {
     Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
     when(tagDao.read(tag.getName())).thenReturn(Optional.of(tag));
 
-    tagService.create(tag);
+    tagService.create(new TagDto(tag));
 
     verify(tagDao).read(tag.getName());
   }
@@ -70,10 +69,11 @@ class TagServiceImplTest {
     Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
     when(tagDao.readAll()).thenReturn(Collections.emptyList());
     when(tagDao.read(tag.getName())).thenReturn(Optional.empty());
+    when(tagDao.create(new TagDto(tag))).thenReturn(new Tag());
 
-    tagService.create(tag);
+    tagService.create(new TagDto(tag));
 
-    verify(tagDao).create(tag);
+    verify(tagDao).create(new TagDto(tag));
   }
 
   @Test

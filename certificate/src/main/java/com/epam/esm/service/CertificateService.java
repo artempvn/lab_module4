@@ -1,6 +1,7 @@
 package com.epam.esm.service;
 
-import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.CertificateDtoWithTags;
+import com.epam.esm.entity.CertificateDtoWithoutTags;
 import com.epam.esm.entity.CertificatesRequest;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface CertificateService {
    * @param certificate the certificate
    * @return the certificate
    */
-  Certificate create(Certificate certificate);
+  CertificateDtoWithTags create(CertificateDtoWithTags certificate);
 
   /**
    * Read certificate.
@@ -22,10 +23,9 @@ public interface CertificateService {
    * @param id the id
    * @return the certificate
    */
-  Certificate read(long id);
+  CertificateDtoWithTags read(long id);
 
-
-  List<Certificate> readAll();
+  List<CertificateDtoWithoutTags> readAll(CertificatesRequest request);
 
   /**
    * Update put certificate.
@@ -33,7 +33,7 @@ public interface CertificateService {
    * @param certificate the certificate
    * @return the certificate
    */
-  Certificate updatePut(Certificate certificate);
+  CertificateDtoWithTags updatePut(CertificateDtoWithTags certificate);
 
   /**
    * Update patch certificate.
@@ -41,7 +41,7 @@ public interface CertificateService {
    * @param certificate the certificate
    * @return the certificate
    */
-  Certificate updatePatch(Certificate certificate);
+  CertificateDtoWithoutTags updatePatch(CertificateDtoWithoutTags certificate);
 
   /**
    * Delete.

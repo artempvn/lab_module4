@@ -1,7 +1,7 @@
 package com.epam.esm.service;
 
-import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.TagAction;
+import com.epam.esm.entity.TagDto;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public interface TagService {
    * @param tag the tag
    * @return the tag
    */
-  Tag create(Tag tag);
+  TagDto create(TagDto tag);
 
   /**
    * Read tag.
@@ -22,14 +22,14 @@ public interface TagService {
    * @param id the id
    * @return the tag
    */
-  Tag read(long id);
+  TagDto read(long id);
 
   /**
    * Read all list.
    *
    * @return the list
    */
-  List<Tag> readAll();
+  List<TagDto> readAll();
 
   /**
    * Delete.

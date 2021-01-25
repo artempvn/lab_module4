@@ -1,6 +1,7 @@
 package com.epam.esm.advice;
 
 import com.epam.esm.entity.ErrorResponse;
+import com.epam.esm.exception.ResourceIsBoundException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.exception.ResourcesValidationException;
@@ -73,6 +74,13 @@ public class ResourceAdvice {
 
   @ExceptionHandler(BindException.class)
   public ResponseEntity<ErrorResponse> handleException(BindException e) {
+    String errorCode = String.format("%s", HttpStatus.BAD_REQUEST.value());
+    ErrorResponse response = new ErrorResponse(e.getMessage(), errorCode);
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(ResourceIsBoundException.class)
+  public ResponseEntity<ErrorResponse> handleException(ResourceIsBoundException e) {
     String errorCode = String.format("%s", HttpStatus.BAD_REQUEST.value());
     ErrorResponse response = new ErrorResponse(e.getMessage(), errorCode);
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

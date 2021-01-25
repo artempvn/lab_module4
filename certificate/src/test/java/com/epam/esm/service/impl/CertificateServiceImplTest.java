@@ -3,7 +3,8 @@ package com.epam.esm.service.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.CertificateDtoWithTags;
+import com.epam.esm.entity.CertificateDtoWithoutTags;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,6 @@ import static org.mockito.Mockito.*;
 class CertificateServiceImplTest {
 
   public static final long ID = 1L;
-  public static final int NO_UPDATED_ROWS = 0;
-  public static final int ONE_UPDATED_ROW = 1;
 
   TagDao tagDao = mock(TagDao.class);
   CertificateDao certificateDao = mock(CertificateDao.class);
@@ -29,11 +28,12 @@ class CertificateServiceImplTest {
   @Test
   void createCertificateDaoCreateInvocation() {
     Certificate certificate = givenCertificate1();
+    CertificateDtoWithTags dto = new CertificateDtoWithTags(certificate);
     when(certificateDao.create(any())).thenReturn(certificate);
 
-    certificateService.create(certificate);
+    certificateService.create(dto);
 
-    verify(certificateDao).create(certificate);
+    verify(certificateDao).create(dto);
   }
 
   @Test
@@ -56,35 +56,25 @@ class CertificateServiceImplTest {
   @Test
   void readAllCertificateDaoReadAllInvocation() {
     Certificate certificate = givenCertificate1();
-    when(certificateDao.readAll()).thenReturn(List.of(certificate));
+    when(certificateDao.readAll(any())).thenReturn(List.of(certificate));
 
-    certificateService.readAll();
+    certificateService.readAll(any());
 
-    verify(certificateDao).readAll();
+    verify(certificateDao).readAll(any());
   }
 
-  //  @Test
-  //  void updateCertificateDaoUpdatePatchInvocation() {
-  //    CertificatePatch certificate = new CertificatePatch();
-  //    when(certificateDao.updatePatch(any())).thenReturn(ONE_UPDATED_ROW);
-  //
-  //    certificateService.updatePatch(certificate);
-  //
-  //    verify(certificateDao).updatePatch(any());
-  //  }
-  //
-  //  @Test
-  //  void updateCertificateDaoUpdatePatchException() {
-  //    CertificatePatch certificate = new CertificatePatch();
-  //    when(certificateDao.updatePatch(any())).thenReturn(NO_UPDATED_ROWS);
-  //
-  //    assertThrows(
-  //        ResourceValidationException.class, () -> certificateService.updatePatch(certificate));
-  //  }
+  @Test
+  void updateCertificateDaoUpdatePatchInvocation() {
+    CertificateDtoWithoutTags certificate = new CertificateDtoWithoutTags();
+
+    certificateService.updatePatch(certificate);
+
+    verify(certificateDao).updatePatch(any());
+  }
 
   @Test
   void updatePut() {
-    Certificate certificate = givenCertificate1();
+    CertificateDtoWithTags certificate = new CertificateDtoWithTags(givenCertificate1());
 
     certificateService.updatePut(certificate);
 
@@ -93,7 +83,7 @@ class CertificateServiceImplTest {
 
   @Test
   void updatePutNotExistedCertificateDaoDeleteCertificateTagsByCertificateIdInvocation() {
-    Certificate certificate = givenCertificate1();
+    CertificateDtoWithTags certificate = new CertificateDtoWithTags(givenCertificate1());
     doThrow(ObjectOptimisticLockingFailureException.class).when(certificateDao).update(any());
 
     assertThrows(
@@ -118,17 +108,5 @@ class CertificateServiceImplTest {
         .createDate(LocalDateTime.of(2020, 12, 25, 15, 0, 0))
         .lastUpdateDate(LocalDateTime.of(2020, 12, 30, 16, 30, 0))
         .build();
-  }
-
-  private static Certificate givenCertificate2() {
-    return Certificate.builder().id(ID).duration(20).tags(List.of(new Tag())).build();
-  }
-
-  private static Certificate givenCertificate3() {
-    return Certificate.builder().id(ID).duration(20).build();
-  }
-
-  private static Tag givenTag() {
-    return Tag.builder().id(ID).build();
   }
 }

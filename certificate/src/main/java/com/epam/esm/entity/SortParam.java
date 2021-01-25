@@ -6,30 +6,30 @@ public class SortParam {
     DESC;
   }
 
-  private SortingType byDate;
-  private SortingType byName;
+  private SortingType date;
+  private SortingType name;
 
-  public SortingType getByDate() {
-    return byDate;
+  public SortingType getDate() {
+    return date;
   }
 
-  public void setByDate(SortingType byDate) {
-    this.byDate = byDate;
+  public void setDate(SortingType date) {
+    this.date = date;
   }
 
-  public SortingType getByName() {
-    return byName;
+  public SortingType getName() {
+    return name;
   }
 
-  public void setByName(SortingType byName) {
-    this.byName = byName;
+  public void setName(SortingType name) {
+    this.name = name;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("SortParam{");
-    sb.append("date=").append(byDate);
-    sb.append(", name=").append(byName);
+    sb.append("date=").append(date);
+    sb.append(", name=").append(name);
     sb.append('}');
     return sb.toString();
   }

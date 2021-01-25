@@ -1,11 +1,10 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.TagAction;
+import com.epam.esm.entity.TagDto;
 import com.epam.esm.service.TagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,8 +33,8 @@ public class TagController {
    * @return the response entity
    */
   @GetMapping("/{id}")
-  public ResponseEntity<Tag> readTag(@PathVariable long id) {
-    Tag tag = tagService.read(id);
+  public ResponseEntity<TagDto> readTag(@PathVariable long id) {
+    TagDto tag = tagService.read(id);
     return ResponseEntity.status(HttpStatus.OK).body(tag);
   }
 
@@ -46,7 +45,7 @@ public class TagController {
    */
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  public List<Tag> readTags() {
+  public List<TagDto> readTags() {
     return tagService.readAll();
   }
 
@@ -58,7 +57,7 @@ public class TagController {
    */
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public Tag createTag(@RequestBody @Valid Tag tag) {
+  public TagDto createTag(@RequestBody @Valid TagDto tag) {
     return tagService.create(tag);
   }
 

@@ -1,6 +1,8 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.CertificateDtoWithTags;
+import com.epam.esm.entity.CertificateDtoWithoutTags;
+import com.epam.esm.entity.CertificatesRequest;
 import com.epam.esm.service.CertificateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,14 +34,14 @@ public class CertificateController {
    * @return the response entity
    */
   @GetMapping("/{id}")
-  public ResponseEntity<Certificate> readCertificate(@PathVariable long id) {
-    Certificate certificate = certificateService.read(id);
+  public ResponseEntity<CertificateDtoWithTags> readCertificate(@PathVariable long id) {
+    CertificateDtoWithTags certificate = certificateService.read(id);
     return ResponseEntity.status(HttpStatus.OK).body(certificate);
   }
 
   @GetMapping
-  public List<Certificate> readCertificates() {
-    return certificateService.readAll();
+  public List<CertificateDtoWithoutTags> readCertificates(CertificatesRequest request) {
+    return certificateService.readAll(request);
   }
 
   /**
@@ -49,10 +51,9 @@ public class CertificateController {
    * @return the response entity
    */
   @PostMapping
-  public ResponseEntity<Certificate> createCertificate(
-      @Valid @RequestBody Certificate certificate) {
-
-    Certificate createdCertificate = certificateService.create(certificate);
+  public ResponseEntity<CertificateDtoWithTags> createCertificate(
+      @Valid @RequestBody CertificateDtoWithTags certificate) {
+    CertificateDtoWithTags createdCertificate = certificateService.create(certificate);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdCertificate);
   }
 
@@ -64,10 +65,10 @@ public class CertificateController {
    * @return the response entity
    */
   @PutMapping("/{id}")
-  public ResponseEntity<Certificate> updateCertificatePut(
-      @PathVariable long id, @Valid @RequestBody Certificate certificate) {
+  public ResponseEntity<CertificateDtoWithTags> updateCertificatePut(
+      @PathVariable long id, @Valid @RequestBody CertificateDtoWithTags certificate) {
     certificate.setId(id);
-    Certificate updatedCertificate = certificateService.updatePut(certificate);
+    CertificateDtoWithTags updatedCertificate = certificateService.updatePut(certificate);
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 
@@ -78,11 +79,11 @@ public class CertificateController {
    * @param certificate the certificate
    * @return the response entity
    */
-  @PatchMapping("/{id}") // TODO refactor
-  public ResponseEntity<Certificate> updateCertificatePatch(
-      @PathVariable long id, @Valid @RequestBody Certificate certificate) {
+  @PatchMapping("/{id}")
+  public ResponseEntity<CertificateDtoWithoutTags> updateCertificatePatch(
+      @PathVariable long id, @Valid @RequestBody CertificateDtoWithoutTags certificate) {
     certificate.setId(id);
-    Certificate updatedCertificate = certificateService.updatePatch(certificate);
+    CertificateDtoWithoutTags updatedCertificate = certificateService.updatePatch(certificate);
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 

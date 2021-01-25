@@ -1,85 +1,47 @@
 package com.epam.esm.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "gift_certificates")
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class Certificate {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CertificateDtoWithTags {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
 
-  @Column private String name;
+  private String name;
+  private String description;
+  private Double price;
+  private Integer duration;
 
-  @Column private String description;
-
-  @Column private Double price;
-
-  @Column private Integer duration;
-
-  @Column(name = "create_date")
   @JsonSerialize(using = ToStringSerializer.class)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime createDate;
 
-  @Column(name = "last_update_date")
   @JsonSerialize(using = ToStringSerializer.class)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime lastUpdateDate;
 
-  @ManyToMany(
-      fetch = FetchType.LAZY,
-      cascade = {
-        CascadeType.PERSIST,
-        CascadeType.MERGE,
-        CascadeType.REMOVE,
-        CascadeType.REFRESH,
-        CascadeType.DETACH
-      })
-  @JoinTable(
-      name = "certificates_tags",
-      joinColumns = {@JoinColumn(name = "certificate_id")},
-      inverseJoinColumns = {@JoinColumn(name = "tag_id")})
-  private List<Tag> tags;
+  private List<TagDto> tags;
 
-  public Certificate() {}
+  public CertificateDtoWithTags() {}
 
-  public Certificate(CertificateDtoWithTags dto) {
-    this.id = dto.getId();
-    this.name = dto.getName();
-    this.description = dto.getDescription();
-    this.price = dto.getPrice();
-    this.duration = dto.getDuration();
-    this.createDate = dto.getCreateDate();
-    this.lastUpdateDate = dto.getLastUpdateDate();
-    this.tags = dto.getTags().stream().map(Tag::new).collect(Collectors.toList());
+  public CertificateDtoWithTags(Certificate entity) {
+    this.id = entity.getId();
+    this.name = entity.getName();
+    this.description = entity.getDescription();
+    this.price = entity.getPrice();
+    this.duration = entity.getDuration();
+    this.createDate = entity.getCreateDate();
+    this.lastUpdateDate = entity.getLastUpdateDate();
+    this.tags = entity.getTags().stream().map(TagDto::new).collect(Collectors.toList());
   }
 
-  public Certificate(CertificateDtoWithoutTags dto) {
-    this.id = dto.getId();
-    this.name = dto.getName();
-    this.description = dto.getDescription();
-    this.price = dto.getPrice();
-    this.duration = dto.getDuration();
-    this.createDate = dto.getCreateDate();
-    this.lastUpdateDate = dto.getLastUpdateDate();
-  }
-
-  private Certificate(Builder builder) {
+  private CertificateDtoWithTags(Builder builder) {
     id = builder.id;
     name = builder.name;
     description = builder.description;
@@ -150,27 +112,12 @@ public class Certificate {
     this.lastUpdateDate = lastUpdateDate;
   }
 
-  public List<Tag> getTags() {
+  public List<TagDto> getTags() {
     return tags;
   }
 
-  public void setTags(List<Tag> tags) {
+  public void setTags(List<TagDto> tags) {
     this.tags = tags;
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("Certificate{");
-    sb.append("id=").append(id);
-    sb.append(", name='").append(name).append('\'');
-    sb.append(", description='").append(description).append('\'');
-    sb.append(", price=").append(price);
-    sb.append(", duration=").append(duration);
-    sb.append(", createDate=").append(createDate);
-    sb.append(", lastUpdateDate=").append(lastUpdateDate);
-    sb.append(", tags=").append(tags);
-    sb.append('}');
-    return sb.toString();
   }
 
   @Override
@@ -178,7 +125,7 @@ public class Certificate {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    Certificate that = (Certificate) o;
+    CertificateDtoWithTags that = (CertificateDtoWithTags) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) return false;
     if (name != null ? !name.equals(that.name) : that.name != null) return false;
@@ -189,8 +136,7 @@ public class Certificate {
     if (createDate != null ? !createDate.equals(that.createDate) : that.createDate != null)
       return false;
     if (lastUpdateDate != null
-        ? lastUpdateDate.toEpochSecond(ZoneOffset.UTC)
-            != that.lastUpdateDate.toEpochSecond(ZoneOffset.UTC)
+        ? !lastUpdateDate.equals(that.lastUpdateDate)
         : that.lastUpdateDate != null) return false;
     return tags != null ? tags.equals(that.tags) : that.tags == null;
   }
@@ -216,7 +162,7 @@ public class Certificate {
     private Integer duration;
     private LocalDateTime createDate;
     private LocalDateTime lastUpdateDate;
-    private List<Tag> tags = Collections.emptyList();
+    private List<TagDto> tags = Collections.emptyList();
 
     private Builder() {}
 
@@ -255,13 +201,13 @@ public class Certificate {
       return this;
     }
 
-    public Builder tags(List<Tag> tags) {
+    public Builder tags(List<TagDto> tags) {
       this.tags = tags;
       return this;
     }
 
-    public Certificate build() {
-      return new Certificate(this);
+    public CertificateDtoWithTags build() {
+      return new CertificateDtoWithTags(this);
     }
   }
 }

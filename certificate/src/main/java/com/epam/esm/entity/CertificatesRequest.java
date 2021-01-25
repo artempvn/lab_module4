@@ -2,33 +2,33 @@ package com.epam.esm.entity;
 
 public class CertificatesRequest {
 
-  private String tagName;
-  private String certificateName;
-  private String certificateDescription;
+  private String tag;
+  private String name;
+  private String description;
   private SortParam sort;
 
-  public String getTagName() {
-    return tagName;
+  public String getTag() {
+    return tag;
   }
 
-  public void setTagName(String tagName) {
-    this.tagName = tagName;
+  public void setTag(String tag) {
+    this.tag = tag;
   }
 
-  public String getCertificateName() {
-    return certificateName;
+  public String getName() {
+    return name;
   }
 
-  public void setCertificateName(String certificateName) {
-    this.certificateName = certificateName;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public String getCertificateDescription() {
-    return certificateDescription;
+  public String getDescription() {
+    return description;
   }
 
-  public void setCertificateDescription(String certificateDescription) {
-    this.certificateDescription = certificateDescription;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public SortParam getSort() {
@@ -41,10 +41,10 @@ public class CertificatesRequest {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("GetParameter{");
-    sb.append("tagName='").append(tagName).append('\'');
-    sb.append(", name='").append(certificateName).append('\'');
-    sb.append(", description='").append(certificateDescription).append('\'');
+    final StringBuilder sb = new StringBuilder("CertificatesRequest{");
+    sb.append("tag='").append(tag).append('\'');
+    sb.append(", name='").append(name).append('\'');
+    sb.append(", description='").append(description).append('\'');
     sb.append(", sort=").append(sort);
     sb.append('}');
     return sb.toString();
