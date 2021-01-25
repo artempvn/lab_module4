@@ -10,13 +10,13 @@ import java.util.Optional;
 @Repository
 public interface TagDao {
 
-  Tag create(TagDto tag);
+  TagDto create(TagDto tag);
 
-  Optional<Tag> read(long id);
+  Optional<TagDto> read(long id);
 
-  List<Tag> readAll();
+  List<TagDto> readAll();
 
   void delete(long id);
 
-  Optional<Tag> read(String name);
+  Optional<TagDto> read(String name);
 }

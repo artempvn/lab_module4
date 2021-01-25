@@ -18,15 +18,15 @@ public class ResourcesValidationException extends RuntimeException {
     return certificateId;
   }
 
-  public static Supplier<ResourcesValidationException> withIds(Long tagId, Long certificateId) {
-    String message =
-        String.format("There is no tag id = %s in certificate id = %s", tagId, certificateId);
-    return () -> new ResourcesValidationException(message, tagId, certificateId);
-  }
-
   public ResourcesValidationException(String message, Long tagId, Long certificateId) {
     super(message);
     this.tagId = tagId;
     this.certificateId = certificateId;
+  }
+
+  public static Supplier<ResourcesValidationException> withIds(Long tagId, Long certificateId) {
+    String message =
+        String.format("There is no tag id = %s in certificate id = %s", tagId, certificateId);
+    return () -> new ResourcesValidationException(message, tagId, certificateId);
   }
 }

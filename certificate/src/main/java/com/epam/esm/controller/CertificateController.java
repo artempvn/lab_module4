@@ -68,7 +68,7 @@ public class CertificateController {
   public ResponseEntity<CertificateDtoWithTags> updateCertificatePut(
       @PathVariable long id, @Valid @RequestBody CertificateDtoWithTags certificate) {
     certificate.setId(id);
-    CertificateDtoWithTags updatedCertificate = certificateService.updatePut(certificate);
+    CertificateDtoWithTags updatedCertificate = certificateService.update(certificate);
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 
@@ -83,7 +83,7 @@ public class CertificateController {
   public ResponseEntity<CertificateDtoWithoutTags> updateCertificatePatch(
       @PathVariable long id, @Valid @RequestBody CertificateDtoWithoutTags certificate) {
     certificate.setId(id);
-    CertificateDtoWithoutTags updatedCertificate = certificateService.updatePatch(certificate);
+    CertificateDtoWithoutTags updatedCertificate = certificateService.updatePresentedFields(certificate);
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 

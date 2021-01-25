@@ -10,11 +10,11 @@ import java.util.Optional;
 
 public interface CertificateDao {
 
-  Certificate create(CertificateDtoWithTags certificate);
+  CertificateDtoWithTags create(CertificateDtoWithTags certificate);
 
-  Optional<Certificate> read(long id);
+  Optional<CertificateDtoWithTags> read(long id);
 
-  List<Certificate> readAll(CertificatesRequest request);
+  List<CertificateDtoWithoutTags> readAll(CertificatesRequest request);
 
   void update(CertificateDtoWithTags certificate);
 
@@ -24,5 +24,5 @@ public interface CertificateDao {
 
   int removeTag(long tagId, long certificateId);
 
-  void updatePatch(CertificateDtoWithoutTags certificate);
+  void updatePresentedFields(CertificateDtoWithoutTags certificate);
 }

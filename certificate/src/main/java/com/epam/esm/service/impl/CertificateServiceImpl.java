@@ -2,21 +2,21 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.CertificateDtoWithTags;
 import com.epam.esm.entity.CertificateDtoWithoutTags;
 import com.epam.esm.entity.CertificatesRequest;
-import com.epam.esm.exception.ResourceException;
+import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.CertificateService;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional(propagation = Propagation.REQUIRED)
 public class CertificateServiceImpl implements CertificateService {
 
   private final CertificateDao certificateDao;
@@ -32,42 +32,35 @@ public class CertificateServiceImpl implements CertificateService {
     LocalDateTime timeNow = LocalDateTime.now();
     certificate.setCreateDate(timeNow);
     certificate.setLastUpdateDate(timeNow);
-    Certificate createdCertificate = certificateDao.create(certificate);
-    return new CertificateDtoWithTags(createdCertificate);
+    CertificateDtoWithTags createdCertificate = certificateDao.create(certificate);
+    return createdCertificate;
   }
 
   @Override
   public CertificateDtoWithTags read(long id) {
-    Optional<Certificate> certificate = certificateDao.read(id);
-    return new CertificateDtoWithTags(
-        certificate.orElseThrow(ResourceException.notFoundWithCertificateId(id)));
+    Optional<CertificateDtoWithTags> certificate = certificateDao.read(id);
+    return certificate.orElseThrow(ResourceNotFoundException.notFoundWithCertificateId(id));
   }
 
   @Override
   public List<CertificateDtoWithoutTags> readAll(CertificatesRequest request) {
-    return certificateDao.readAll(request).stream()
-        .map(CertificateDtoWithoutTags::new)
-        .collect(Collectors.toList());
+    return certificateDao.readAll(request);
   }
 
   @Override
-  public CertificateDtoWithoutTags updatePatch(CertificateDtoWithoutTags certificate) {
+  public CertificateDtoWithoutTags updatePresentedFields(CertificateDtoWithoutTags certificate) {
     LocalDateTime timeNow = LocalDateTime.now();
     certificate.setLastUpdateDate(timeNow);
-    certificateDao.updatePatch(certificate);
+    certificateDao.updatePresentedFields(certificate);
     return certificate;
   }
 
   @Override
-  public CertificateDtoWithTags updatePut(CertificateDtoWithTags certificate) {
+  public CertificateDtoWithTags update(CertificateDtoWithTags certificate) {
     LocalDateTime timeNow = LocalDateTime.now();
     certificate.setCreateDate(timeNow);
     certificate.setLastUpdateDate(timeNow);
-    try {
-      certificateDao.update(certificate);
-    } catch (ObjectOptimisticLockingFailureException ex) {
-      throw ResourceException.validationWithCertificateId(certificate.getId()).get();
-    }
+    certificateDao.update(certificate);
     return certificate;
   }
 

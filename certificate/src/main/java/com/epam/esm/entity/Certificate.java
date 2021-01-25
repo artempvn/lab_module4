@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -186,8 +185,9 @@ public class Certificate {
       return false;
     if (price != null ? !price.equals(that.price) : that.price != null) return false;
     if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
-    if (createDate != null ? !createDate.equals(that.createDate) : that.createDate != null)
-      return false;
+    if (createDate != null
+        ? createDate.toEpochSecond(ZoneOffset.UTC) != that.createDate.toEpochSecond(ZoneOffset.UTC)
+        : that.createDate != null) return false;
     if (lastUpdateDate != null
         ? lastUpdateDate.toEpochSecond(ZoneOffset.UTC)
             != that.lastUpdateDate.toEpochSecond(ZoneOffset.UTC)

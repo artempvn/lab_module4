@@ -2,13 +2,13 @@ package com.epam.esm.controller;
 
 import com.epam.esm.advice.ResourceAdvice;
 import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dao.HibernateSessionFactoryUtil;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.CertificateDtoWithTags;
 import com.epam.esm.entity.TagAction;
 import com.epam.esm.entity.TagDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,8 @@ class TagControllerTest {
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
   @Autowired TagController tagController;
-  @Autowired HibernateSessionFactoryUtil factoryUtil;
+  @Autowired
+  SessionFactory sessionFactory;
 
   @BeforeEach
   public void setup() {
@@ -48,7 +49,7 @@ class TagControllerTest {
 
   @AfterEach
   void setDown() {
-    Session session = factoryUtil.getSessionFactory().openSession();
+    Session session = sessionFactory.openSession();
     session.beginTransaction();
     String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
     session.createNativeQuery(sql).executeUpdate();
@@ -176,11 +177,11 @@ class TagControllerTest {
   @Test
   void deleteTagStatusCheckAfterRequest() throws Exception {
     TagDto tag1 = givenExistingTag1();
-    tagDao.create(tag1);
+    long id=tagDao.create(tag1).getId();
 
-    mockMvc.perform(delete("/tags/{id}", tag1.getId()));
+    mockMvc.perform(delete("/tags/{id}", id));
 
-    mockMvc.perform(get("/tags/{id}", tag1.getId())).andExpect(status().isNotFound());
+    mockMvc.perform(get("/tags/{id}", id)).andExpect(status().isNotFound());
   }
 
   @Test

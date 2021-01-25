@@ -1,21 +1,24 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dao.HibernateSessionFactoryUtil;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.CertificateDtoWithTags;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.TagDto;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.PersistenceException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,11 +33,11 @@ class TagDaoImplTest {
   public static final int NOT_EXISTED_TAG_ID = 9999999;
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
-  @Autowired HibernateSessionFactoryUtil factoryUtil;
+  @Autowired SessionFactory sessionFactory;
 
   @AfterEach
   void setDown() {
-    Session session = factoryUtil.getSessionFactory().openSession();
+    Session session = sessionFactory.openSession();
     session.beginTransaction();
     String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
     session.createNativeQuery(sql).executeUpdate();
@@ -46,7 +49,7 @@ class TagDaoImplTest {
   void create() {
     TagDto expectedTag = givenNewTagWithoutId();
 
-    Tag actualTag = tagDao.create(expectedTag);
+    TagDto actualTag = tagDao.create(expectedTag);
 
     assertNotNull(actualTag.getId());
   }
@@ -56,14 +59,14 @@ class TagDaoImplTest {
     TagDto expectedTag = givenExistingTag1();
     long id = tagDao.create(expectedTag).getId();
 
-    Optional<Tag> actualTag = tagDao.read(id);
+    Optional<TagDto> actualTag = tagDao.read(id);
 
     assertTrue(actualTag.isPresent());
   }
 
   @Test
   void readNotExistedById() {
-    Optional<Tag> actualTag = tagDao.read(NOT_EXISTED_TAG_ID);
+    Optional<TagDto> actualTag = tagDao.read(NOT_EXISTED_TAG_ID);
 
     assertTrue(actualTag.isEmpty());
   }
@@ -76,7 +79,7 @@ class TagDaoImplTest {
     tagDao.create(tag2);
     List<Tag> expectedList = List.of(new Tag(tag1), new Tag(tag2));
 
-    List<Tag> actualList = tagDao.readAll();
+    List<TagDto> actualList = tagDao.readAll();
 
     assertEquals(expectedList.size(), actualList.size());
   }
@@ -88,7 +91,7 @@ class TagDaoImplTest {
 
     tagDao.delete(id);
 
-    assertTrue(tagDao.read(tag.getId()).isEmpty());
+    assertTrue(tagDao.read(id).isEmpty());
   }
 
   @Test
@@ -106,7 +109,7 @@ class TagDaoImplTest {
     long certificateId = certificateDao.create(certificate).getId();
     certificateDao.addTag(tagId, certificateId);
 
-    assertThrows(DataIntegrityViolationException.class, () -> tagDao.delete(tagId));
+    assertThrows(JpaSystemException.class, () -> tagDao.delete(tagId));
   }
 
   @Test
@@ -114,7 +117,7 @@ class TagDaoImplTest {
     TagDto expectedTag = givenExistingTag1();
     tagDao.create(expectedTag);
 
-    Optional<Tag> actualTag = tagDao.read(expectedTag.getName());
+    Optional<TagDto> actualTag = tagDao.read(expectedTag.getName());
 
     assertTrue(actualTag.isPresent());
   }
@@ -123,7 +126,7 @@ class TagDaoImplTest {
   void readNotExistedByName() {
     TagDto expectedTag = givenExistingTag1();
 
-    Optional<Tag> actualTag = tagDao.read(expectedTag.getName());
+    Optional<TagDto> actualTag = tagDao.read(expectedTag.getName());
 
     assertTrue(actualTag.isEmpty());
   }

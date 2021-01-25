@@ -2,13 +2,13 @@ package com.epam.esm.controller;
 
 import com.epam.esm.advice.ResourceAdvice;
 import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dao.HibernateSessionFactoryUtil;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.CertificateDtoWithTags;
 import com.epam.esm.entity.CertificateDtoWithoutTags;
 import com.epam.esm.entity.TagDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,8 @@ class CertificateControllerTest {
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
   @Autowired CertificateController certificateController;
-  @Autowired HibernateSessionFactoryUtil factoryUtil;
+  @Autowired
+  SessionFactory sessionFactory;
 
   @BeforeEach
   public void setup() {
@@ -48,7 +49,7 @@ class CertificateControllerTest {
 
   @AfterEach
   void setDown() {
-    Session session = factoryUtil.getSessionFactory().openSession();
+    Session session = sessionFactory.openSession();
     session.beginTransaction();
     String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
     session.createNativeQuery(sql).executeUpdate();

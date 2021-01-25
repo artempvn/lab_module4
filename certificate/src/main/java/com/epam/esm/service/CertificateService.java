@@ -33,7 +33,7 @@ public interface CertificateService {
    * @param certificate the certificate
    * @return the certificate
    */
-  CertificateDtoWithTags updatePut(CertificateDtoWithTags certificate);
+  CertificateDtoWithTags update(CertificateDtoWithTags certificate);
 
   /**
    * Update patch certificate.
@@ -41,7 +41,7 @@ public interface CertificateService {
    * @param certificate the certificate
    * @return the certificate
    */
-  CertificateDtoWithoutTags updatePatch(CertificateDtoWithoutTags certificate);
+  CertificateDtoWithoutTags updatePresentedFields(CertificateDtoWithoutTags certificate);
 
   /**
    * Delete.

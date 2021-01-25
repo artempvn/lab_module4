@@ -4,6 +4,7 @@ import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.TagAction;
 import com.epam.esm.exception.ResourceException;
+import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.service.TagActionService;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +28,10 @@ public class AddTagActionServiceImpl implements TagActionService {
     long tagId = tagAction.getTagId();
     long certificateId = tagAction.getCertificateId();
     if (tagDao.read(tagId).isEmpty()) {
-      throw ResourceException.validationWithTagId(tagId).get();
+      throw ResourceValidationException.validationWithTagId(tagId).get();
     }
     if (certificateDao.read(certificateId).isEmpty()) {
-      throw ResourceException.validationWithCertificateId(certificateId).get();
+      throw ResourceValidationException.validationWithCertificateId(certificateId).get();
     }
     certificateDao.addTag(tagId, certificateId);
   }

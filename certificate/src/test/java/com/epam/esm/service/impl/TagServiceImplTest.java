@@ -2,19 +2,19 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Tag;
-import com.epam.esm.entity.TagAction;
-import com.epam.esm.entity.TagDto;
+import com.epam.esm.entity.*;
 import com.epam.esm.exception.ResourceIsBoundException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.exception.ResourcesValidationException;
 import com.epam.esm.service.TagActionService;
 import com.epam.esm.service.TagService;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaSystemException;
 
+import javax.persistence.PersistenceException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +37,7 @@ class TagServiceImplTest {
   @Test
   void createTagDaoReadInvocation() {
     TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
-    when(tagDao.read(tag.getName())).thenReturn(Optional.of(new Tag(tag)));
+    when(tagDao.read(tag.getName())).thenReturn(Optional.of(tag));
 
     tagService.create(tag);
 
@@ -47,7 +47,7 @@ class TagServiceImplTest {
   @Test
   void createIfExistedTagDaoCreateInvocation() {
     TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
-    when(tagDao.read(tag.getName())).thenReturn(Optional.of(new Tag(tag)));
+    when(tagDao.read(tag.getName())).thenReturn(Optional.of(tag));
 
     tagService.create(tag);
 
@@ -56,29 +56,29 @@ class TagServiceImplTest {
 
   @Test
   void createIfExistedTagDaoReadInvocation() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
     when(tagDao.read(tag.getName())).thenReturn(Optional.of(tag));
 
-    tagService.create(new TagDto(tag));
+    tagService.create(tag);
 
     verify(tagDao).read(tag.getName());
   }
 
   @Test
   void createIfNotExistedTagDaoCreateInvocation() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
     when(tagDao.readAll()).thenReturn(Collections.emptyList());
     when(tagDao.read(tag.getName())).thenReturn(Optional.empty());
-    when(tagDao.create(new TagDto(tag))).thenReturn(new Tag());
+    when(tagDao.create(tag)).thenReturn(new TagDto());
 
-    tagService.create(new TagDto(tag));
+    tagService.create(tag);
 
-    verify(tagDao).create(new TagDto(tag));
+    verify(tagDao).create(tag);
   }
 
   @Test
   void read() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
     when(tagDao.read(anyLong())).thenReturn(Optional.of(tag));
 
     tagService.read(TAG_ID);
@@ -100,7 +100,6 @@ class TagServiceImplTest {
 
   @Test
   void deleteTagDaoDeleteInvocation() {
-
     tagService.delete(TAG_ID);
 
     verify(tagDao).delete(TAG_ID);
@@ -108,15 +107,15 @@ class TagServiceImplTest {
 
   @Test
   void deleteTagDaoDeleteBoundException() {
-    doThrow(DataIntegrityViolationException.class).when(tagDao).delete(anyLong());
+    doThrow(JpaSystemException.class).when(tagDao).delete(anyLong());
 
     assertThrows(ResourceIsBoundException.class, () -> tagService.delete(TAG_ID));
   }
 
   @Test
   void processTagActionAddTagDaoReadInvocation() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
-    Certificate certificate = Certificate.builder().id(CERTIFICATE_ID).build();
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
+    CertificateDtoWithTags certificate = CertificateDtoWithTags.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction = new TagAction(TagAction.ActionType.ADD, certificate.getId(), tag.getId());
     when(tagDao.read(anyLong())).thenReturn(Optional.of(tag));
     when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));
@@ -128,8 +127,8 @@ class TagServiceImplTest {
 
   @Test
   void processTagActionAddCertificateDaoReadInvocation() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
-    Certificate certificate = Certificate.builder().id(CERTIFICATE_ID).build();
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
+    CertificateDtoWithTags certificate = CertificateDtoWithTags.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction = new TagAction(TagAction.ActionType.ADD, certificate.getId(), tag.getId());
     when(tagDao.read(anyLong())).thenReturn(Optional.of(tag));
     when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));
@@ -141,8 +140,8 @@ class TagServiceImplTest {
 
   @Test
   void processTagActionAddCertificateDaoAddTagInvocation() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
-    Certificate certificate = Certificate.builder().id(CERTIFICATE_ID).build();
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
+    CertificateDtoWithTags certificate = CertificateDtoWithTags.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction = new TagAction(TagAction.ActionType.ADD, certificate.getId(), tag.getId());
     when(tagDao.read(anyLong())).thenReturn(Optional.of(tag));
     when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));
@@ -154,8 +153,8 @@ class TagServiceImplTest {
 
   @Test
   void processTagActionAddTagDaoReadException() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
-    Certificate certificate = Certificate.builder().id(CERTIFICATE_ID).build();
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
+    CertificateDtoWithTags certificate = CertificateDtoWithTags.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction = new TagAction(TagAction.ActionType.ADD, certificate.getId(), tag.getId());
     when(tagDao.read(anyLong())).thenReturn(Optional.empty());
     when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));
@@ -165,7 +164,7 @@ class TagServiceImplTest {
 
   @Test
   void processTagActionAddCertificateDaoReadException() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
     Certificate certificate = Certificate.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction = new TagAction(TagAction.ActionType.ADD, certificate.getId(), tag.getId());
     when(tagDao.read(anyLong())).thenReturn(Optional.of(tag));
@@ -176,7 +175,7 @@ class TagServiceImplTest {
 
   @Test
   void processTagActionRemoveCertificateDaoRemoveTagInvocation() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
     Certificate certificate = Certificate.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction =
         new TagAction(TagAction.ActionType.REMOVE, certificate.getId(), tag.getId());
@@ -189,7 +188,7 @@ class TagServiceImplTest {
 
   @Test
   void processTagActionRemoveCertificateDaoRemoveTagException() {
-    Tag tag = Tag.builder().id(TAG_ID).name("first tag").build();
+    TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
     Certificate certificate = Certificate.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction =
         new TagAction(TagAction.ActionType.REMOVE, certificate.getId(), tag.getId());
