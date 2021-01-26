@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import javax.persistence.criteria.*;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -28,16 +30,22 @@ public class CriteriaHandler {
           //          CompareType.EQUALS,
           "name", CompareType.CONTAINS, "description", CompareType.CONTAINS);
 
+  private static final Map<
+          SortParam.SortingType, BiFunction<CriteriaBuilder, Path<Certificate>, Order>>
+      SORT_BUILDER =
+          Map.of(
+              SortParam.SortingType.ASC,
+              CriteriaBuilder::asc,
+              SortParam.SortingType.DESC,
+              CriteriaBuilder::desc);
+
   public CriteriaUpdate<Certificate> updateWithNotNullFields(
       CriteriaBuilder builder, Certificate certificate) {
     CriteriaUpdate<Certificate> criteria = builder.createCriteriaUpdate(Certificate.class);
     Root<Certificate> root = criteria.from(Certificate.class);
 
     List<Field> notNullFields = takeNotNullFields(certificate, CERTIFICATE_FIELD_NAMES);
-    notNullFields.forEach(
-        field ->
-            criteria.set(
-                root.get(field.getName()), takeValueFromField(field, certificate).orElseThrow()));
+    addCriteriaValuableFields(certificate, criteria, root, notNullFields);
 
     criteria.where(builder.equal(root.get("id"), certificate.getId()));
     return criteria;
@@ -50,50 +58,67 @@ public class CriteriaHandler {
 
     List<Field> notNullFilterFields = takeNotNullFields(request, FILTER_REQUEST_FIELDS.keySet());
     List<Predicate> predicates =
-        notNullFilterFields.stream()
-            .map(
-                field ->
-                    builder.like(
-                        root.get(field.getName()),
-                        String.format(
-                            "%%%s%%", takeValueFromField(field, request).orElseThrow().toString())))
-            .collect(Collectors.toList());
+        takeFilteringPredicates(builder, request, root, notNullFilterFields);
     Predicate[] arrayOfPredicates = new Predicate[notNullFilterFields.size()];
     predicates.toArray(arrayOfPredicates);
+    criteria.where(arrayOfPredicates);
 
-    List<Order> orders = Collections.emptyList();
     SortParam param = request.getSort();
     if (param != null) {
       List<Field> notNullSortingFields = takeNotNullFields(param, SORTING_FIELD_NAMES.keySet());
-
-      orders =
-          notNullSortingFields.stream()
-              .map(
-                  field -> {
-                    SortParam.SortingType sortingType =
-                        (SortParam.SortingType) takeValueFromField(field, param).orElseThrow();
-                    switch (sortingType) {
-                      case ASC:
-                        return builder.asc(root.get(SORTING_FIELD_NAMES.get(field.getName())));
-                      case DESC:
-                        return builder.desc(root.get(SORTING_FIELD_NAMES.get(field.getName())));
-                      default:
-                        throw new IllegalArgumentException(
-                            "There is no such sorting type provided");
-                    }
-                  })
-              .collect(Collectors.toList());
+      List<Order> orders = takeSortingOrders(builder, root, param, notNullSortingFields);
+      criteria.orderBy(orders);
     }
 
-    criteria.where(arrayOfPredicates).orderBy(orders);
     return criteria;
   }
 
-  List<Field> takeNotNullFields(Object obj, Collection requaredFields) {
+  List<Order> takeSortingOrders(
+      CriteriaBuilder builder,
+      Root<Certificate> root,
+      SortParam param,
+      List<Field> notNullSortingFields) {
+    return notNullSortingFields.stream()
+        .map(takeFieldOrderFunction(builder, root, param))
+        .collect(Collectors.toList());
+  }
+
+  Function<Field, Order> takeFieldOrderFunction(
+      CriteriaBuilder builder, Root<Certificate> root, SortParam param) {
+    return field -> {
+      SortParam.SortingType sortingType =
+          takeValueFromField(field, param, SortParam.SortingType.class).orElseThrow();
+      String fieldName = field.getName();
+      String sortingFieldName = SORTING_FIELD_NAMES.get(fieldName);
+      Path<Certificate> path = root.get(sortingFieldName);
+      return SORT_BUILDER.get(sortingType).apply(builder, path);
+    };
+  }
+
+  List<Predicate> takeFilteringPredicates(
+      CriteriaBuilder builder,
+      CertificatesRequest request,
+      Root<Certificate> root,
+      List<Field> notNullFilterFields) {
+    return notNullFilterFields.stream()
+        .map(takeFieldPredicateFunction(builder, request, root))
+        .collect(Collectors.toList());
+  }
+
+  Function<Field, Predicate> takeFieldPredicateFunction(
+      CriteriaBuilder builder, CertificatesRequest request, Root<Certificate> root) {
+    return field -> {
+      String fieldName = field.getName();
+      String value = takeValueFromField(field, request).orElseThrow().toString();
+      return builder.like(root.get(fieldName), String.format("%%%s%%", value));
+    };
+  }
+
+  List<Field> takeNotNullFields(Object obj, Collection requiredFields) {
     Class clazz = obj.getClass();
     Field[] fields = clazz.getDeclaredFields();
     return Arrays.stream(fields)
-        .filter(field -> requaredFields.contains(field.getName()))
+        .filter(field -> requiredFields.contains(field.getName()))
         .filter(field -> takeValueFromField(field, obj).isPresent())
         .collect(Collectors.toList());
   }
@@ -107,5 +132,21 @@ public class CriteriaHandler {
       throw new RuntimeException("impossible exception");
     }
     return Optional.ofNullable(fieldValue);
+  }
+
+  <T> Optional<T> takeValueFromField(Field field, Object inputObject, Class<T> clazz) {
+    return takeValueFromField(field, inputObject).map(value -> (T) value);
+  }
+
+  void addCriteriaValuableFields(
+      Certificate certificate,
+      CriteriaUpdate<Certificate> criteria,
+      Root<Certificate> root,
+      List<Field> notNullFields) {
+    for (Field field : notNullFields) {
+      String fieldName = field.getName();
+      Object value = takeValueFromField(field, certificate).orElseThrow();
+      criteria.set(root.get(fieldName), value);
+    }
   }
 }

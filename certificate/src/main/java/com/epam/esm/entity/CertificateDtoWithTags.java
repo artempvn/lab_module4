@@ -1,23 +1,36 @@
 package com.epam.esm.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CertificateDtoWithTags {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
 
+  @NotBlank
+  @Size(min = 1, max = 45)
   private String name;
+
+  @NotBlank
+  @Size(min = 1, max = 1000)
   private String description;
-  private Double price;
-  private Integer duration;
+
+  @NotNull @PositiveOrZero private Double price;
+
+  @NotNull @PositiveOrZero private Integer duration;
 
   @JsonSerialize(using = ToStringSerializer.class)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -135,12 +148,12 @@ public class CertificateDtoWithTags {
     if (price != null ? !price.equals(that.price) : that.price != null) return false;
     if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
     if (createDate != null
-            ? createDate.toEpochSecond(ZoneOffset.UTC) != that.createDate.toEpochSecond(ZoneOffset.UTC)
-            : that.createDate != null) return false;
+        ? createDate.toEpochSecond(ZoneOffset.UTC) != that.createDate.toEpochSecond(ZoneOffset.UTC)
+        : that.createDate != null) return false;
     if (lastUpdateDate != null
-            ? lastUpdateDate.toEpochSecond(ZoneOffset.UTC)
+        ? lastUpdateDate.toEpochSecond(ZoneOffset.UTC)
             != that.lastUpdateDate.toEpochSecond(ZoneOffset.UTC)
-            : that.lastUpdateDate != null) return false;
+        : that.lastUpdateDate != null) return false;
     return tags != null ? tags.equals(that.tags) : that.tags == null;
   }
 

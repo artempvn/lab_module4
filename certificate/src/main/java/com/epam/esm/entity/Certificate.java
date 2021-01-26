@@ -1,10 +1,5 @@
 package com.epam.esm.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -14,12 +9,10 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "gift_certificates")
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Certificate {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
 
   @Column private String name;
@@ -31,24 +24,14 @@ public class Certificate {
   @Column private Integer duration;
 
   @Column(name = "create_date")
-  @JsonSerialize(using = ToStringSerializer.class)
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime createDate;
 
   @Column(name = "last_update_date")
-  @JsonSerialize(using = ToStringSerializer.class)
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime lastUpdateDate;
 
   @ManyToMany(
       fetch = FetchType.LAZY,
-      cascade = {
-        CascadeType.PERSIST,
-        CascadeType.MERGE,
-        CascadeType.REMOVE,
-        CascadeType.REFRESH,
-        CascadeType.DETACH
-      })
+      cascade = {CascadeType.DETACH})
   @JoinTable(
       name = "certificates_tags",
       joinColumns = {@JoinColumn(name = "certificate_id")},

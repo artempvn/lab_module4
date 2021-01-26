@@ -16,12 +16,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -35,15 +35,16 @@ class TagControllerTest {
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
   @Autowired TagController tagController;
-  @Autowired
-  SessionFactory sessionFactory;
+  @Autowired SessionFactory sessionFactory;
+  @Autowired ReloadableResourceBundleMessageSource messageSource;
 
   @BeforeEach
   public void setup() {
     MockitoAnnotations.openMocks(this);
     mockMvc =
         MockMvcBuilders.standaloneSetup(tagController)
-            .setControllerAdvice(new ResourceAdvice())
+            .setControllerAdvice(new ResourceAdvice(messageSource))
+            .setValidator(null)
             .build();
   }
 
@@ -177,7 +178,7 @@ class TagControllerTest {
   @Test
   void deleteTagStatusCheckAfterRequest() throws Exception {
     TagDto tag1 = givenExistingTag1();
-    long id=tagDao.create(tag1).getId();
+    long id = tagDao.create(tag1).getId();
 
     mockMvc.perform(delete("/tags/{id}", id));
 
@@ -206,8 +207,6 @@ class TagControllerTest {
         .description("first description")
         .price(1.33)
         .duration(5)
-        .createDate(LocalDateTime.of(2020, 12, 25, 15, 30, 10))
-        .lastUpdateDate(LocalDateTime.of(2020, 12, 30, 16, 30, 0))
         .build();
   }
 }

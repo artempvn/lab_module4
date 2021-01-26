@@ -6,12 +6,10 @@ import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.CertificateDtoWithTags;
 import com.epam.esm.entity.CertificateDtoWithoutTags;
 import com.epam.esm.entity.CertificatesRequest;
-import com.epam.esm.exception.ResourceException;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
-import org.springframework.orm.jpa.JpaOptimisticLockingFailureException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,6 +24,10 @@ import java.util.stream.Collectors;
 @Repository
 @Transactional(propagation = Propagation.REQUIRED)
 public class CertificateDaoImpl implements CertificateDao {
+  public static final String SQL_ADD_TAG =
+      "INSERT INTO certificates_tags(tag_id,certificate_id) VALUES (:tag_id,:certificate_id)";
+  public static final String SQL_REMOVE_TAG =
+      "DELETE FROM certificates_tags WHERE tag_id=:tag_id AND certificate_id=:certificate_id ";
   private final SessionFactory sessionFactory;
   private final CriteriaHandler criteriaHandler;
 
@@ -40,6 +41,13 @@ public class CertificateDaoImpl implements CertificateDao {
     Certificate certificate = new Certificate(certificateDto);
     Session session = sessionFactory.getCurrentSession();
     session.save(certificate);
+
+    certificate.getTags().forEach(session::merge);
+
+    certificate.getTags().stream()
+        .filter(tag -> tag.certificatePresented(certificate.getId()))
+        .forEach(tag -> tag.withCertificate(certificate));
+
     return new CertificateDtoWithTags(certificate);
   }
 
@@ -100,11 +108,9 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public void addTag(long tagId, long certificateId) {
     Session session = sessionFactory.getCurrentSession();
-    String sql =
-        "INSERT INTO certificates_tags(tag_id,certificate_id) VALUES (:tag_id,:certificate_id)";
     Query q =
         session
-            .createNativeQuery(sql)
+            .createNativeQuery(SQL_ADD_TAG)
             .setParameter("tag_id", tagId)
             .setParameter("certificate_id", certificateId);
     q.executeUpdate();
@@ -113,11 +119,9 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public int removeTag(long tagId, long certificateId) {
     Session session = sessionFactory.getCurrentSession();
-    String sql =
-        "DELETE FROM certificates_tags WHERE tag_id=:tag_id AND certificate_id=:certificate_id ";
     Query q =
         session
-            .createNativeQuery(sql)
+            .createNativeQuery(SQL_REMOVE_TAG)
             .setParameter("tag_id", tagId)
             .setParameter("certificate_id", certificateId);
     int result = q.executeUpdate();

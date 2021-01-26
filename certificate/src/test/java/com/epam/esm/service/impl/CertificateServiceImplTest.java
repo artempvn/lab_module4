@@ -1,10 +1,10 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.CertificateDtoWithTags;
 import com.epam.esm.entity.CertificateDtoWithoutTags;
 import com.epam.esm.exception.ResourceNotFoundException;
+import com.epam.esm.service.TagService;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -18,9 +18,10 @@ class CertificateServiceImplTest {
 
   public static final long ID = 1L;
 
-  TagDao tagDao = mock(TagDao.class);
   CertificateDao certificateDao = mock(CertificateDao.class);
-  CertificateServiceImpl certificateService = new CertificateServiceImpl(certificateDao, tagDao);
+  TagService tagService = mock(TagService.class);
+  CertificateServiceImpl certificateService =
+      new CertificateServiceImpl(tagService, certificateDao);
 
   @Test
   void createCertificateDaoCreateInvocation() {
@@ -76,8 +77,6 @@ class CertificateServiceImplTest {
 
     verify(certificateDao).update(any());
   }
-
-
 
   @Test
   void deleteCertificateDaoDeleteInvocation() {

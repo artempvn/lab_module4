@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.entity.CertificateDtoPatch;
 import com.epam.esm.entity.CertificateDtoWithTags;
 import com.epam.esm.entity.CertificateDtoWithoutTags;
 import com.epam.esm.entity.CertificatesRequest;
@@ -39,6 +40,12 @@ public class CertificateController {
     return ResponseEntity.status(HttpStatus.OK).body(certificate);
   }
 
+  /**
+   * Read certificates list.
+   *
+   * @param request the request
+   * @return the list
+   */
   @GetMapping
   public List<CertificateDtoWithoutTags> readCertificates(CertificatesRequest request) {
     return certificateService.readAll(request);
@@ -81,9 +88,10 @@ public class CertificateController {
    */
   @PatchMapping("/{id}")
   public ResponseEntity<CertificateDtoWithoutTags> updateCertificatePatch(
-      @PathVariable long id, @Valid @RequestBody CertificateDtoWithoutTags certificate) {
+      @PathVariable long id, @Valid @RequestBody CertificateDtoPatch certificate) {
     certificate.setId(id);
-    CertificateDtoWithoutTags updatedCertificate = certificateService.updatePresentedFields(certificate);
+    CertificateDtoWithoutTags updatedCertificate =
+        certificateService.updatePresentedFields(new CertificateDtoWithoutTags(certificate));
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 

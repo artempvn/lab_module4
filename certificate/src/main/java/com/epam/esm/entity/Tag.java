@@ -1,6 +1,8 @@
 package com.epam.esm.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tag")
@@ -13,6 +15,9 @@ public class Tag {
   @Column(name = "name")
   private String name;
 
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")
+  private List<Certificate> certificates = new ArrayList<>();
+
   public Tag() {}
 
   public Tag(TagDto dto) {
@@ -23,6 +28,24 @@ public class Tag {
   private Tag(Builder builder) {
     id = builder.id;
     name = builder.name;
+  }
+
+  public void setCertificates(List<Certificate> certificates) {
+    this.certificates = certificates;
+  }
+
+  public void addCertificate(Certificate certificate) {
+    this.certificates.add(certificate);
+  }
+
+  public Tag withCertificate(Certificate certificate) {
+    this.certificates.add(certificate);
+    return this;
+  }
+
+  public boolean certificatePresented(Long certificteId) {
+    System.out.println(certificates);
+    return certificates.stream().map(Certificate::getId).anyMatch(certificteId::equals);
   }
 
   public static Builder builder() {

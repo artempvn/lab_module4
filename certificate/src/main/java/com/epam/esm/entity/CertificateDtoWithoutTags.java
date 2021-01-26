@@ -1,5 +1,6 @@
 package com.epam.esm.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -7,6 +8,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CertificateDtoWithoutTags {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
@@ -34,6 +36,14 @@ public class CertificateDtoWithoutTags {
     this.duration = entity.getDuration();
     this.createDate = entity.getCreateDate();
     this.lastUpdateDate = entity.getLastUpdateDate();
+  }
+
+  public CertificateDtoWithoutTags(CertificateDtoPatch patchData) {
+    this.id = patchData.getId();
+    this.name = patchData.getName();
+    this.description = patchData.getDescription();
+    this.price = patchData.getPrice();
+    this.duration = patchData.getDuration();
   }
 
   private CertificateDtoWithoutTags(Builder builder) {

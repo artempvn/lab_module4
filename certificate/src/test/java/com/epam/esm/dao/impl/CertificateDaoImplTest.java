@@ -28,8 +28,7 @@ class CertificateDaoImplTest {
 
   @Autowired CertificateDao certificateDao;
   @Autowired TagDao tagDao;
-  @Autowired
-  SessionFactory sessionFactory;
+  @Autowired SessionFactory sessionFactory;
 
   @AfterEach
   void setDown() {
@@ -62,7 +61,8 @@ class CertificateDaoImplTest {
 
   @Test
   void readNotExisted() {
-    Optional<CertificateDtoWithTags> actualCertificate = certificateDao.read(NOT_EXISTED_CERTIFICATE_ID);
+    Optional<CertificateDtoWithTags> actualCertificate =
+        certificateDao.read(NOT_EXISTED_CERTIFICATE_ID);
 
     assertTrue(actualCertificate.isEmpty());
   }
@@ -100,8 +100,7 @@ class CertificateDaoImplTest {
         CertificateDtoWithTags.builder().id(certificate1.getId()).name("new name").build();
 
     assertThrows(
-            ResourceValidationException.class,
-        () -> certificateDao.update(expectedCertificate));
+        ResourceValidationException.class, () -> certificateDao.update(expectedCertificate));
   }
 
   @Test
@@ -113,7 +112,7 @@ class CertificateDaoImplTest {
     updateCertificate.setName("new name");
     LocalDateTime timeNow = LocalDateTime.now();
     updateCertificate.setLastUpdateDate(timeNow);
-    CertificateDtoWithTags expectedCertificate =givenExistingCertificate1();
+    CertificateDtoWithTags expectedCertificate = givenExistingCertificate1();
     expectedCertificate.setId(id);
     expectedCertificate.setName(updateCertificate.getName());
     expectedCertificate.setLastUpdateDate(timeNow);
@@ -133,7 +132,8 @@ class CertificateDaoImplTest {
     updateCertificate.setName("new name");
 
     assertThrows(
-        ResourceValidationException.class, () -> certificateDao.updatePresentedFields(updateCertificate));
+        ResourceValidationException.class,
+        () -> certificateDao.updatePresentedFields(updateCertificate));
   }
 
   @Test

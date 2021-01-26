@@ -10,36 +10,42 @@ import java.util.List;
 public interface CertificateService {
 
   /**
-   * Create certificate.
+   * Create certificate dto with tags.
    *
    * @param certificate the certificate
-   * @return the certificate
+   * @return the certificate dto with tags
    */
   CertificateDtoWithTags create(CertificateDtoWithTags certificate);
 
   /**
-   * Read certificate.
+   * Read certificate dto with tags.
    *
    * @param id the id
-   * @return the certificate
+   * @return the certificate dto with tags
    */
   CertificateDtoWithTags read(long id);
 
+  /**
+   * Read all list.
+   *
+   * @param request the request
+   * @return the list
+   */
   List<CertificateDtoWithoutTags> readAll(CertificatesRequest request);
 
   /**
-   * Update put certificate.
+   * Update certificate dto with tags.
    *
    * @param certificate the certificate
-   * @return the certificate
+   * @return the certificate dto with tags
    */
   CertificateDtoWithTags update(CertificateDtoWithTags certificate);
 
   /**
-   * Update patch certificate.
+   * Update presented fields certificate dto without tags.
    *
    * @param certificate the certificate
-   * @return the certificate
+   * @return the certificate dto without tags
    */
   CertificateDtoWithoutTags updatePresentedFields(CertificateDtoWithoutTags certificate);
 

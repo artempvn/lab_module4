@@ -9,18 +9,18 @@ import java.util.List;
 public interface TagService {
 
   /**
-   * Create tag.
+   * Create tag dto.
    *
    * @param tag the tag
-   * @return the tag
+   * @return the tag dto
    */
   TagDto create(TagDto tag);
 
   /**
-   * Read tag.
+   * Read tag dto.
    *
    * @param id the id
-   * @return the tag
+   * @return the tag dto
    */
   TagDto read(long id);
 

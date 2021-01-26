@@ -3,6 +3,7 @@ package com.epam.esm.controller;
 import com.epam.esm.advice.ResourceAdvice;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.entity.CertificateDtoPatch;
 import com.epam.esm.entity.CertificateDtoWithTags;
 import com.epam.esm.entity.CertificateDtoWithoutTags;
 import com.epam.esm.entity.TagDto;
@@ -16,12 +17,13 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.LocaleResolver;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -35,15 +37,18 @@ class CertificateControllerTest {
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
   @Autowired CertificateController certificateController;
-  @Autowired
-  SessionFactory sessionFactory;
+  @Autowired SessionFactory sessionFactory;
+
+  @Autowired ReloadableResourceBundleMessageSource messageSource;
+  @Autowired LocaleResolver localeResolver;
 
   @BeforeEach
   public void setup() {
     MockitoAnnotations.openMocks(this);
     mockMvc =
         MockMvcBuilders.standaloneSetup(certificateController)
-            .setControllerAdvice(new ResourceAdvice())
+            .setControllerAdvice(new ResourceAdvice(messageSource))
+            .setLocaleResolver(localeResolver)
             .build();
   }
 
@@ -108,12 +113,16 @@ class CertificateControllerTest {
   void readCertificatesValueCheck() throws Exception {
     CertificateDtoWithTags certificate1 = givenExistingCertificate1();
     CertificateDtoWithTags certificate2 = givenExistingCertificate2();
-    long certificateId1 = certificateDao.create(certificate1).getId();
-    long certificateId2 = certificateDao.create(certificate2).getId();
+    var cert1 = certificateDao.create(certificate1);
+    var cert2 = certificateDao.create(certificate2);
     CertificateDtoWithoutTags c1 = givenExistingCertificate1WT();
     CertificateDtoWithoutTags c2 = givenExistingCertificate2WT();
-    c1.setId(certificateId1);
-    c2.setId(certificateId2);
+    c1.setId(cert1.getId());
+    c1.setCreateDate(cert1.getCreateDate());
+    c1.setLastUpdateDate(cert1.getLastUpdateDate());
+    c2.setId(cert2.getId());
+    c2.setCreateDate(cert2.getCreateDate());
+    c2.setLastUpdateDate(cert2.getLastUpdateDate());
 
     mockMvc
         .perform(get("/certificates"))
@@ -124,12 +133,16 @@ class CertificateControllerTest {
   void readAll() throws Exception {
     CertificateDtoWithTags certificate1 = givenExistingCertificate1();
     CertificateDtoWithTags certificate2 = givenExistingCertificate2();
-    long certificateId1 = certificateDao.create(certificate1).getId();
-    long certificateId2 = certificateDao.create(certificate2).getId();
+    var cert1 = certificateDao.create(certificate1);
+    var cert2 = certificateDao.create(certificate2);
     CertificateDtoWithoutTags c1 = givenExistingCertificate1WT();
     CertificateDtoWithoutTags c2 = givenExistingCertificate2WT();
-    c1.setId(certificateId1);
-    c2.setId(certificateId2);
+    c1.setId(cert1.getId());
+    c1.setCreateDate(cert1.getCreateDate());
+    c1.setLastUpdateDate(cert1.getLastUpdateDate());
+    c2.setId(cert2.getId());
+    c2.setCreateDate(cert2.getCreateDate());
+    c2.setLastUpdateDate(cert2.getLastUpdateDate());
 
     mockMvc
         .perform(get("/certificates?name=cert"))
@@ -243,7 +256,7 @@ class CertificateControllerTest {
   void updateCertificatePatchPositiveValueCheck() throws Exception {
     CertificateDtoWithTags certificate = givenExistingCertificate1();
     long id = certificateDao.create(certificate).getId();
-    CertificateDtoWithoutTags certificateUpdate = givenExistingCertificate2WT();
+    CertificateDtoPatch certificateUpdate = certificateForPatch();
     certificateUpdate.setId(id);
 
     mockMvc
@@ -253,9 +266,7 @@ class CertificateControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id").value(id))
         .andExpect(jsonPath("$.name").value(certificateUpdate.getName()))
-        .andExpect(jsonPath("$.description").value(certificateUpdate.getDescription()))
-        .andExpect(jsonPath("$.price").value(certificateUpdate.getPrice()))
-        .andExpect(jsonPath("$.duration").value(certificateUpdate.getDuration()));
+        .andExpect(jsonPath("$.price").value(certificateUpdate.getPrice()));
   }
 
   @Test
@@ -291,8 +302,6 @@ class CertificateControllerTest {
         .description("first description")
         .price(1.33)
         .duration(5)
-        .createDate(LocalDateTime.of(2020, 12, 25, 15, 30, 10))
-        .lastUpdateDate(LocalDateTime.of(2020, 12, 30, 16, 30, 0))
         .build();
   }
 
@@ -301,10 +310,8 @@ class CertificateControllerTest {
         .id(2L)
         .name("second certificate")
         .description("second description")
-        //        .price(2.33)
-        //        .duration(10)
-        .createDate(LocalDateTime.of(2020, 12, 25, 15, 0, 0))
-        .lastUpdateDate(LocalDateTime.of(2021, 1, 5, 14, 0, 0))
+        .price(2.33)
+        .duration(10)
         .build();
   }
 
@@ -315,8 +322,6 @@ class CertificateControllerTest {
         .description("first description")
         .price(1.33)
         .duration(5)
-        .createDate(LocalDateTime.of(2020, 12, 25, 15, 30, 10))
-        .lastUpdateDate(LocalDateTime.of(2020, 12, 30, 16, 30, 0))
         .build();
   }
 
@@ -325,11 +330,16 @@ class CertificateControllerTest {
         .id(2L)
         .name("second certificate")
         .description("second description")
-        //        .price(2.33)
-        //        .duration(10)
-        .createDate(LocalDateTime.of(2020, 12, 25, 15, 0, 0))
-        .lastUpdateDate(LocalDateTime.of(2021, 1, 5, 14, 0, 0))
+        .price(2.33)
+        .duration(10)
         .build();
+  }
+
+  private static CertificateDtoPatch certificateForPatch() {
+    CertificateDtoPatch certificateDtoPatch = new CertificateDtoPatch();
+    certificateDtoPatch.setName("new name");
+    certificateDtoPatch.setPrice(50.5);
+    return certificateDtoPatch;
   }
 
   private static CertificateDtoWithTags givenNewCertificateForUpdatePutId1() {
