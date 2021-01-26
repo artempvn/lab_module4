@@ -2,9 +2,9 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.entity.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.entity.TagDto;
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -74,7 +74,7 @@ class TagDaoImplTest {
     TagDto tag2 = givenExistingTag2();
     tagDao.create(tag1);
     tagDao.create(tag2);
-    List<Tag> expectedList = List.of(new Tag(tag1), new Tag(tag2));
+    List<TagDto> expectedList = List.of(tag1, tag2);
 
     List<TagDto> actualList = tagDao.readAll();
 

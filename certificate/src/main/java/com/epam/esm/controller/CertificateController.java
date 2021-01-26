@@ -1,8 +1,8 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.entity.CertificateDtoPatch;
-import com.epam.esm.entity.CertificateDtoWithTags;
-import com.epam.esm.entity.CertificateDtoWithoutTags;
+import com.epam.esm.dto.CertificateDtoPatch;
+import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateDtoWithoutTags;
 import com.epam.esm.entity.CertificatesRequest;
 import com.epam.esm.service.CertificateService;
 import org.springframework.http.HttpStatus;

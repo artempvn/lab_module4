@@ -2,7 +2,7 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.TagAction;
-import com.epam.esm.entity.TagDto;
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.ResourceIsBoundException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.TagActionService;

@@ -2,6 +2,9 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateDtoWithoutTags;
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.*;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;

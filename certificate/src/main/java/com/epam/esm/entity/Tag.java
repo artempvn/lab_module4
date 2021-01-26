@@ -1,5 +1,7 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.dto.TagDto;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

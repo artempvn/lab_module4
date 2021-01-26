@@ -1,5 +1,8 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateDtoWithoutTags;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;

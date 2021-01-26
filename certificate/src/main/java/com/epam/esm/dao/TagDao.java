@@ -1,6 +1,6 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.entity.TagDto;
+import com.epam.esm.dto.TagDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
