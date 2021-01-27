@@ -16,20 +16,20 @@ import java.util.Optional;
 @Transactional(propagation = Propagation.REQUIRED)
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userDao;
+  private final UserDao userDao;
 
-    public UserServiceImpl(UserDao userDao) {
-        this.userDao = userDao;
-    }
+  public UserServiceImpl(UserDao userDao) {
+    this.userDao = userDao;
+  }
 
-    @Override
-    public UserDtoWithOrders read(long id) {
-        Optional<UserDtoWithOrders> user= userDao.read(id);
-        return user.orElseThrow(ResourceNotFoundException.notFoundWithCertificateId(id));
-    }
+  @Override
+  public UserDtoWithOrders read(long id) {
+    Optional<UserDtoWithOrders> user = userDao.read(id);
+    return user.orElseThrow(ResourceNotFoundException.notFoundWithCertificateId(id));
+  }
 
-    @Override
-    public List<UserDtoWithoutOrders> readAll() {
-        return userDao.readAll();
-    }
+  @Override
+  public List<UserDtoWithoutOrders> readAll() {
+    return userDao.readAll();
+  }
 }

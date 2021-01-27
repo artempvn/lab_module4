@@ -88,6 +88,8 @@ class TagServiceImplTest {
 
   @Test
   void readException() {
+    when(tagDao.read(anyLong())).thenReturn(Optional.empty());
+
     assertThrows(ResourceNotFoundException.class, () -> tagService.read(TAG_ID));
   }
 

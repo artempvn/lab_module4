@@ -2,9 +2,9 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.CriteriaHandler;
-import com.epam.esm.entity.Certificate;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.CertificateDtoWithoutTags;
+import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.CertificatesRequest;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;

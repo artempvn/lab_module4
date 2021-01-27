@@ -1,10 +1,8 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDtoWithoutOrders;
-import com.epam.esm.entity.Tag;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
@@ -19,21 +17,23 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("user")
 @AutoConfigureTestDatabase
 @SpringBootTest
 class UserDaoImplTest {
+  public static final int NOT_EXISTING_USER_ID = 9999999;
   @Autowired UserDao userDao;
+
   @Autowired SessionFactory sessionFactory;
 
   @AfterEach
   void setDown() {
-    Session session = sessionFactory.openSession();
-    session.beginTransaction();
-    String sql = "DELETE FROM users";
-    session.createNativeQuery(sql).executeUpdate();
-    session.getTransaction().commit();
-    session.close();
+    try (Session session = sessionFactory.openSession()) {
+      session.beginTransaction();
+      String sql = "DELETE FROM users";
+      session.createNativeQuery(sql).executeUpdate();
+      session.getTransaction().commit();
+    }
   }
 
   @Test
@@ -57,9 +57,7 @@ class UserDaoImplTest {
 
   @Test
   void readNotExisted() {
-    UserDtoWithOrders user = givenUser1();
-
-    Optional<UserDtoWithOrders> actualUser = userDao.read(user.getId());
+    Optional<UserDtoWithOrders> actualUser = userDao.read(NOT_EXISTING_USER_ID);
 
     assertFalse(actualUser.isPresent());
   }
@@ -78,14 +76,14 @@ class UserDaoImplTest {
   }
 
   UserDtoWithOrders givenUser1() {
-    UserDtoWithOrders user=new UserDtoWithOrders();
+    UserDtoWithOrders user = new UserDtoWithOrders();
     user.setName("name1");
     user.setSurname("surname1");
     return user;
   }
 
   UserDtoWithOrders givenUser2() {
-    UserDtoWithOrders user=new UserDtoWithOrders();
+    UserDtoWithOrders user = new UserDtoWithOrders();
     user.setName("name2");
     user.setSurname("surname2");
     return user;

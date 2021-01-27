@@ -4,6 +4,7 @@ import com.epam.esm.entity.User;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
@@ -11,10 +12,11 @@ import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
 import java.util.Locale;
 
+@Profile("user")
 @Configuration
 public class UserConfig {
 
-    @Bean
+    @Bean(name = "userSessionFactory")
     public SessionFactory getSessionFactory() {
         org.hibernate.cfg.Configuration configuration =
                 new org.hibernate.cfg.Configuration().configure();

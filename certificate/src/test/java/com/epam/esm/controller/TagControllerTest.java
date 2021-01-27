@@ -4,8 +4,8 @@ import com.epam.esm.advice.ResourceAdvice;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.entity.TagAction;
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.entity.TagAction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -27,7 +27,7 @@ import java.util.List;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("certificate")
 @AutoConfigureTestDatabase
 @SpringBootTest
 class TagControllerTest {
@@ -44,18 +44,17 @@ class TagControllerTest {
     mockMvc =
         MockMvcBuilders.standaloneSetup(tagController)
             .setControllerAdvice(new ResourceAdvice(messageSource))
-            .setValidator(null)
             .build();
   }
 
   @AfterEach
   void setDown() {
-    Session session = sessionFactory.openSession();
-    session.beginTransaction();
-    String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
-    session.createNativeQuery(sql).executeUpdate();
-    session.getTransaction().commit();
-    session.close();
+    try (Session session = sessionFactory.openSession()) {
+      session.beginTransaction();
+      String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
+      session.createNativeQuery(sql).executeUpdate();
+      session.getTransaction().commit();
+    }
   }
 
   @Test

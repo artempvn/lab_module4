@@ -29,7 +29,7 @@ import java.util.List;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("certificate")
 @AutoConfigureTestDatabase
 @SpringBootTest
 class CertificateControllerTest {
@@ -48,18 +48,17 @@ class CertificateControllerTest {
     mockMvc =
         MockMvcBuilders.standaloneSetup(certificateController)
             .setControllerAdvice(new ResourceAdvice(messageSource))
-            .setLocaleResolver(localeResolver)
             .build();
   }
 
   @AfterEach
   void setDown() {
-    Session session = sessionFactory.openSession();
-    session.beginTransaction();
-    String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
-    session.createNativeQuery(sql).executeUpdate();
-    session.getTransaction().commit();
-    session.close();
+    try (Session session = sessionFactory.openSession()) {
+      session.beginTransaction();
+      String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
+      session.createNativeQuery(sql).executeUpdate();
+      session.getTransaction().commit();
+    }
   }
 
   @Test

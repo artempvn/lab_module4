@@ -3,7 +3,6 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
@@ -22,7 +21,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("certificate")
 @AutoConfigureTestDatabase
 @SpringBootTest
 class TagDaoImplTest {
@@ -34,12 +33,12 @@ class TagDaoImplTest {
 
   @AfterEach
   void setDown() {
-    Session session = sessionFactory.openSession();
-    session.beginTransaction();
-    String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
-    session.createNativeQuery(sql).executeUpdate();
-    session.getTransaction().commit();
-    session.close();
+    try (Session session = sessionFactory.openSession()) {
+      session.beginTransaction();
+      String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
+      session.createNativeQuery(sql).executeUpdate();
+      session.getTransaction().commit();
+    }
   }
 
   @Test
