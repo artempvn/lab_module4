@@ -4,8 +4,8 @@ import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.CriteriaHandler;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.CertificateDtoWithoutTags;
-import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.CertificatesRequest;
+import com.epam.esm.dao.entity.Certificate;
+import com.epam.esm.dto.CertificatesRequest;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -44,9 +44,7 @@ public class CertificateDaoImpl implements CertificateDao {
 
     certificate.getTags().forEach(session::merge);
 
-    certificate.getTags().stream()
-        .filter(tag -> tag.certificatePresented(certificate.getId()))
-        .forEach(tag -> tag.withCertificate(certificate));
+    certificate.getTags().forEach(tag -> tag.withCertificate(certificate));
 
     return new CertificateDtoWithTags(certificate);
   }

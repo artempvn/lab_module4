@@ -4,16 +4,6 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
-jar {
-    manifest {
-        attributes "Main-Class": "com.epam.esm.Main"
-    }
-
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
-
 group 'com.epam.esm'
 version '1.0'
 
@@ -40,11 +30,4 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-jar {
-    enabled = true
-}
-bootJar {
-    enabled = false
 }

@@ -30,7 +30,8 @@ class UserDaoImplTest {
   void setDown() {
     try (Session session = sessionFactory.openSession()) {
       session.beginTransaction();
-      String sql = "DELETE FROM users";
+      String sql = "DELETE FROM certificates_tags_backup;DELETE FROM tags_backup;DELETE FROM orders;" +
+              "DELETE FROM certificates_backup;DELETE FROM users;";
       session.createNativeQuery(sql).executeUpdate();
       session.getTransaction().commit();
     }
@@ -38,16 +39,16 @@ class UserDaoImplTest {
 
   @Test
   void create() {
-    UserDtoWithOrders user = givenUser1();
+    UserDtoWithoutOrders user = givenUser1WO();
 
-    UserDtoWithOrders actualUser = userDao.create(user);
+    UserDtoWithoutOrders actualUser = userDao.create(user);
 
     assertNotNull(actualUser.getId());
   }
 
   @Test
   void readExisted() {
-    UserDtoWithOrders user = givenUser1();
+    UserDtoWithoutOrders user = givenUser1WO();
     long id = userDao.create(user).getId();
 
     Optional<UserDtoWithOrders> actualUser = userDao.read(id);
@@ -64,11 +65,11 @@ class UserDaoImplTest {
 
   @Test
   void readAll() {
-    UserDtoWithOrders user1 = givenUser1();
-    UserDtoWithOrders user2 = givenUser2();
+    UserDtoWithoutOrders user1 = givenUser1WO();
+    UserDtoWithoutOrders user2 = givenUser2WO();
     userDao.create(user1);
     userDao.create(user2);
-    List<UserDtoWithOrders> expectedList = List.of(user1, user2);
+    List<UserDtoWithoutOrders> expectedList = List.of(user1, user2);
 
     List<UserDtoWithoutOrders> actualList = userDao.readAll();
 
@@ -86,6 +87,20 @@ class UserDaoImplTest {
     UserDtoWithOrders user = new UserDtoWithOrders();
     user.setName("name2");
     user.setSurname("surname2");
+    return user;
+  }
+
+  UserDtoWithoutOrders givenUser1WO(){
+    UserDtoWithoutOrders user=new UserDtoWithoutOrders();
+    user.setName("name");
+    user.setSurname("surname");
+    return user;
+  }
+
+  UserDtoWithoutOrders givenUser2WO(){
+    UserDtoWithoutOrders user=new UserDtoWithoutOrders();
+    user.setName("name1");
+    user.setSurname("surname1");
     return user;
   }
 }

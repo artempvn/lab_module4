@@ -1,8 +1,6 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.entity.User;
-
-import javax.persistence.Column;
+import com.epam.esm.dao.entity.User;
 
 public class UserDtoWithOrders {
 

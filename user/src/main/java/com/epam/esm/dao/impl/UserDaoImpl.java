@@ -3,7 +3,7 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDtoWithoutOrders;
-import com.epam.esm.entity.User;
+import com.epam.esm.dao.entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
@@ -27,11 +27,11 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public UserDtoWithOrders create(UserDtoWithOrders dto) {
+  public UserDtoWithoutOrders create(UserDtoWithoutOrders dto) {
     User user = new User(dto);
     Session session = sessionFactory.getCurrentSession();
     session.save(user);
-    return new UserDtoWithOrders(user);
+    return new UserDtoWithoutOrders(user);
   }
 
   @Override

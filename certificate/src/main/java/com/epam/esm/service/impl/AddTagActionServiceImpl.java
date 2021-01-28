@@ -2,7 +2,7 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.entity.TagAction;
+import com.epam.esm.dto.TagAction;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.service.TagActionService;
 import org.springframework.stereotype.Service;

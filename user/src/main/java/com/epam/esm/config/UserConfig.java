@@ -1,6 +1,9 @@
 package com.epam.esm.config;
 
-import com.epam.esm.entity.User;
+import com.epam.esm.dao.entity.Certificate;
+import com.epam.esm.dao.entity.Order;
+import com.epam.esm.dao.entity.Tag;
+import com.epam.esm.dao.entity.User;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +15,7 @@ import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
 import java.util.Locale;
 
-@Profile("user")
+//@Profile("user")
 @Configuration
 public class UserConfig {
 
@@ -21,6 +24,9 @@ public class UserConfig {
         org.hibernate.cfg.Configuration configuration =
                 new org.hibernate.cfg.Configuration().configure();
         configuration.addAnnotatedClass(User.class);
+        configuration.addAnnotatedClass(Tag.class);
+        configuration.addAnnotatedClass(Order.class);
+        configuration.addAnnotatedClass(Certificate.class);
         return configuration.buildSessionFactory();
     }
 

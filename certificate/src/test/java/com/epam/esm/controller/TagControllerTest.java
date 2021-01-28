@@ -1,11 +1,12 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.advice.ResourceAdvice;
+import com.epam.esm.web.advice.ResourceAdvice;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.entity.TagAction;
+import com.epam.esm.dto.TagAction;
+import com.epam.esm.web.rest.TagController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -34,7 +35,8 @@ class TagControllerTest {
   MockMvc mockMvc;
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
-  @Autowired TagController tagController;
+  @Autowired
+  TagController tagController;
   @Autowired SessionFactory sessionFactory;
   @Autowired ReloadableResourceBundleMessageSource messageSource;
 

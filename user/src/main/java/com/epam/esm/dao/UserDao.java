@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface UserDao {
 
-    UserDtoWithOrders create (UserDtoWithOrders user);
+    UserDtoWithoutOrders create (UserDtoWithoutOrders user);
 
     Optional<UserDtoWithOrders> read (long id);
 

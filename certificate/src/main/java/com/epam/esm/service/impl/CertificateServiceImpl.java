@@ -3,7 +3,7 @@ package com.epam.esm.service.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.CertificateDtoWithoutTags;
-import com.epam.esm.entity.CertificatesRequest;
+import com.epam.esm.dto.CertificatesRequest;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.service.TagService;

@@ -1,6 +1,6 @@
 package com.epam.esm.service;
 
-import com.epam.esm.entity.TagAction;
+import com.epam.esm.dto.TagAction;
 
 /** The interface Tag action service. */
 public interface TagActionService {

@@ -2,7 +2,7 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.CertificateDtoWithoutTags;
-import com.epam.esm.entity.CertificatesRequest;
+import com.epam.esm.dto.CertificatesRequest;
 
 import java.util.List;
 
