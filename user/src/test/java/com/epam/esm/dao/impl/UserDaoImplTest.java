@@ -30,8 +30,9 @@ class UserDaoImplTest {
   void setDown() {
     try (Session session = sessionFactory.openSession()) {
       session.beginTransaction();
-      String sql = "DELETE FROM certificates_tags_backup;DELETE FROM tags_backup;DELETE FROM orders;" +
-              "DELETE FROM certificates_backup;DELETE FROM users;";
+      String sql =
+              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM orders;"
+                      + "DELETE FROM ordered_certificates;DELETE FROM users;";
       session.createNativeQuery(sql).executeUpdate();
       session.getTransaction().commit();
     }
@@ -76,29 +77,15 @@ class UserDaoImplTest {
     assertEquals(expectedList.size(), actualList.size());
   }
 
-  UserDtoFull givenUser1() {
-    UserDtoFull user = new UserDtoFull();
-    user.setName("name1");
-    user.setSurname("surname1");
-    return user;
-  }
-
-  UserDtoFull givenUser2() {
-    UserDtoFull user = new UserDtoFull();
-    user.setName("name2");
-    user.setSurname("surname2");
-    return user;
-  }
-
-  UserDto givenUser1WO(){
-    UserDto user=new UserDto();
+  UserDto givenUser1WO() {
+    UserDto user = new UserDto();
     user.setName("name");
     user.setSurname("surname");
     return user;
   }
 
-  UserDto givenUser2WO(){
-    UserDto user=new UserDto();
+  UserDto givenUser2WO() {
+    UserDto user = new UserDto();
     user.setName("name1");
     user.setSurname("surname1");
     return user;

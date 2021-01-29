@@ -24,14 +24,14 @@ public class OrderController {
   public ResponseEntity<OrderDtoFull> readUserOrder(
       @PathVariable long userId, @PathVariable long orderId) {
     OrderDtoFull order = orderService.readOrderByUser(userId, orderId);
-    return ResponseEntity.status(HttpStatus.CREATED).body(order);
+    return ResponseEntity.status(HttpStatus.OK).body(order);
   }
 
   @GetMapping
   @RequestMapping("/users/{userId}/orders")
   public ResponseEntity<List<OrderDto>> readUserOrders(@PathVariable long userId) {
     List<OrderDto> orders = orderService.readAllByUser(userId);
-    return ResponseEntity.status(HttpStatus.CREATED).body(orders);
+    return ResponseEntity.status(HttpStatus.OK).body(orders);
   }
 
   @PostMapping

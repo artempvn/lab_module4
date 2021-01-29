@@ -12,44 +12,43 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class CertificateServiceImplTest {
-    CertificateDao certificateDao = mock(CertificateDao.class);
-    TagService tagService = mock(TagService.class);
-    CertificateServiceImpl certificateService =
-            new CertificateServiceImpl(tagService, certificateDao);
+  CertificateDao certificateDao = mock(CertificateDao.class);
+  TagService tagService = mock(TagService.class);
+  CertificateServiceImpl certificateService =
+      new CertificateServiceImpl(tagService, certificateDao);
 
-    @Test
-    void createCertificateDaoCreateInvocation() {
-        CertificateDtoFull certificate = givenCertificate();
-        when(certificateDao.create(any())).thenReturn(certificate);
+  @Test
+  void createCertificateDaoCreateInvocation() {
+    CertificateDtoFull certificate = givenCertificate();
+    when(certificateDao.create(any())).thenReturn(certificate);
 
-        certificateService.create(certificate);
+    certificateService.create(certificate);
 
-        verify(certificateDao).create(certificate);
-    }
+    verify(certificateDao).create(certificate);
+  }
 
-    @Test
-    void createTagServiceNewInvocation() {
-        CertificateDtoFull certificate = givenCertificate();
-        when(certificateDao.create(any())).thenReturn(certificate);
+  @Test
+  void createTagServiceNewInvocation() {
+    CertificateDtoFull certificate = givenCertificate();
+    when(certificateDao.create(any())).thenReturn(certificate);
 
-        certificateService.create(certificate);
+    certificateService.create(certificate);
 
-        verify(tagService).create(any());
-    }
+    verify(tagService).create(any());
+  }
 
-    CertificateDtoFull givenCertificate(){
-        CertificateDtoFull certificate=new CertificateDtoFull();
-        certificate.setPreviousId(99L);
-        certificate.setPrice(99.99);
-        var tag=givenTag();
-        certificate.setTags(List.of(tag));
-        return certificate;
-    }
+  CertificateDtoFull givenCertificate() {
+    CertificateDtoFull certificate = new CertificateDtoFull();
+    certificate.setPreviousId(99L);
+    certificate.setPrice(99.99);
+    var tag = givenTag();
+    certificate.setTags(List.of(tag));
+    return certificate;
+  }
 
-    TagDto givenTag(){
-        TagDto tag=new TagDto();
-        tag.setName("tag name");
-        return tag;
-    }
-
+  TagDto givenTag() {
+    TagDto tag = new TagDto();
+    tag.setName("tag name");
+    return tag;
+  }
 }

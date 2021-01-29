@@ -1,7 +1,6 @@
 package com.epam.esm.web.rest;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.UserDtoFull;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.web.advice.ResourceAdvice;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,8 +31,7 @@ class UserControllerTest {
   public static final int NOT_EXISTING_ID = 99999;
   MockMvc mockMvc;
   @Autowired UserDao userDao;
-  @Autowired
-  UserController userController;
+  @Autowired UserController userController;
   @Autowired SessionFactory sessionFactory;
   @Autowired ReloadableResourceBundleMessageSource messageSource;
 
@@ -50,7 +48,9 @@ class UserControllerTest {
   void setDown() {
     try (Session session = sessionFactory.openSession()) {
       session.beginTransaction();
-      String sql = "DELETE FROM users";
+      String sql =
+              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM orders;"
+                      + "DELETE FROM ordered_certificates;DELETE FROM users;";
       session.createNativeQuery(sql).executeUpdate();
       session.getTransaction().commit();
     }
@@ -77,7 +77,6 @@ class UserControllerTest {
 
   @Test
   void readUsers() throws Exception {
-
     UserDto user1 = givenUserWO1();
     UserDto user2 = givenUserWO2();
     long userId1 = userDao.create(user1).getId();
@@ -91,20 +90,6 @@ class UserControllerTest {
         .perform(get("/users"))
         .andExpect(
             content().json(new ObjectMapper().writeValueAsString(List.of(user1WO, user2WO))));
-  }
-
-  UserDtoFull givenUser1() {
-    UserDtoFull user = new UserDtoFull();
-    user.setName("name1");
-    user.setSurname("surname1");
-    return user;
-  }
-
-  UserDtoFull givenUser2() {
-    UserDtoFull user = new UserDtoFull();
-    user.setName("name2");
-    user.setSurname("surname2");
-    return user;
   }
 
   UserDto givenUserWO1() {

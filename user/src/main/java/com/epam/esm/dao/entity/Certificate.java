@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "certificates_backup")
+@Table(name = "ordered_certificates")
 public class Certificate {
 
   @Id
@@ -26,7 +26,7 @@ public class Certificate {
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
-      name = "certificates_tags_backup",
+      name = "ordered_certificates_tags",
       joinColumns = {@JoinColumn(name = "certificate_id")},
       inverseJoinColumns = {@JoinColumn(name = "tag_id")})
   private List<Tag> tags;

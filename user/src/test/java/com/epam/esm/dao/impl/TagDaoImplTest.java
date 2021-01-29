@@ -21,58 +21,52 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class TagDaoImplTest {
 
-    @Autowired
-    TagDao tagDao;
-    @Autowired
-    CertificateDao certificateDao;
-    @Autowired
-    SessionFactory sessionFactory;
+  @Autowired TagDao tagDao;
+  @Autowired CertificateDao certificateDao;
+  @Autowired SessionFactory sessionFactory;
 
-
-    @AfterEach
-    void setDown() {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            String sql = "DELETE FROM certificates_tags_backup;DELETE FROM tags_backup;DELETE FROM orders;" +
-                    "DELETE FROM certificates_backup;DELETE FROM users;";
-            session.createNativeQuery(sql).executeUpdate();
-            session.getTransaction().commit();
-        }
+  @AfterEach
+  void setDown() {
+    try (Session session = sessionFactory.openSession()) {
+      session.beginTransaction();
+      String sql =
+              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM orders;"
+                      + "DELETE FROM ordered_certificates;DELETE FROM users;";
+      session.createNativeQuery(sql).executeUpdate();
+      session.getTransaction().commit();
     }
+  }
 
-    @Test
-    void create() {
-        TagDto expectedTag = givenTag();
+  @Test
+  void create() {
+    TagDto expectedTag = givenTag();
 
-        TagDto actualTag = tagDao.create(expectedTag);
+    TagDto actualTag = tagDao.create(expectedTag);
 
-        assertNotNull(actualTag.getId());
-    }
+    assertNotNull(actualTag.getId());
+  }
 
-    @Test
-    void readExistedByName() {
-        TagDto expectedTag = givenTag();
-        tagDao.create(expectedTag);
+  @Test
+  void readExistedByName() {
+    TagDto expectedTag = givenTag();
+    tagDao.create(expectedTag);
 
-        Optional<TagDto> actualTag = tagDao.read(expectedTag.getName());
+    Optional<TagDto> actualTag = tagDao.read(expectedTag.getName());
 
-        assertTrue(actualTag.isPresent());
-    }
+    assertTrue(actualTag.isPresent());
+  }
 
-    @Test
-    void readNotExistedByName() {
-        TagDto expectedTag = givenTag();
-        Optional<TagDto> actualTag = tagDao.read(expectedTag.getName());
+  @Test
+  void readNotExistedByName() {
+    TagDto expectedTag = givenTag();
+    Optional<TagDto> actualTag = tagDao.read(expectedTag.getName());
 
-        assertTrue(actualTag.isEmpty());
-    }
+    assertTrue(actualTag.isEmpty());
+  }
 
-    TagDto givenTag(){
-        TagDto tag=new TagDto();
-        tag.setName("tag name");
-        return tag;
-    }
-
-
-
+  TagDto givenTag() {
+    TagDto tag = new TagDto();
+    tag.setName("tag name");
+    return tag;
+  }
 }

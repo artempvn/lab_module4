@@ -1,7 +1,9 @@
 package com.epam.esm.web.rest;
 
+import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.dto.*;
+import com.epam.esm.service.OrderService;
 import com.epam.esm.web.advice.ResourceAdvice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
@@ -21,7 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,82 +32,102 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class OrderControllerTest {
 
-    MockMvc mockMvc;
-    @Autowired
-    UserDao userDao;
-    @Autowired
-    OrderController orderController;
-    @Autowired
-    SessionFactory sessionFactory;
-    @Autowired
-    ReloadableResourceBundleMessageSource messageSource;
+  MockMvc mockMvc;
+  @Autowired UserDao userDao;
+  @Autowired OrderDao orderDao;
+  @Autowired OrderService orderService;
+  @Autowired OrderController orderController;
+  @Autowired SessionFactory sessionFactory;
+  @Autowired ReloadableResourceBundleMessageSource messageSource;
 
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc =
-                MockMvcBuilders.standaloneSetup(orderController)
-                        .setControllerAdvice(new ResourceAdvice(messageSource))
-                        .build();
+  @BeforeEach
+  public void setup() {
+    MockitoAnnotations.openMocks(this);
+    mockMvc =
+        MockMvcBuilders.standaloneSetup(orderController)
+            .setControllerAdvice(new ResourceAdvice(messageSource))
+            .build();
+  }
+
+  @AfterEach
+  void setDown() {
+    try (Session session = sessionFactory.openSession()) {
+      session.beginTransaction();
+      String sql =
+              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM orders;"
+                      + "DELETE FROM ordered_certificates;DELETE FROM users;";
+      session.createNativeQuery(sql).executeUpdate();
+      session.getTransaction().commit();
     }
+  }
 
-    @AfterEach
-    void setDown() {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            String sql =
-                    "DELETE FROM certificates_tags_backup;DELETE FROM tags_backup;DELETE FROM certificates_backup;"
-                            + "DELETE FROM orders;DELETE FROM users;";
-            session.createNativeQuery(sql).executeUpdate();
-            session.getTransaction().commit();
-        }
-    }
+  @Test
+  void createOrderValueCheck() throws Exception {
+    OrderDtoFullCreation order = givenOrder();
+    UserDto user = givenUser();
+    Long userId = userDao.create(user).getId();
 
-    @Test
-    void createOrderValueCheck() throws Exception {
-        OrderDtoFull order=givenOrder();
-        UserDto user=givenUser();
-        Long userId= userDao.create(user).getId();
+    mockMvc
+        .perform(
+            post("/users/{id}/order", userId)
+                .content(new ObjectMapper().writeValueAsString(order))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").exists())
+        .andExpect(status().isCreated());
+  }
 
-        mockMvc
-                .perform(
-                        post("/users/{id}/orders",userId)
-                                .content(new ObjectMapper().writeValueAsString(order))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(status().isCreated());
-    }
+  @Test
+  void readUserOrder() throws Exception {
+    OrderDtoFullCreation order = givenOrder();
+    UserDto user = givenUser();
+    Long userId = userDao.create(user).getId();
+    order.setUserId(userId);
+    Long orderId = orderService.create(order).getId();
 
-    OrderDtoFull givenOrder() {
-        OrderDtoFull order=new OrderDtoFull();
-        var certificate=givenCertificate();
-        order.setCertificates(List.of(certificate));
-        var user=givenUser();
-        order.setUser(user);
-        return order;
-    }
+    mockMvc
+        .perform(get("/users/{userId}/order/{orderId}", userId, orderId))
+        .andExpect(jsonPath("$.id").value(orderId))
+        .andExpect(status().isOk());
+  }
 
-    UserDto givenUser(){
-        UserDto user=new UserDto();
-        user.setId(1L);
-        user.setName("name");
-        user.setSurname("surname");
-        return user;
-    }
+  @Test
+  void readUserOrders() throws Exception {
+    OrderDtoFullCreation order = givenOrder();
+    UserDto user = givenUser();
+    Long userId = userDao.create(user).getId();
+    order.setUserId(userId);
+    orderService.create(order);
 
-    CertificateDtoFull givenCertificate(){
-        CertificateDtoFull certificate=new CertificateDtoFull();
-        certificate.setPreviousId(99L);
-        certificate.setPrice(99.99);
-        var tag=givenTag();
-        certificate.setTags(List.of(tag));
-        return certificate;
-    }
+    mockMvc.perform(get("/users/{userId}/orders", userId)).andExpect(status().isOk());
+  }
 
-    TagDto givenTag(){
-        TagDto tag=new TagDto();
-        tag.setName("tag name");
-        return tag;
-    }
+  OrderDtoFullCreation givenOrder() {
+    OrderDtoFullCreation order = new OrderDtoFullCreation();
+    var certificate = givenCertificate();
+    order.setCertificates(List.of(certificate));
+    return order;
+  }
 
+  UserDto givenUser() {
+    UserDto user = new UserDto();
+    user.setId(1L);
+    user.setName("name");
+    user.setSurname("surname");
+    return user;
+  }
+
+  CertificateDtoFull givenCertificate() {
+    CertificateDtoFull certificate = new CertificateDtoFull();
+    certificate.setPreviousId(99L);
+    certificate.setPrice(99.99);
+    var tag = givenTag();
+    certificate.setTags(List.of(tag));
+    return certificate;
+  }
+
+  TagDto givenTag() {
+    TagDto tag = new TagDto();
+    tag.setName("tag name");
+    return tag;
+  }
 }

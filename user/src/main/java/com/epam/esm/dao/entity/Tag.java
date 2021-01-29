@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Table(name = "tags_backup")
+@Table(name = "ordered_tags")
 public class Tag {
 
   @Id

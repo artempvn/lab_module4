@@ -5,16 +5,14 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.TagService;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class TagServiceImplTest {
   TagDao tagDao = mock(TagDao.class);
-  TagService tagService=new TagServiceImpl(tagDao);
+  TagService tagService = new TagServiceImpl(tagDao);
 
   @Test
   void createTagDaoReadInvocation() {
@@ -57,10 +55,9 @@ class TagServiceImplTest {
     verify(tagDao).create(tag);
   }
 
-  TagDto givenTag(){
-    TagDto tag=new TagDto();
+  TagDto givenTag() {
+    TagDto tag = new TagDto();
     tag.setName("tag name");
     return tag;
   }
-
 }

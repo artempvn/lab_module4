@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
 UNIQUE INDEX `id_UNIQUE1` (`id` ASC) );
 
-CREATE TABLE IF NOT EXISTS `certificates_backup` (
+CREATE TABLE IF NOT EXISTS `ordered_certificates` (
   `id` BIGINT(5) NOT NULL AUTO_INCREMENT,
   `previous_id` BIGINT(5) NULL,
   `price` DECIMAL(8,2) NULL,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `certificates_backup` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
-CREATE TABLE IF NOT EXISTS `tags_backup` (
+CREATE TABLE IF NOT EXISTS `ordered_tags` (
   `id` BIGINT(5) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
@@ -35,16 +35,16 @@ CREATE TABLE IF NOT EXISTS `orders` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
-CREATE TABLE IF NOT EXISTS `certificates_tags_backup` (
+CREATE TABLE IF NOT EXISTS `ordered_certificates_tags` (
   `tag_id` BIGINT(5) NOT NULL,
   `certificate_id` BIGINT(5) NOT NULL,
   CONSTRAINT `cert_backup_fk`
     FOREIGN KEY (`certificate_id`)
-    REFERENCES `certificates_backup` (`id`)
+    REFERENCES `ordered_certificates` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `tag_backup_fk`
     FOREIGN KEY (`tag_id`)
-    REFERENCES `tags_backup` (`id`)
+    REFERENCES `ordered_tags` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
