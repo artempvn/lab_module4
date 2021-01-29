@@ -1,50 +1,31 @@
-package com.epam.esm.dao.entity;
+package com.epam.esm.dto;
 
-import com.epam.esm.dto.CertificateDtoFull;
+import com.epam.esm.dao.entity.Certificate;
 
-import javax.persistence.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "certificates_backup")
-public class Certificate {
+public class CertificateDtoFull {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @Column(name = "previous_id")
   private Long previousId;
+  private Double price;
+  private List<TagDto> tags;
 
-  @Column private Double price;
+  public CertificateDtoFull() {}
 
-  @ManyToOne
-  @JoinColumn(name = "order_id")
-  private Order order;
-
-  @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(
-      name = "certificates_tags_backup",
-      joinColumns = {@JoinColumn(name = "certificate_id")},
-      inverseJoinColumns = {@JoinColumn(name = "tag_id")})
-  private List<Tag> tags;
-
-  public Certificate() {}
-
-  public Certificate(CertificateDtoFull dto) {
-    this.id = dto.getId();
-    this.previousId = dto.getPreviousId();
-    this.price = dto.getPrice();
-    this.tags = dto.getTags().stream().map(Tag::new).collect(Collectors.toList());
+  public CertificateDtoFull(Certificate entity) {
+    this.id = entity.getId();
+    this.previousId = entity.getPreviousId();
+    this.price = entity.getPrice();
+    this.tags = entity.getTags().stream().map(TagDto::new).collect(Collectors.toList());
   }
 
-  private Certificate(Builder builder) {
+  private CertificateDtoFull(Builder builder) {
     id = builder.id;
     previousId = builder.previousId;
     price = builder.price;
-    order = builder.order;
     tags = builder.tags;
   }
 
@@ -76,19 +57,11 @@ public class Certificate {
     this.price = price;
   }
 
-  public Order getOrder() {
-    return order;
-  }
-
-  public void setOrder(Order order) {
-    this.order = order;
-  }
-
-  public List<Tag> getTags() {
+  public List<TagDto> getTags() {
     return tags;
   }
 
-  public void setTags(List<Tag> tags) {
+  public void setTags(List<TagDto> tags) {
     this.tags = tags;
   }
 
@@ -97,13 +70,12 @@ public class Certificate {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    Certificate that = (Certificate) o;
+    CertificateDtoFull that = (CertificateDtoFull) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) return false;
     if (previousId != null ? !previousId.equals(that.previousId) : that.previousId != null)
       return false;
     if (price != null ? !price.equals(that.price) : that.price != null) return false;
-    if (order != null ? !order.equals(that.order) : that.order != null) return false;
     return tags != null ? tags.equals(that.tags) : that.tags == null;
   }
 
@@ -112,18 +84,16 @@ public class Certificate {
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (previousId != null ? previousId.hashCode() : 0);
     result = 31 * result + (price != null ? price.hashCode() : 0);
-    result = 31 * result + (order != null ? order.hashCode() : 0);
     result = 31 * result + (tags != null ? tags.hashCode() : 0);
     return result;
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("Certificate{");
+    final StringBuilder sb = new StringBuilder("CertificateDtoFull{");
     sb.append("id=").append(id);
     sb.append(", previousId=").append(previousId);
     sb.append(", price=").append(price);
-    sb.append(", order=").append(order);
     sb.append(", tags=").append(tags);
     sb.append('}');
     return sb.toString();
@@ -133,8 +103,7 @@ public class Certificate {
     private Long id;
     private Long previousId;
     private Double price;
-    private Order order;
-    private List<Tag> tags = Collections.emptyList();
+    private List<TagDto> tags = Collections.emptyList();
 
     private Builder() {}
 
@@ -153,18 +122,13 @@ public class Certificate {
       return this;
     }
 
-    public Builder order(Order order) {
-      this.order = order;
-      return this;
-    }
-
-    public Builder tags(List<Tag> tags) {
+    public Builder tags(List<TagDto> tags) {
       this.tags = tags;
       return this;
     }
 
-    public Certificate build() {
-      return new Certificate(this);
+    public CertificateDtoFull build() {
+      return new CertificateDtoFull(this);
     }
   }
 }

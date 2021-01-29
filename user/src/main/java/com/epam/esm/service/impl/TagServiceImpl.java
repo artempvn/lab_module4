@@ -10,15 +10,15 @@ import java.util.Optional;
 @Service
 public class TagServiceImpl implements TagService {
 
-    private final TagDao tagDao;
+  private final TagDao tagDao;
 
-    public TagServiceImpl(TagDao tagDao) {
-        this.tagDao = tagDao;
-    }
+  public TagServiceImpl(TagDao tagDao) {
+    this.tagDao = tagDao;
+  }
 
-    @Override
-    public TagDto create(TagDto tag) {
-        Optional<TagDto> existingTag = tagDao.read(tag.getName());
-        return existingTag.orElseGet(() -> tagDao.create(tag));
-    }
+  @Override
+  public TagDto create(TagDto tag) {
+    Optional<TagDto> existingTag = tagDao.read(tag.getName());
+    return existingTag.orElseGet(() -> tagDao.create(tag));
+  }
 }

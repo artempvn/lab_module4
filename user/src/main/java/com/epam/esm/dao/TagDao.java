@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface TagDao {
 
-    TagDto create (TagDto tag);
+  TagDto create(TagDto tag);
 
-    Optional<TagDto> read(String name);
+  Optional<TagDto> read(String name);
 }

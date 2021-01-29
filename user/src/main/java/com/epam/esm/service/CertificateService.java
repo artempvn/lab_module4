@@ -1,10 +1,8 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.CertificateDto;
-
-import java.security.cert.Certificate;
+import com.epam.esm.dto.CertificateDtoFull;
 
 public interface CertificateService {
 
-    CertificateDto create (CertificateDto certificate);
+  CertificateDtoFull create(CertificateDtoFull certificate);
 }

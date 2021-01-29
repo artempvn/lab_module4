@@ -2,7 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.entity.Certificate;
-import com.epam.esm.dto.CertificateDto;
+import com.epam.esm.dto.CertificateDtoFull;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
@@ -12,22 +12,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CertificateDaoImpl implements CertificateDao {
 
-    private final SessionFactory sessionFactory;
+  private final SessionFactory sessionFactory;
 
-    public CertificateDaoImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+  public CertificateDaoImpl(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
 
-    @Override
-    public CertificateDto create(CertificateDto certificateDto) {
-        Certificate certificate = new Certificate(certificateDto);
-        Session session = sessionFactory.getCurrentSession();
-        session.save(certificate);
+  @Override
+  public CertificateDtoFull create(CertificateDtoFull certificateDto) {
+    Certificate certificate = new Certificate(certificateDto);
+    Session session = sessionFactory.getCurrentSession();
+    session.save(certificate);
 
-        certificate.getTags().forEach(session::merge);
+    certificate.getTags().forEach(session::merge);
+    certificate.getTags().forEach(tag -> tag.withCertificate(certificate));
 
-        certificate.getTags().forEach(tag -> tag.withCertificate(certificate));
-
-        return new CertificateDto(certificate);
-    }
+    return new CertificateDtoFull(certificate);
+  }
 }

@@ -1,8 +1,8 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.UserDtoWithOrders;
-import com.epam.esm.dto.UserDtoWithoutOrders;
+import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.UserService;
 import org.springframework.stereotype.Service;
@@ -23,13 +23,13 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDtoWithOrders read(long id) {
-    Optional<UserDtoWithOrders> user = userDao.read(id);
-    return user.orElseThrow(ResourceNotFoundException.notFoundWithCertificateId(id));
+  public UserDtoFull read(long id) {
+    Optional<UserDtoFull> user = userDao.read(id);
+    return user.orElseThrow(ResourceNotFoundException.notFoundWithUser(id));
   }
 
   @Override
-  public List<UserDtoWithoutOrders> readAll() {
+  public List<UserDto> readAll() {
     return userDao.readAll();
   }
 }

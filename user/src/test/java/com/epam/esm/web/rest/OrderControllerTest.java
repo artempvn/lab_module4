@@ -21,7 +21,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,8 +53,9 @@ class OrderControllerTest {
     void setDown() {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            String sql = "DELETE FROM certificates_tags_backup;DELETE FROM tags_backup;DELETE FROM orders;" +
-                    "DELETE FROM certificates_backup;DELETE FROM users;";
+            String sql =
+                    "DELETE FROM certificates_tags_backup;DELETE FROM tags_backup;DELETE FROM certificates_backup;"
+                            + "DELETE FROM orders;DELETE FROM users;";
             session.createNativeQuery(sql).executeUpdate();
             session.getTransaction().commit();
         }
@@ -64,7 +64,7 @@ class OrderControllerTest {
     @Test
     void createOrderValueCheck() throws Exception {
         OrderDtoFull order=givenOrder();
-        UserDtoWithoutOrders user=givenUser();
+        UserDto user=givenUser();
         Long userId= userDao.create(user).getId();
 
         mockMvc
@@ -85,16 +85,16 @@ class OrderControllerTest {
         return order;
     }
 
-    UserDtoWithoutOrders givenUser(){
-        UserDtoWithoutOrders user=new UserDtoWithoutOrders();
+    UserDto givenUser(){
+        UserDto user=new UserDto();
         user.setId(1L);
         user.setName("name");
         user.setSurname("surname");
         return user;
     }
 
-    CertificateDto givenCertificate(){
-        CertificateDto certificate=new CertificateDto();
+    CertificateDtoFull givenCertificate(){
+        CertificateDtoFull certificate=new CertificateDtoFull();
         certificate.setPreviousId(99L);
         certificate.setPrice(99.99);
         var tag=givenTag();

@@ -3,8 +3,8 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.CertificateDto;
+import com.epam.esm.dto.CertificateDtoFull;
+import com.epam.esm.dto.OrderDtoFull;
 import com.epam.esm.dto.TagDto;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -50,16 +50,16 @@ class CertificateDaoImplTest {
         TagDto tag=givenTag();
         long id=tagDao.create(tag).getId();
         tag.setId(id);
-        CertificateDto expectedCertificate = givenCertificate();
+        CertificateDtoFull expectedCertificate = givenCertificate();
         expectedCertificate.setTags(List.of(tag));
 
-        CertificateDto actualCertificate = certificateDao.create(expectedCertificate);
+        CertificateDtoFull actualCertificate = certificateDao.create(expectedCertificate);
 
         assertNotNull(actualCertificate.getId());
     }
 
-    CertificateDto givenCertificate(){
-        CertificateDto certificate=new CertificateDto();
+    CertificateDtoFull givenCertificate(){
+        CertificateDtoFull certificate=new CertificateDtoFull();
         certificate.setPreviousId(99L);
         certificate.setPrice(99.99);
         var tag=givenTag();

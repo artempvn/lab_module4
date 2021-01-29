@@ -1,13 +1,13 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.UserDtoWithOrders;
-import com.epam.esm.dto.UserDtoWithoutOrders;
+import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDto;
 
 import java.util.List;
 
 public interface UserService {
 
-    UserDtoWithOrders read (long id);
+  UserDtoFull read(long id);
 
-    List<UserDtoWithoutOrders> readAll ();
+  List<UserDto> readAll();
 }

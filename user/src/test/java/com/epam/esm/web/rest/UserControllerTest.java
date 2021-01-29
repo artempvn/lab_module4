@@ -1,10 +1,9 @@
-package com.epam.esm.controller;
+package com.epam.esm.web.rest;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.UserDtoWithOrders;
-import com.epam.esm.dto.UserDtoWithoutOrders;
+import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDto;
 import com.epam.esm.web.advice.ResourceAdvice;
-import com.epam.esm.web.rest.UserController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -59,7 +58,7 @@ class UserControllerTest {
 
   @Test
   void readUserPositive() throws Exception {
-    UserDtoWithoutOrders user = givenUserWO1();
+    UserDto user = givenUserWO1();
     long userId = userDao.create(user).getId();
 
     mockMvc
@@ -79,12 +78,12 @@ class UserControllerTest {
   @Test
   void readUsers() throws Exception {
 
-    UserDtoWithoutOrders user1 = givenUserWO1();
-    UserDtoWithoutOrders user2 = givenUserWO2();
+    UserDto user1 = givenUserWO1();
+    UserDto user2 = givenUserWO2();
     long userId1 = userDao.create(user1).getId();
     long userId2 = userDao.create(user2).getId();
-    UserDtoWithoutOrders user1WO = givenUserWO1();
-    UserDtoWithoutOrders user2WO = givenUserWO2();
+    UserDto user1WO = givenUserWO1();
+    UserDto user2WO = givenUserWO2();
     user1WO.setId(userId1);
     user2WO.setId(userId2);
 
@@ -94,29 +93,29 @@ class UserControllerTest {
             content().json(new ObjectMapper().writeValueAsString(List.of(user1WO, user2WO))));
   }
 
-  UserDtoWithOrders givenUser1() {
-    UserDtoWithOrders user = new UserDtoWithOrders();
+  UserDtoFull givenUser1() {
+    UserDtoFull user = new UserDtoFull();
     user.setName("name1");
     user.setSurname("surname1");
     return user;
   }
 
-  UserDtoWithOrders givenUser2() {
-    UserDtoWithOrders user = new UserDtoWithOrders();
+  UserDtoFull givenUser2() {
+    UserDtoFull user = new UserDtoFull();
     user.setName("name2");
     user.setSurname("surname2");
     return user;
   }
 
-  UserDtoWithoutOrders givenUserWO1() {
-    UserDtoWithoutOrders user = new UserDtoWithoutOrders();
+  UserDto givenUserWO1() {
+    UserDto user = new UserDto();
     user.setName("name1");
     user.setSurname("surname1");
     return user;
   }
 
-  UserDtoWithoutOrders givenUserWO2() {
-    UserDtoWithoutOrders user = new UserDtoWithoutOrders();
+  UserDto givenUserWO2() {
+    UserDto user = new UserDto();
     user.setName("name2");
     user.setSurname("surname2");
     return user;

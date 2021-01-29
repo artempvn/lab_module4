@@ -8,13 +8,13 @@ public class ResourceValidationException extends ResourceException {
     super(message, resourceId);
   }
 
-  public static Supplier<ResourceException> validationWithCertificateId(Long id) {
-    String message = String.format("There is no certificate with id = %s", id);
+  public static Supplier<ResourceException> validationWithUser(Long id) {
+    String message = String.format("There is no user with id = %s", id);
     return () -> new ResourceValidationException(message, id);
   }
 
-  public static Supplier<ResourceException> validationWithTagId(Long id) {
-    String message = String.format("There is no tag with id = %s", id);
+  public static Supplier<ResourceException> validationWithOrder(Long id) {
+    String message = String.format("There is no order with id = %s", id);
     return () -> new ResourceValidationException(message, id);
   }
 }

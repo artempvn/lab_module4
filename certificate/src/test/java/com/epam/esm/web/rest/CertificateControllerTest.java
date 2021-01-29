@@ -1,4 +1,4 @@
-package com.epam.esm.controller;
+package com.epam.esm.web.rest;
 
 import com.epam.esm.web.advice.ResourceAdvice;
 import com.epam.esm.dao.CertificateDao;

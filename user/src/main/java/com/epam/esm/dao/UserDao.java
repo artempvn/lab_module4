@@ -1,16 +1,16 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dto.UserDtoWithOrders;
-import com.epam.esm.dto.UserDtoWithoutOrders;
+import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserDao {
 
-    UserDtoWithoutOrders create (UserDtoWithoutOrders user);
+  UserDto create(UserDto user);
 
-    Optional<UserDtoWithOrders> read (long id);
+  Optional<UserDtoFull> read(long id);
 
-    List<UserDtoWithoutOrders> readAll();
+  List<UserDto> readAll();
 }

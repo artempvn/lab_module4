@@ -1,49 +1,32 @@
-package com.epam.esm.dao.entity;
+package com.epam.esm.dto;
 
-import com.epam.esm.dto.UserDto;
-import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dao.entity.User;
 
-import javax.persistence.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "users")
-public class User {
+public class UserDtoFull {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  private String name;
+  private String surname;
+  private List<OrderDto> orders;
 
-  @Column private String name;
+  public UserDtoFull() {}
 
-  @Column private String surname;
-
-  @OneToMany(
-      mappedBy = "user",
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.ALL})
-  private List<Order> orders;
-
-  public User() {}
-
-  public User(UserDtoFull dto) {
-    this.id = dto.getId();
-    this.name = dto.getName();
-    this.surname = dto.getSurname();
+  public UserDtoFull(User entity) {
+    this.id = entity.getId();
+    this.name = entity.getName();
+    this.surname = entity.getSurname();
+    this.orders = entity.getOrders().stream().map(OrderDto::new).collect(Collectors.toList());
   }
 
-  private User(Builder builder) {
+  private UserDtoFull(Builder builder) {
     id = builder.id;
     name = builder.name;
     surname = builder.surname;
     orders = builder.orders;
-  }
-
-  public User(UserDto dto) {
-    this.id = dto.getId();
-    this.name = dto.getName();
-    this.surname = dto.getSurname();
   }
 
   public static Builder builder() {
@@ -74,11 +57,11 @@ public class User {
     this.surname = surname;
   }
 
-  public List<Order> getOrders() {
+  public List<OrderDto> getOrders() {
     return orders;
   }
 
-  public void setOrders(List<Order> orders) {
+  public void setOrders(List<OrderDto> orders) {
     this.orders = orders;
   }
 
@@ -87,12 +70,12 @@ public class User {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    User user = (User) o;
+    UserDtoFull that = (UserDtoFull) o;
 
-    if (id != null ? !id.equals(user.id) : user.id != null) return false;
-    if (name != null ? !name.equals(user.name) : user.name != null) return false;
-    if (surname != null ? !surname.equals(user.surname) : user.surname != null) return false;
-    return orders != null ? orders.equals(user.orders) : user.orders == null;
+    if (id != null ? !id.equals(that.id) : that.id != null) return false;
+    if (name != null ? !name.equals(that.name) : that.name != null) return false;
+    if (surname != null ? !surname.equals(that.surname) : that.surname != null) return false;
+    return orders != null ? orders.equals(that.orders) : that.orders == null;
   }
 
   @Override
@@ -106,7 +89,7 @@ public class User {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("User{");
+    final StringBuilder sb = new StringBuilder("UserDtoFull{");
     sb.append("id=").append(id);
     sb.append(", name='").append(name).append('\'');
     sb.append(", surname='").append(surname).append('\'');
@@ -119,7 +102,7 @@ public class User {
     private Long id;
     private String name;
     private String surname;
-    private List<Order> orders = Collections.emptyList();
+    private List<OrderDto> orders = Collections.emptyList();
 
     private Builder() {}
 
@@ -138,13 +121,13 @@ public class User {
       return this;
     }
 
-    public Builder orders(List<Order> orders) {
+    public Builder orders(List<OrderDto> orders) {
       this.orders = orders;
       return this;
     }
 
-    public User build() {
-      return new User(this);
+    public UserDtoFull build() {
+      return new UserDtoFull(this);
     }
   }
 }

@@ -1,8 +1,8 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.UserDtoWithOrders;
-import com.epam.esm.dto.UserDtoWithoutOrders;
+import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDto;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
@@ -39,66 +39,66 @@ class UserDaoImplTest {
 
   @Test
   void create() {
-    UserDtoWithoutOrders user = givenUser1WO();
+    UserDto user = givenUser1WO();
 
-    UserDtoWithoutOrders actualUser = userDao.create(user);
+    UserDto actualUser = userDao.create(user);
 
     assertNotNull(actualUser.getId());
   }
 
   @Test
   void readExisted() {
-    UserDtoWithoutOrders user = givenUser1WO();
+    UserDto user = givenUser1WO();
     long id = userDao.create(user).getId();
 
-    Optional<UserDtoWithOrders> actualUser = userDao.read(id);
+    Optional<UserDtoFull> actualUser = userDao.read(id);
 
     assertTrue(actualUser.isPresent());
   }
 
   @Test
   void readNotExisted() {
-    Optional<UserDtoWithOrders> actualUser = userDao.read(NOT_EXISTING_USER_ID);
+    Optional<UserDtoFull> actualUser = userDao.read(NOT_EXISTING_USER_ID);
 
     assertFalse(actualUser.isPresent());
   }
 
   @Test
   void readAll() {
-    UserDtoWithoutOrders user1 = givenUser1WO();
-    UserDtoWithoutOrders user2 = givenUser2WO();
+    UserDto user1 = givenUser1WO();
+    UserDto user2 = givenUser2WO();
     userDao.create(user1);
     userDao.create(user2);
-    List<UserDtoWithoutOrders> expectedList = List.of(user1, user2);
+    List<UserDto> expectedList = List.of(user1, user2);
 
-    List<UserDtoWithoutOrders> actualList = userDao.readAll();
+    List<UserDto> actualList = userDao.readAll();
 
     assertEquals(expectedList.size(), actualList.size());
   }
 
-  UserDtoWithOrders givenUser1() {
-    UserDtoWithOrders user = new UserDtoWithOrders();
+  UserDtoFull givenUser1() {
+    UserDtoFull user = new UserDtoFull();
     user.setName("name1");
     user.setSurname("surname1");
     return user;
   }
 
-  UserDtoWithOrders givenUser2() {
-    UserDtoWithOrders user = new UserDtoWithOrders();
+  UserDtoFull givenUser2() {
+    UserDtoFull user = new UserDtoFull();
     user.setName("name2");
     user.setSurname("surname2");
     return user;
   }
 
-  UserDtoWithoutOrders givenUser1WO(){
-    UserDtoWithoutOrders user=new UserDtoWithoutOrders();
+  UserDto givenUser1WO(){
+    UserDto user=new UserDto();
     user.setName("name");
     user.setSurname("surname");
     return user;
   }
 
-  UserDtoWithoutOrders givenUser2WO(){
-    UserDtoWithoutOrders user=new UserDtoWithoutOrders();
+  UserDto givenUser2WO(){
+    UserDto user=new UserDto();
     user.setName("name1");
     user.setSurname("surname1");
     return user;

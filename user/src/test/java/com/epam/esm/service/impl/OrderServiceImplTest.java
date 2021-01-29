@@ -31,7 +31,7 @@ class OrderServiceImplTest {
   @Test
   void createOrderDaoInvocation() {
     OrderDtoFull order=givenOrder();
-    UserDtoWithOrders user=givenUser();
+    UserDtoFull user=givenUser();
     when(userDao.read(anyLong())).thenReturn(Optional.of(user));
 
     orderService.create(order);
@@ -42,7 +42,7 @@ class OrderServiceImplTest {
   @Test
   void createCertificateServiceInvocation() {
     OrderDtoFull order=givenOrder();
-    UserDtoWithOrders user=givenUser();
+    UserDtoFull user=givenUser();
     when(userDao.read(anyLong())).thenReturn(Optional.of(user));
 
     orderService.create(order);
@@ -67,24 +67,24 @@ class OrderServiceImplTest {
     return order;
   }
 
-  UserDtoWithOrders givenUser(){
-    UserDtoWithOrders user=new UserDtoWithOrders();
+  UserDtoFull givenUser(){
+    UserDtoFull user=new UserDtoFull();
     user.setId(1L);
     user.setName("name");
     user.setSurname("surname");
     return user;
   }
 
-  UserDtoWithoutOrders givenUserWO(){
-    UserDtoWithoutOrders user=new UserDtoWithoutOrders();
+  UserDto givenUserWO(){
+    UserDto user=new UserDto();
     user.setId(1L);
     user.setName("name");
     user.setSurname("surname");
     return user;
   }
 
-  CertificateDto givenCertificate(){
-    CertificateDto certificate=new CertificateDto();
+  CertificateDtoFull givenCertificate(){
+    CertificateDtoFull certificate=new CertificateDtoFull();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag=givenTag();

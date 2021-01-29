@@ -1,8 +1,8 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.UserDtoWithOrders;
-import com.epam.esm.dto.UserDtoWithoutOrders;
+import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDto;
 import com.epam.esm.dao.entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -27,27 +27,27 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public UserDtoWithoutOrders create(UserDtoWithoutOrders dto) {
+  public UserDto create(UserDto dto) {
     User user = new User(dto);
     Session session = sessionFactory.getCurrentSession();
     session.save(user);
-    return new UserDtoWithoutOrders(user);
+    return new UserDto(user);
   }
 
   @Override
-  public Optional<UserDtoWithOrders> read(long id) {
+  public Optional<UserDtoFull> read(long id) {
     Session session = sessionFactory.getCurrentSession();
     Optional<User> user = Optional.ofNullable(session.get(User.class, id));
-    return user.map(UserDtoWithOrders::new);
+    return user.map(UserDtoFull::new);
   }
 
   @Override
-  public List<UserDtoWithoutOrders> readAll() {
+  public List<UserDto> readAll() {
     Session session = sessionFactory.getCurrentSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<User> criteria = builder.createQuery(User.class);
     criteria.from(User.class);
-    List<User> tags = session.createQuery(criteria).list();
-    return tags.stream().map(UserDtoWithoutOrders::new).collect(Collectors.toList());
+    List<User> users = session.createQuery(criteria).list();
+    return users.stream().map(UserDto::new).collect(Collectors.toList());
   }
 }
