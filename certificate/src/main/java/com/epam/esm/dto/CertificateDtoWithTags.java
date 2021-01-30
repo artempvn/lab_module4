@@ -41,7 +41,7 @@ public class CertificateDtoWithTags {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime lastUpdateDate;
 
-  private List<TagDto> tags;
+  private List<TagDto> tags = Collections.emptyList();
 
   public CertificateDtoWithTags() {}
 

@@ -1,5 +1,6 @@
 package com.epam.esm.web.advice;
 
+import com.epam.esm.exception.OrderException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -40,6 +41,16 @@ public class ResourceAdvice {
     String errorCode = String.format("%s%s", HttpStatus.NOT_FOUND.value(), e.getResourceId());
     ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
     return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(OrderException.class)
+  public ResponseEntity<ErrorResponse> handleException(OrderException e) {
+    String textMessage =
+            messageSource.getMessage("error.orderEmpty", null, LocaleContextHolder.getLocale());
+    String errorMessage = String.format("%s %s", textMessage, e.getResourceId());
+    String errorCode = String.format("%s%s", HttpStatus.BAD_REQUEST.value(), e.getResourceId());
+    ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)

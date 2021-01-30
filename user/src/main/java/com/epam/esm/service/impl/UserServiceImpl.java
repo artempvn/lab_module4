@@ -1,7 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.UserService;
@@ -23,8 +23,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDtoFull read(long id) {
-    Optional<UserDtoFull> user = userDao.read(id);
+  public UserDtoWithOrders read(long id) {
+    Optional<UserDtoWithOrders> user = userDao.read(id);
     return user.orElseThrow(ResourceNotFoundException.notFoundWithUser(id));
   }
 

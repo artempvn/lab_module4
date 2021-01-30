@@ -29,9 +29,9 @@ class OrderServiceImplTest {
 
   @Test
   void createOrderDaoInvocation() {
-    OrderDtoFullCreation order = givenOrder();
-    UserDtoFull user = givenUser();
-    when(userDao.read(anyLong())).thenReturn(Optional.of(user));
+    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    UserDto user = givenUser();
+    when(userDao.readWithoutOrders(anyLong())).thenReturn(Optional.of(user));
 
     orderService.create(order);
 
@@ -40,9 +40,9 @@ class OrderServiceImplTest {
 
   @Test
   void createCertificateServiceInvocation() {
-    OrderDtoFullCreation order = givenOrder();
-    UserDtoFull user = givenUser();
-    when(userDao.read(anyLong())).thenReturn(Optional.of(user));
+    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    UserDto user = givenUser();
+    when(userDao.readWithoutOrders(anyLong())).thenReturn(Optional.of(user));
 
     orderService.create(order);
 
@@ -51,7 +51,7 @@ class OrderServiceImplTest {
 
   @Test
   void createException() {
-    OrderDtoFullCreation order = givenOrder();
+    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
     when(userDao.read(anyLong())).thenReturn(Optional.empty());
 
     assertThrows(ResourceValidationException.class, () -> orderService.create(order));
@@ -68,7 +68,7 @@ class OrderServiceImplTest {
 
   @Test
   void readOrderByUserOrderDaoInvocation() {
-    OrderDtoFull order = givenOrder2();
+    OrderDtoWithCertificates order = givenOrder2();
     when(orderDao.readOrderByUser(anyLong(), anyLong())).thenReturn(Optional.of(order));
 
     orderService.readOrderByUser(USER_ID, ORDER_ID);
@@ -84,28 +84,28 @@ class OrderServiceImplTest {
         ResourceNotFoundException.class, () -> orderService.readOrderByUser(USER_ID, ORDER_ID));
   }
 
-  OrderDtoFullCreation givenOrder() {
-    OrderDtoFullCreation order = new OrderDtoFullCreation();
+  OrderDtoWithCertificatesWithTagsForCreation givenOrder() {
+    OrderDtoWithCertificatesWithTagsForCreation order = new OrderDtoWithCertificatesWithTagsForCreation();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
     order.setUserId(USER_ID);
     return order;
   }
 
-  OrderDtoFull givenOrder2() {
-    return OrderDtoFull.builder().certificates(Collections.emptyList()).build();
+  OrderDtoWithCertificates givenOrder2() {
+    return OrderDtoWithCertificates.builder().certificates(Collections.emptyList()).build();
   }
 
-  UserDtoFull givenUser() {
-    UserDtoFull user = new UserDtoFull();
+  UserDto givenUser() {
+    UserDto user = new UserDto();
     user.setId(1L);
     user.setName("name");
     user.setSurname("surname");
     return user;
   }
 
-  CertificateDtoFull givenCertificate() {
-    CertificateDtoFull certificate = new CertificateDtoFull();
+  CertificateDtoWithTags givenCertificate() {
+    CertificateDtoWithTags certificate = new CertificateDtoWithTags();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();

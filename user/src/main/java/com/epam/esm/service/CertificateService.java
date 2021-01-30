@@ -1,8 +1,8 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.CertificateDtoFull;
+import com.epam.esm.dto.CertificateDtoWithTags;
 
 public interface CertificateService {
 
-  CertificateDtoFull create(CertificateDtoFull certificate);
+  CertificateDtoWithTags create(CertificateDtoWithTags certificate);
 }

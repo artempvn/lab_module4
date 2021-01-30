@@ -1,8 +1,8 @@
 package com.epam.esm.web.rest;
 
 import com.epam.esm.dto.OrderDto;
-import com.epam.esm.dto.OrderDtoFull;
-import com.epam.esm.dto.OrderDtoFullCreation;
+import com.epam.esm.dto.OrderDtoWithCertificates;
+import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
 import com.epam.esm.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +21,9 @@ public class OrderController {
 
   @GetMapping
   @RequestMapping("/users/{userId}/order/{orderId}")
-  public ResponseEntity<OrderDtoFull> readUserOrder(
+  public ResponseEntity<OrderDtoWithCertificates> readUserOrder(
       @PathVariable long userId, @PathVariable long orderId) {
-    OrderDtoFull order = orderService.readOrderByUser(userId, orderId);
+    OrderDtoWithCertificates order = orderService.readOrderByUser(userId, orderId);
     return ResponseEntity.status(HttpStatus.OK).body(order);
   }
 
@@ -36,10 +36,10 @@ public class OrderController {
 
   @PostMapping
   @RequestMapping("/users/{userId}/order")
-  public ResponseEntity<OrderDtoFullCreation> createOrder(
-      @PathVariable long userId, @RequestBody OrderDtoFullCreation order) {
+  public ResponseEntity<OrderDtoWithCertificatesWithTagsForCreation> createOrder(
+      @PathVariable long userId, @RequestBody OrderDtoWithCertificatesWithTagsForCreation order) {
     order.setUserId(userId);
-    OrderDtoFullCreation createdOrder = orderService.create(order);
+    OrderDtoWithCertificatesWithTagsForCreation createdOrder = orderService.create(order);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
   }
 }

@@ -1,7 +1,7 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dao.entity.User;
 import org.hibernate.Session;
@@ -35,10 +35,17 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public Optional<UserDtoFull> read(long id) {
+  public Optional<UserDtoWithOrders> read(long id) {
     Session session = sessionFactory.getCurrentSession();
     Optional<User> user = Optional.ofNullable(session.get(User.class, id));
-    return user.map(UserDtoFull::new);
+    return user.map(UserDtoWithOrders::new);
+  }
+
+  @Override
+  public Optional<UserDto> readWithoutOrders(long id) {
+    Session session = sessionFactory.getCurrentSession();
+    Optional<User> user = Optional.ofNullable(session.get(User.class, id));
+    return user.map(UserDto::new);
   }
 
   @Override

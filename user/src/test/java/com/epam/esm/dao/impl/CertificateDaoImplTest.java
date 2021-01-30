@@ -3,7 +3,7 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.dto.CertificateDtoFull;
+import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.TagDto;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -34,8 +34,8 @@ class CertificateDaoImplTest {
     try (Session session = sessionFactory.openSession()) {
       session.beginTransaction();
       String sql =
-              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM orders;"
-                      + "DELETE FROM ordered_certificates;DELETE FROM users;";
+              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
+                      + "DELETE FROM orders;DELETE FROM users;";
       session.createNativeQuery(sql).executeUpdate();
       session.getTransaction().commit();
     }
@@ -46,16 +46,16 @@ class CertificateDaoImplTest {
     TagDto tag = givenTag();
     long id = tagDao.create(tag).getId();
     tag.setId(id);
-    CertificateDtoFull expectedCertificate = givenCertificate();
+    CertificateDtoWithTags expectedCertificate = givenCertificate();
     expectedCertificate.setTags(List.of(tag));
 
-    CertificateDtoFull actualCertificate = certificateDao.create(expectedCertificate);
+    CertificateDtoWithTags actualCertificate = certificateDao.create(expectedCertificate);
 
     assertNotNull(actualCertificate.getId());
   }
 
-  CertificateDtoFull givenCertificate() {
-    CertificateDtoFull certificate = new CertificateDtoFull();
+  CertificateDtoWithTags givenCertificate() {
+    CertificateDtoWithTags certificate = new CertificateDtoWithTags();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();

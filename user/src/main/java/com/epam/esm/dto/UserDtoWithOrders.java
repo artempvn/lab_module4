@@ -6,23 +6,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UserDtoFull {
+public class UserDtoWithOrders {
 
   private Long id;
   private String name;
   private String surname;
   private List<OrderDto> orders;
 
-  public UserDtoFull() {}
+  public UserDtoWithOrders() {}
 
-  public UserDtoFull(User entity) {
+  public UserDtoWithOrders(User entity) {
     this.id = entity.getId();
     this.name = entity.getName();
     this.surname = entity.getSurname();
     this.orders = entity.getOrders().stream().map(OrderDto::new).collect(Collectors.toList());
   }
 
-  private UserDtoFull(Builder builder) {
+  private UserDtoWithOrders(Builder builder) {
     id = builder.id;
     name = builder.name;
     surname = builder.surname;
@@ -70,7 +70,7 @@ public class UserDtoFull {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    UserDtoFull that = (UserDtoFull) o;
+    UserDtoWithOrders that = (UserDtoWithOrders) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) return false;
     if (name != null ? !name.equals(that.name) : that.name != null) return false;
@@ -126,8 +126,8 @@ public class UserDtoFull {
       return this;
     }
 
-    public UserDtoFull build() {
-      return new UserDtoFull(this);
+    public UserDtoWithOrders build() {
+      return new UserDtoWithOrders(this);
     }
   }
 }

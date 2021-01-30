@@ -1,7 +1,7 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -31,8 +31,8 @@ class UserDaoImplTest {
     try (Session session = sessionFactory.openSession()) {
       session.beginTransaction();
       String sql =
-              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM orders;"
-                      + "DELETE FROM ordered_certificates;DELETE FROM users;";
+              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
+                      + "DELETE FROM orders;DELETE FROM users;";
       session.createNativeQuery(sql).executeUpdate();
       session.getTransaction().commit();
     }
@@ -52,14 +52,14 @@ class UserDaoImplTest {
     UserDto user = givenUser1WO();
     long id = userDao.create(user).getId();
 
-    Optional<UserDtoFull> actualUser = userDao.read(id);
+    Optional<UserDtoWithOrders> actualUser = userDao.read(id);
 
     assertTrue(actualUser.isPresent());
   }
 
   @Test
   void readNotExisted() {
-    Optional<UserDtoFull> actualUser = userDao.read(NOT_EXISTING_USER_ID);
+    Optional<UserDtoWithOrders> actualUser = userDao.read(NOT_EXISTING_USER_ID);
 
     assertFalse(actualUser.isPresent());
   }

@@ -54,8 +54,8 @@ class OrderControllerTest {
     try (Session session = sessionFactory.openSession()) {
       session.beginTransaction();
       String sql =
-              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM orders;"
-                      + "DELETE FROM ordered_certificates;DELETE FROM users;";
+              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
+                      + "DELETE FROM orders;DELETE FROM users;";
       session.createNativeQuery(sql).executeUpdate();
       session.getTransaction().commit();
     }
@@ -63,7 +63,7 @@ class OrderControllerTest {
 
   @Test
   void createOrderValueCheck() throws Exception {
-    OrderDtoFullCreation order = givenOrder();
+    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
     UserDto user = givenUser();
     Long userId = userDao.create(user).getId();
 
@@ -78,7 +78,7 @@ class OrderControllerTest {
 
   @Test
   void readUserOrder() throws Exception {
-    OrderDtoFullCreation order = givenOrder();
+    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
     UserDto user = givenUser();
     Long userId = userDao.create(user).getId();
     order.setUserId(userId);
@@ -92,7 +92,7 @@ class OrderControllerTest {
 
   @Test
   void readUserOrders() throws Exception {
-    OrderDtoFullCreation order = givenOrder();
+    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
     UserDto user = givenUser();
     Long userId = userDao.create(user).getId();
     order.setUserId(userId);
@@ -101,8 +101,8 @@ class OrderControllerTest {
     mockMvc.perform(get("/users/{userId}/orders", userId)).andExpect(status().isOk());
   }
 
-  OrderDtoFullCreation givenOrder() {
-    OrderDtoFullCreation order = new OrderDtoFullCreation();
+  OrderDtoWithCertificatesWithTagsForCreation givenOrder() {
+    OrderDtoWithCertificatesWithTagsForCreation order = new OrderDtoWithCertificatesWithTagsForCreation();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
     return order;
@@ -116,8 +116,8 @@ class OrderControllerTest {
     return user;
   }
 
-  CertificateDtoFull givenCertificate() {
-    CertificateDtoFull certificate = new CertificateDtoFull();
+  CertificateDtoWithTags givenCertificate() {
+    CertificateDtoWithTags certificate = new CertificateDtoWithTags();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();

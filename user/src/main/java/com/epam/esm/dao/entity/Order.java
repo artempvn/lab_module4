@@ -1,6 +1,8 @@
 package com.epam.esm.dao.entity;
 
-import com.epam.esm.dto.OrderDtoFullCreation;
+import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -23,12 +25,18 @@ public class Order {
   @JoinColumn(name = "user_id")
   private User user;
 
+
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
   private List<Certificate> certificates;
 
+
+  @Formula(
+      "( Select SUM(ordered_certificates.price) FROM ordered_certificates WHERE ordered_certificates.order_id=id)")
+  private double price;
+
   public Order() {}
 
-  public Order(OrderDtoFullCreation dto) {
+  public Order(OrderDtoWithCertificatesWithTagsForCreation dto) {
     this.id = dto.getId();
     this.createDate = dto.getCreateDate();
     this.user = User.builder().id(dto.getUserId()).build();
@@ -77,6 +85,14 @@ public class Order {
 
   public void setCertificates(List<Certificate> certificates) {
     this.certificates = certificates;
+  }
+
+  public double getPrice() {
+    return price;
+  }
+
+  public void setPrice(double price) {
+    this.price = price;
   }
 
   @Override

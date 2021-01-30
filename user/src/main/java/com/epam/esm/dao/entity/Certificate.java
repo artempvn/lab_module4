@@ -1,6 +1,6 @@
 package com.epam.esm.dao.entity;
 
-import com.epam.esm.dto.CertificateDtoFull;
+import com.epam.esm.dto.CertificateDtoWithTags;
 
 import javax.persistence.*;
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class Certificate {
 
   public Certificate() {}
 
-  public Certificate(CertificateDtoFull dto) {
+  public Certificate(CertificateDtoWithTags dto) {
     this.id = dto.getId();
     this.previousId = dto.getPreviousId();
     this.price = dto.getPrice();

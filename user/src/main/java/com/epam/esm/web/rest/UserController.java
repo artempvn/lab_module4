@@ -1,6 +1,6 @@
 package com.epam.esm.web.rest;
 
-import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -20,8 +20,8 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<UserDtoFull> readUser(@PathVariable long id) {
-    UserDtoFull user = userService.read(id);
+  public ResponseEntity<UserDtoWithOrders> readUser(@PathVariable long id) {
+    UserDtoWithOrders user = userService.read(id);
     return ResponseEntity.status(HttpStatus.OK).body(user);
   }
 

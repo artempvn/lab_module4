@@ -1,7 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dto.CertificateDtoFull;
+import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.TagService;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ class CertificateServiceImplTest {
 
   @Test
   void createCertificateDaoCreateInvocation() {
-    CertificateDtoFull certificate = givenCertificate();
+    CertificateDtoWithTags certificate = givenCertificate();
     when(certificateDao.create(any())).thenReturn(certificate);
 
     certificateService.create(certificate);
@@ -29,7 +29,7 @@ class CertificateServiceImplTest {
 
   @Test
   void createTagServiceNewInvocation() {
-    CertificateDtoFull certificate = givenCertificate();
+    CertificateDtoWithTags certificate = givenCertificate();
     when(certificateDao.create(any())).thenReturn(certificate);
 
     certificateService.create(certificate);
@@ -37,8 +37,8 @@ class CertificateServiceImplTest {
     verify(tagService).create(any());
   }
 
-  CertificateDtoFull givenCertificate() {
-    CertificateDtoFull certificate = new CertificateDtoFull();
+  CertificateDtoWithTags givenCertificate() {
+    CertificateDtoWithTags certificate = new CertificateDtoWithTags();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();

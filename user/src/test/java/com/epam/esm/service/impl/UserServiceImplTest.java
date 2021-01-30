@@ -1,7 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.UserDtoFull;
+import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class UserServiceImplTest {
 
   @Test
   void read() {
-    UserDtoFull user = givenUser();
+    UserDtoWithOrders user = givenUser();
     when(userDao.read(anyLong())).thenReturn(Optional.of(user));
 
     userService.read(USER_ID);
@@ -43,8 +43,8 @@ class UserServiceImplTest {
     verify(userDao).readAll();
   }
 
-  UserDtoFull givenUser() {
-    UserDtoFull user = new UserDtoFull();
+  UserDtoWithOrders givenUser() {
+    UserDtoWithOrders user = new UserDtoWithOrders();
     user.setName("name");
     user.setSurname("surname");
     return user;

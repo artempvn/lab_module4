@@ -1,5 +1,4 @@
 rootProject.name = 'lab3'
 include 'certificate'
-include 'main'
 include 'user'
 

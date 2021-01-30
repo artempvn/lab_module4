@@ -1,15 +1,13 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.OrderDao;
-import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.dto.*;
+import com.epam.esm.exception.OrderException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.service.OrderService;
-import com.epam.esm.service.TagService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,15 +29,20 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public OrderDtoFullCreation create(OrderDtoFullCreation order) {
+  public OrderDtoWithCertificatesWithTagsForCreation create(
+      OrderDtoWithCertificatesWithTagsForCreation order) {
     userDao
-        .read(order.getUserId())
-        .orElseThrow(ResourceValidationException.validationWithOrder(order.getUserId()));
+        .readWithoutOrders(order.getUserId())
+        .orElseThrow(ResourceValidationException.validationWithUser(order.getUserId()));
 
     LocalDateTime timeNow = LocalDateTime.now();
     order.setCreateDate(timeNow);
 
-    List<CertificateDtoFull> certificates =
+    if (order.getCertificates().isEmpty()) {
+      throw OrderException.validationWithEmptyOrder(order.getUserId()).get();
+    }
+
+    List<CertificateDtoWithTags> certificates =
         order.getCertificates().stream()
             .map(certificateService::create)
             .collect(Collectors.toList());
@@ -54,13 +57,8 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public OrderDtoFull readOrderByUser(long userId, long orderId) {
-    Optional<OrderDtoFull> order = orderDao.readOrderByUser(userId, orderId);
-    OrderDtoFull existingOrder =
-        order.orElseThrow(ResourceNotFoundException.notFoundWithOrder(orderId));
-    double sum =
-        existingOrder.getCertificates().stream().mapToDouble(CertificateDto::getPrice).sum();
-    existingOrder.setPrice(sum);
-    return existingOrder;
+  public OrderDtoWithCertificates readOrderByUser(long userId, long orderId) {
+    Optional<OrderDtoWithCertificates> order = orderDao.readOrderByUser(userId, orderId);
+    return order.orElseThrow(ResourceNotFoundException.notFoundWithOrder(orderId));
   }
 }

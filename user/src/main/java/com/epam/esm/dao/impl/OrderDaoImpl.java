@@ -5,8 +5,8 @@ import com.epam.esm.dao.entity.Certificate;
 import com.epam.esm.dao.entity.Order;
 import com.epam.esm.dao.entity.User;
 import com.epam.esm.dto.OrderDto;
-import com.epam.esm.dto.OrderDtoFull;
-import com.epam.esm.dto.OrderDtoFullCreation;
+import com.epam.esm.dto.OrderDtoWithCertificates;
+import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -29,7 +29,7 @@ public class OrderDaoImpl implements OrderDao {
   }
 
   @Override
-  public OrderDtoFullCreation create(OrderDtoFullCreation dto) {
+  public OrderDtoWithCertificatesWithTagsForCreation create(OrderDtoWithCertificatesWithTagsForCreation dto) {
     Order order = new Order(dto);
     Session session = sessionFactory.getCurrentSession();
     session.save(order);
@@ -38,7 +38,7 @@ public class OrderDaoImpl implements OrderDao {
         .map(certificate -> session.load(Certificate.class, certificate.getId()))
         .forEach(certificate -> certificate.setOrder(order));
 
-    return new OrderDtoFullCreation(order);
+    return new OrderDtoWithCertificatesWithTagsForCreation(order);
   }
 
   @Override
@@ -53,12 +53,12 @@ public class OrderDaoImpl implements OrderDao {
   }
 
   @Override
-  public Optional<OrderDtoFull> readOrderByUser(long userId, long orderId) {
+  public Optional<OrderDtoWithCertificates> readOrderByUser(long userId, long orderId) {
     Session session = sessionFactory.getCurrentSession();
     Optional.ofNullable(session.get(User.class, userId))
         .orElseThrow(ResourceValidationException.validationWithUser(userId));
 
     Optional<Order> order = Optional.ofNullable(session.get(Order.class, orderId));
-    return order.map(OrderDtoFull::new);
+    return order.map(OrderDtoWithCertificates::new);
   }
 }

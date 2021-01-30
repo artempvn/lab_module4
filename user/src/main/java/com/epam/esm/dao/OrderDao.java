@@ -1,17 +1,17 @@
 package com.epam.esm.dao;
 
 import com.epam.esm.dto.OrderDto;
-import com.epam.esm.dto.OrderDtoFull;
-import com.epam.esm.dto.OrderDtoFullCreation;
+import com.epam.esm.dto.OrderDtoWithCertificates;
+import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface OrderDao {
 
-  OrderDtoFullCreation create(OrderDtoFullCreation order);
+  OrderDtoWithCertificatesWithTagsForCreation create(OrderDtoWithCertificatesWithTagsForCreation order);
 
   List<OrderDto> readAllByUser(long userId);
 
-  Optional<OrderDtoFull> readOrderByUser(long userId, long orderId);
+  Optional<OrderDtoWithCertificates> readOrderByUser(long userId, long orderId);
 }

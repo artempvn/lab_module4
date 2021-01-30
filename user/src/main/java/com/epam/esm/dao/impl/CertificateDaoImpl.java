@@ -2,7 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.entity.Certificate;
-import com.epam.esm.dto.CertificateDtoFull;
+import com.epam.esm.dto.CertificateDtoWithTags;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
@@ -19,7 +19,7 @@ public class CertificateDaoImpl implements CertificateDao {
   }
 
   @Override
-  public CertificateDtoFull create(CertificateDtoFull certificateDto) {
+  public CertificateDtoWithTags create(CertificateDtoWithTags certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
     Session session = sessionFactory.getCurrentSession();
     session.save(certificate);
@@ -27,6 +27,6 @@ public class CertificateDaoImpl implements CertificateDao {
     certificate.getTags().forEach(session::merge);
     certificate.getTags().forEach(tag -> tag.withCertificate(certificate));
 
-    return new CertificateDtoFull(certificate);
+    return new CertificateDtoWithTags(certificate);
   }
 }

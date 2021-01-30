@@ -22,6 +22,19 @@ import java.util.Locale;
 @Configuration
 public class UserConfig {
 
+    @Autowired private Environment environment;
+
+    @Bean
+    public DataSource getDataSource() {
+        DriverManagerDataSource dataSource =
+                new DriverManagerDataSource(
+                        environment.getProperty("url"),
+                        environment.getProperty("uname"),
+                        environment.getProperty("password"));
+        dataSource.setDriverClassName(environment.getProperty("driver"));
+        return dataSource;
+    }
+
     @Bean(name = "userSessionFactory")
     public SessionFactory getSessionFactory() {
         org.hibernate.cfg.Configuration configuration =

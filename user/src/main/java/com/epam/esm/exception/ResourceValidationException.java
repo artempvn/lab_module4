@@ -17,4 +17,5 @@ public class ResourceValidationException extends ResourceException {
     String message = String.format("There is no order with id = %s", id);
     return () -> new ResourceValidationException(message, id);
   }
+
 }

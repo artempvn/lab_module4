@@ -62,6 +62,8 @@ public class CertificateServiceImpl implements CertificateService {
     LocalDateTime timeNow = LocalDateTime.now();
     certificate.setCreateDate(timeNow);
     certificate.setLastUpdateDate(timeNow);
+    certificate.setTags(
+        certificate.getTags().stream().map(tagService::create).collect(Collectors.toList()));
     certificateDao.update(certificate);
     return certificate;
   }
