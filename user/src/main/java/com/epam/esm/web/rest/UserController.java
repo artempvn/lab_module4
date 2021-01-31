@@ -1,5 +1,6 @@
 package com.epam.esm.web.rest;
 
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -28,8 +30,8 @@ public class UserController {
 
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  public List<UserDto> readUsers() {
-    return userService.readAll();
+  public List<UserDto> readUsers(@Valid PaginationParameter parameter) {
+    return userService.readAll(parameter);
   }
 
   @GetMapping("/popular_tag")

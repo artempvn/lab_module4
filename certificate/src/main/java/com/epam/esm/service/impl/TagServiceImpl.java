@@ -1,6 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagAction;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.ResourceIsBoundException;
@@ -40,8 +41,8 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
-  public List<TagDto> readAll() {
-    return tagDao.readAll();
+  public List<TagDto> readAll(PaginationParameter parameter) {
+    return tagDao.readAll(parameter);
   }
 
   @Override

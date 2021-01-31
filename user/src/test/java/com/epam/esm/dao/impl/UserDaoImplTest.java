@@ -1,6 +1,8 @@
 package com.epam.esm.dao.impl;
 
+import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.UserDao;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
 import org.hibernate.Session;
@@ -72,7 +74,7 @@ class UserDaoImplTest {
     userDao.create(user2);
     List<UserDto> expectedList = List.of(user1, user2);
 
-    List<UserDto> actualList = userDao.readAll();
+    List<UserDto> actualList = userDao.readAll(new PaginationParameter());
 
     assertEquals(expectedList.size(), actualList.size());
   }

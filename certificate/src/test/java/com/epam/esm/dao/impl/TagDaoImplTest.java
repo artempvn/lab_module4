@@ -1,8 +1,10 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
+import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
@@ -75,7 +77,7 @@ class TagDaoImplTest {
     tagDao.create(tag2);
     List<TagDto> expectedList = List.of(tag1, tag2);
 
-    List<TagDto> actualList = tagDao.readAll();
+    List<TagDto> actualList = tagDao.readAll(new PaginationParameter());
 
     assertEquals(expectedList.size(), actualList.size());
   }

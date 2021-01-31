@@ -9,6 +9,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -68,8 +69,8 @@ public class ResourceAdvice {
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ErrorResponse> handleException(MethodArgumentNotValidException e) {
+  @ExceptionHandler({MethodArgumentNotValidException.class,BindException.class})
+  public ResponseEntity<ErrorResponse> handleException(BindException e) {
     StringBuilder errorMessage = new StringBuilder();
     (e.getBindingResult().getFieldErrors())
         .forEach(

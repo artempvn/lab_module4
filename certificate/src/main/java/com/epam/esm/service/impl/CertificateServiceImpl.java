@@ -4,6 +4,7 @@ import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.CertificateDtoWithoutTags;
 import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.service.TagService;
@@ -45,8 +46,8 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
-  public List<CertificateDtoWithoutTags> readAll(CertificatesRequest request) {
-    return certificateDao.readAll(request);
+  public List<CertificateDtoWithoutTags> readAll(CertificatesRequest request, PaginationParameter parameter) {
+    return certificateDao.readAll(request,parameter);
   }
 
   @Override

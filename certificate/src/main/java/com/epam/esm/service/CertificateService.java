@@ -3,6 +3,7 @@ package com.epam.esm.service;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.CertificateDtoWithoutTags;
 import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.dto.PaginationParameter;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public interface CertificateService {
    * @param request the request
    * @return the list
    */
-  List<CertificateDtoWithoutTags> readAll(CertificatesRequest request);
+  List<CertificateDtoWithoutTags> readAll(CertificatesRequest request, PaginationParameter parameter);
 
   /**
    * Update certificate dto with tags.

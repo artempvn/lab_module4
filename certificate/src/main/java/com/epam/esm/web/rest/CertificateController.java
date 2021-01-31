@@ -1,9 +1,6 @@
 package com.epam.esm.web.rest;
 
-import com.epam.esm.dto.CertificateDtoPatch;
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.CertificateDtoWithoutTags;
-import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.dto.*;
 import com.epam.esm.service.CertificateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,8 +44,8 @@ public class CertificateController {
    * @return the list
    */
   @GetMapping
-  public List<CertificateDtoWithoutTags> readCertificates(CertificatesRequest request) {
-    return certificateService.readAll(request);
+  public List<CertificateDtoWithoutTags> readCertificates(CertificatesRequest request, @Valid PaginationParameter parameter) {
+    return certificateService.readAll(request,parameter);
   }
 
   /**

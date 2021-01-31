@@ -53,11 +53,11 @@ class CertificateServiceImplTest {
   @Test
   void readAllCertificateDaoReadAllInvocation() {
     CertificateDtoWithoutTags certificate = new CertificateDtoWithoutTags();
-    when(certificateDao.readAll(any())).thenReturn(List.of(certificate));
+    when(certificateDao.readAll(any(),any())).thenReturn(List.of(certificate));
 
-    certificateService.readAll(any());
+    certificateService.readAll(any(),any());
 
-    verify(certificateDao).readAll(any());
+    verify(certificateDao).readAll(any(),any());
   }
 
   @Test

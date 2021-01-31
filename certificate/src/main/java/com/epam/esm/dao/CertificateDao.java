@@ -3,6 +3,7 @@ package com.epam.esm.dao;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.CertificateDtoWithoutTags;
 import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.dto.PaginationParameter;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public interface CertificateDao {
    * @param request the request
    * @return the list
    */
-  List<CertificateDtoWithoutTags> readAll(CertificatesRequest request);
+  List<CertificateDtoWithoutTags> readAll(CertificatesRequest request, PaginationParameter parameter);
 
   /**
    * Update.

@@ -1,9 +1,6 @@
 package com.epam.esm.dao.impl;
 
-import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dao.OrderDao;
-import com.epam.esm.dao.TagDao;
-import com.epam.esm.dao.UserDao;
+import com.epam.esm.dao.*;
 import com.epam.esm.dto.*;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
@@ -76,7 +73,7 @@ class OrderDaoImplTest {
     order.setCertificates(List.of(certificate1));
     orderDao.create(order);
 
-    List<OrderDto> actualList = orderDao.readAllByUser(id);
+    List<OrderDto> actualList = orderDao.readAllByUser(id,new PaginationParameter());
 
     assertEquals(1, actualList.size());
   }
@@ -85,7 +82,7 @@ class OrderDaoImplTest {
   void readAllByNotExistingUser() {
 
     assertThrows(
-        ResourceValidationException.class, () -> orderDao.readAllByUser(NOT_EXISTING_USER_ID));
+        ResourceValidationException.class, () -> orderDao.readAllByUser(NOT_EXISTING_USER_ID,new PaginationParameter()));
   }
 
   @Test

@@ -38,9 +38,9 @@ class UserServiceImplTest {
 
   @Test
   void readAll() {
-    userService.readAll();
+    userService.readAll(any());
 
-    verify(userDao).readAll();
+    verify(userDao).readAll(any());
   }
 
   UserDtoWithOrders givenUser() {

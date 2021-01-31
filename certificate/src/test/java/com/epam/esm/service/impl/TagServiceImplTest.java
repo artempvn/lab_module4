@@ -67,7 +67,7 @@ class TagServiceImplTest {
   @Test
   void createIfNotExistedTagDaoCreateInvocation() {
     TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
-    when(tagDao.readAll()).thenReturn(Collections.emptyList());
+    when(tagDao.readAll(any())).thenReturn(Collections.emptyList());
     when(tagDao.read(tag.getName())).thenReturn(Optional.empty());
     when(tagDao.create(tag)).thenReturn(new TagDto());
 
@@ -95,9 +95,9 @@ class TagServiceImplTest {
 
   @Test
   void readAll() {
-    tagService.readAll();
+    tagService.readAll(any());
 
-    verify(tagDao).readAll();
+    verify(tagDao).readAll(any());
   }
 
   @Test

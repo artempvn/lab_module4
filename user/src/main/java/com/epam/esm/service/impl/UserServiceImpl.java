@@ -2,6 +2,7 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.dao.entity.Tag;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
@@ -31,8 +32,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public List<UserDto> readAll() {
-    return userDao.readAll();
+  public List<UserDto> readAll(PaginationParameter parameter) {
+    return userDao.readAll(parameter);
   }
 
   @Override

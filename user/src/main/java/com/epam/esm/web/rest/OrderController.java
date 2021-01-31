@@ -3,11 +3,13 @@ package com.epam.esm.web.rest;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.OrderDtoWithCertificates;
 import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -29,8 +31,8 @@ public class OrderController {
 
   @GetMapping
   @RequestMapping("/users/{userId}/orders")
-  public ResponseEntity<List<OrderDto>> readUserOrders(@PathVariable long userId) {
-    List<OrderDto> orders = orderService.readAllByUser(userId);
+  public ResponseEntity<List<OrderDto>> readUserOrders(@PathVariable long userId, @Valid PaginationParameter parameter) {
+    List<OrderDto> orders = orderService.readAllByUser(userId,parameter);
     return ResponseEntity.status(HttpStatus.OK).body(orders);
   }
 

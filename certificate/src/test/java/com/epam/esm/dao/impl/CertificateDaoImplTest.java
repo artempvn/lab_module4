@@ -1,12 +1,10 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
+import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.CertificateDtoWithoutTags;
-import com.epam.esm.dto.TagDto;
+import com.epam.esm.dto.*;
 import com.epam.esm.dao.entity.Certificate;
-import com.epam.esm.dto.CertificatesRequest;
 import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
@@ -33,7 +31,6 @@ class CertificateDaoImplTest {
 
   @Autowired CertificateDao certificateDao;
   @Autowired TagDao tagDao;
-
   @Autowired SessionFactory sessionFactory;
 
   @AfterEach
@@ -82,7 +79,7 @@ class CertificateDaoImplTest {
     List<Certificate> expectedList =
         List.of(new Certificate(certificate1), new Certificate(certificate2));
 
-    List<CertificateDtoWithoutTags> actualList = certificateDao.readAll(new CertificatesRequest());
+    List<CertificateDtoWithoutTags> actualList = certificateDao.readAll(new CertificatesRequest(),new PaginationParameter());
     assertEquals(expectedList.size(), actualList.size());
   }
 

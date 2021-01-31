@@ -59,11 +59,11 @@ class OrderServiceImplTest {
 
   @Test
   void readAllByUserOrderDaoInvocation() {
-    when(orderDao.readAllByUser(anyLong())).thenReturn(anyList());
+    when(orderDao.readAllByUser(anyLong(),any())).thenReturn(anyList());
 
-    orderService.readAllByUser(USER_ID);
+    orderService.readAllByUser(anyLong(),null);
 
-    verify(orderDao).readAllByUser(USER_ID);
+    verify(orderDao).readAllByUser(anyLong(),any());
   }
 
   @Test

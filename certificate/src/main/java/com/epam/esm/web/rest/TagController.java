@@ -1,5 +1,6 @@
 package com.epam.esm.web.rest;
 
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagAction;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.TagService;
@@ -45,8 +46,8 @@ public class TagController {
    */
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  public List<TagDto> readTags() {
-    return tagService.readAll();
+  public List<TagDto> readTags(@Valid PaginationParameter parameter) {
+    return tagService.readAll(parameter);
   }
 
   /**

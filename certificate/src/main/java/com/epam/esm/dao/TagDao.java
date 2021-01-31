@@ -1,5 +1,6 @@
 package com.epam.esm.dao;
 
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
 import org.springframework.stereotype.Repository;
 
@@ -31,7 +32,7 @@ public interface TagDao {
    *
    * @return the list
    */
-  List<TagDto> readAll();
+  List<TagDto> readAll(PaginationParameter parameter);
 
   /**
    * Delete.

@@ -1,6 +1,8 @@
 package com.epam.esm.dao.impl;
 
+import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.exception.ResourceValidationException;
@@ -11,8 +13,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,9 +26,11 @@ import java.util.stream.Collectors;
 public class TagDaoImpl implements TagDao {
 
   private final SessionFactory sessionFactory;
+  private final PaginationHandler paginationHandler;
 
-  public TagDaoImpl(SessionFactory sessionFactory) {
+  public TagDaoImpl(SessionFactory sessionFactory, PaginationHandler paginationHandler) {
     this.sessionFactory = sessionFactory;
+    this.paginationHandler = paginationHandler;
   }
 
   @Override
@@ -43,12 +49,18 @@ public class TagDaoImpl implements TagDao {
   }
 
   @Override
-  public List<TagDto> readAll() {
+  public List<TagDto> readAll(PaginationParameter parameter) {
     Session session = sessionFactory.getCurrentSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
-    CriteriaQuery<Tag> criteria = builder.createQuery(Tag.class);
-    criteria.from(Tag.class);
-    List<Tag> tags = session.createQuery(criteria).list();
+
+    CriteriaQuery<Tag> criteriaQuery = builder
+            .createQuery(Tag.class);
+    Root<Tag> from = criteriaQuery.from(Tag.class);
+    CriteriaQuery<Tag> select = criteriaQuery.select(from);
+
+    TypedQuery<Tag> typedQuery = session.createQuery(select);
+    paginationHandler.setPageToQuery(typedQuery,parameter);
+    List<Tag> tags = typedQuery.getResultList();
     return tags.stream().map(TagDto::new).collect(Collectors.toList());
   }
 

@@ -1,7 +1,9 @@
 package com.epam.esm.dao.impl;
 
+import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.dao.entity.Tag;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
@@ -14,8 +16,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
@@ -37,9 +41,11 @@ public class UserDaoImpl implements UserDao {
           + SQL_REQUEST_FOR_USER_ID_WITH_HIGHEST_COST_ORDERS
           + " GROUP BY ordered_tags.name ORDER BY count(ordered_tags.name) desc limit 1;";
   private final SessionFactory sessionFactory;
+  private final PaginationHandler paginationHandler;
 
-  public UserDaoImpl(SessionFactory sessionFactory) {
+  public UserDaoImpl(SessionFactory sessionFactory, PaginationHandler paginationHandler) {
     this.sessionFactory = sessionFactory;
+    this.paginationHandler = paginationHandler;
   }
 
   @Override
@@ -65,12 +71,18 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public List<UserDto> readAll() {
+  public List<UserDto> readAll(PaginationParameter parameter) {
     Session session = sessionFactory.getCurrentSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
-    CriteriaQuery<User> criteria = builder.createQuery(User.class);
-    criteria.from(User.class);
-    List<User> users = session.createQuery(criteria).list();
+    CriteriaQuery<User> criteriaQuery = builder
+            .createQuery(User.class);
+    Root<User> from = criteriaQuery.from(User.class);
+    CriteriaQuery<User> select = criteriaQuery.select(from);
+
+    TypedQuery<User> typedQuery = session.createQuery(select);
+    paginationHandler.setPageToQuery(typedQuery,parameter);
+
+    List<User> users = typedQuery.getResultList();
     return users.stream().map(UserDto::new).collect(Collectors.toList());
   }
 
