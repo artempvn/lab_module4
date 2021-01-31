@@ -2,6 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CriteriaHandler;
 import com.epam.esm.dao.entity.Certificate;
+import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.dto.CertificatesRequest;
 import com.epam.esm.dto.SortParam;
 import org.springframework.stereotype.Component;
@@ -16,20 +17,11 @@ import java.util.stream.Collectors;
 @Component
 public class CriteriaHandlerImpl implements CriteriaHandler {
 
-  public enum CompareType {
-    EQUALS,
-    CONTAINS;
-  }
-
   private static final List<String> CERTIFICATE_FIELD_NAMES =
       List.of("name", "description", "price", "duration", "lastUpdateDate");
   private static final Map<String, String> SORTING_FIELD_NAMES =
       Map.of("date", "createDate", "name", "name");
-  private static final Map<String, CompareType> FILTER_REQUEST_FIELDS =
-      Map.of(
-          //          "tag",  TODO update method later with tag
-          //          CompareType.EQUALS,
-          "name", CompareType.CONTAINS, "description", CompareType.CONTAINS);
+  private static final List<String> FILTER_REQUEST_FIELDS = List.of("name", "description");
 
   private static final Map<
           SortParam.SortingType, BiFunction<CriteriaBuilder, Path<Certificate>, Order>>
@@ -59,10 +51,13 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
     CriteriaQuery<Certificate> criteria = builder.createQuery(Certificate.class);
     Root<Certificate> root = criteria.from(Certificate.class);
 
-    List<Field> notNullFilterFields = takeNotNullFields(request, FILTER_REQUEST_FIELDS.keySet());
+    List<Field> notNullFilterFields = takeNotNullFields(request, FILTER_REQUEST_FIELDS);
     Predicate[] arrayOfPredicates =
         takeFilteringPredicatesAsArray(builder, request, root, notNullFilterFields);
     criteria.where(arrayOfPredicates);
+
+    Predicate[] arrayOfPredicatesTags = takeTagsPredicatesAsArray(builder, request, root);
+    criteria.where(arrayOfPredicatesTags);
 
     SortParam param = request.getSort();
     if (param != null) {
@@ -72,6 +67,28 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
     }
 
     return criteria;
+  }
+
+  Predicate[] takeTagsPredicatesAsArray(
+      CriteriaBuilder builder, CertificatesRequest request, Root<Certificate> root) {
+    List<Predicate> predicates = takeTagsPredicates(builder, request, root);
+
+    Predicate[] arrayOfPredicates = new Predicate[predicates.size()];
+    predicates.toArray(arrayOfPredicates);
+
+    return arrayOfPredicates;
+  }
+
+  List<Predicate> takeTagsPredicates(
+      CriteriaBuilder builder, CertificatesRequest request, Root<Certificate> root) {
+    List<Predicate> predicates = new ArrayList<>();
+    List<String> tags = request.getTags();
+
+    for (String tag : tags) {
+      Join<Certificate, Tag> join = root.join("tags");
+      predicates.add(builder.equal(join.get("name"), tag));
+    }
+    return predicates;
   }
 
   List<Order> takeSortingOrders(
