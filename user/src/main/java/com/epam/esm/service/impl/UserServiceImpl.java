@@ -1,6 +1,8 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.UserDao;
+import com.epam.esm.dao.entity.Tag;
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.ResourceNotFoundException;
@@ -31,5 +33,11 @@ public class UserServiceImpl implements UserService {
   @Override
   public List<UserDto> readAll() {
     return userDao.readAll();
+  }
+
+  @Override
+  public TagDto takeMostWidelyTagFromUserWithHighestCostOrders() {
+    return userDao
+        .takeMostWidelyTagFromUserWithHighestCostOrders();
   }
 }

@@ -3,6 +3,7 @@ package com.epam.esm.web.advice;
 import com.epam.esm.exception.OrderException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
+import com.epam.esm.exception.TagException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
@@ -50,6 +51,15 @@ public class ResourceAdvice {
     String errorMessage = String.format("%s %s", textMessage, e.getResourceId());
     String errorCode = String.format("%s%s", HttpStatus.BAD_REQUEST.value(), e.getResourceId());
     ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(TagException.class)
+  public ResponseEntity<ErrorResponse> handleException(TagException e) {
+    String textMessage =
+            messageSource.getMessage("error.noTags", null, LocaleContextHolder.getLocale());
+    String errorCode = String.format("%s", HttpStatus.BAD_REQUEST.value());
+    ErrorResponse response = new ErrorResponse(textMessage, errorCode);
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 

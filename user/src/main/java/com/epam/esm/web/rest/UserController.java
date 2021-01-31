@@ -1,5 +1,6 @@
 package com.epam.esm.web.rest;
 
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.UserService;
@@ -30,4 +31,10 @@ public class UserController {
   public List<UserDto> readUsers() {
     return userService.readAll();
   }
+
+  @GetMapping("/popular_tag")
+  public ResponseEntity<TagDto> readMostWidelyTagFromUserWithHighestCostOrders() {
+    TagDto tag = userService.takeMostWidelyTagFromUserWithHighestCostOrders();
+    return ResponseEntity.status(HttpStatus.OK).body(tag);
+    }
 }
