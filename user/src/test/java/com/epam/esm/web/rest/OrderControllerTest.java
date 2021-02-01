@@ -2,7 +2,10 @@ package com.epam.esm.web.rest;
 
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
+import com.epam.esm.dto.TagDto;
+import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.web.advice.ResourceAdvice;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +26,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,8 +58,8 @@ class OrderControllerTest {
     try (Session session = sessionFactory.openSession()) {
       session.beginTransaction();
       String sql =
-              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
-                      + "DELETE FROM orders;DELETE FROM users;";
+          "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
+              + "DELETE FROM orders;DELETE FROM users;";
       session.createNativeQuery(sql).executeUpdate();
       session.getTransaction().commit();
     }
@@ -102,7 +106,8 @@ class OrderControllerTest {
   }
 
   OrderDtoWithCertificatesWithTagsForCreation givenOrder() {
-    OrderDtoWithCertificatesWithTagsForCreation order = new OrderDtoWithCertificatesWithTagsForCreation();
+    OrderDtoWithCertificatesWithTagsForCreation order =
+        new OrderDtoWithCertificatesWithTagsForCreation();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
     return order;

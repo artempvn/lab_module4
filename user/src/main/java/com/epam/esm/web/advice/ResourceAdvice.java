@@ -48,7 +48,7 @@ public class ResourceAdvice {
   @ExceptionHandler(OrderException.class)
   public ResponseEntity<ErrorResponse> handleException(OrderException e) {
     String textMessage =
-            messageSource.getMessage("error.orderEmpty", null, LocaleContextHolder.getLocale());
+        messageSource.getMessage("error.orderEmpty", null, LocaleContextHolder.getLocale());
     String errorMessage = String.format("%s %s", textMessage, e.getResourceId());
     String errorCode = String.format("%s%s", HttpStatus.BAD_REQUEST.value(), e.getResourceId());
     ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
@@ -58,7 +58,7 @@ public class ResourceAdvice {
   @ExceptionHandler(TagException.class)
   public ResponseEntity<ErrorResponse> handleException(TagException e) {
     String textMessage =
-            messageSource.getMessage("error.noTags", null, LocaleContextHolder.getLocale());
+        messageSource.getMessage("error.noTags", null, LocaleContextHolder.getLocale());
     String errorCode = String.format("%s", HttpStatus.BAD_REQUEST.value());
     ErrorResponse response = new ErrorResponse(textMessage, errorCode);
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -68,10 +68,10 @@ public class ResourceAdvice {
   public ResponseEntity<ErrorResponse> handleException(BindException e) {
     StringBuilder errorMessage = new StringBuilder();
     (e.getBindingResult().getFieldErrors())
-            .forEach(
-                    error ->
-                            errorMessage.append(
-                                    String.format("%s: %s; ", error.getField(), error.getDefaultMessage())));
+        .forEach(
+            error ->
+                errorMessage.append(
+                    String.format("%s: %s; ", error.getField(), error.getDefaultMessage())));
     String errorCode = String.format("%s%s", HttpStatus.BAD_REQUEST.value(), e.getErrorCount());
     ErrorResponse response = new ErrorResponse(errorMessage.toString(), errorCode);
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

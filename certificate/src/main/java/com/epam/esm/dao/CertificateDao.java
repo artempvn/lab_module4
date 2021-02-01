@@ -31,9 +31,11 @@ public interface CertificateDao {
    * Read all list.
    *
    * @param request the request
+   * @param parameter the parameter
    * @return the list
    */
-  List<CertificateDtoWithoutTags> readAll(CertificatesRequest request, PaginationParameter parameter);
+  List<CertificateDtoWithoutTags> readAll(
+      CertificatesRequest request, PaginationParameter parameter);
 
   /**
    * Update.

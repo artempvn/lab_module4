@@ -53,13 +53,12 @@ public class TagDaoImpl implements TagDao {
     Session session = sessionFactory.getCurrentSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
 
-    CriteriaQuery<Tag> criteriaQuery = builder
-            .createQuery(Tag.class);
+    CriteriaQuery<Tag> criteriaQuery = builder.createQuery(Tag.class);
     Root<Tag> from = criteriaQuery.from(Tag.class);
     CriteriaQuery<Tag> select = criteriaQuery.select(from);
 
     TypedQuery<Tag> typedQuery = session.createQuery(select);
-    paginationHandler.setPageToQuery(typedQuery,parameter);
+    paginationHandler.setPageToQuery(typedQuery, parameter);
     List<Tag> tags = typedQuery.getResultList();
     return tags.stream().map(TagDto::new).collect(Collectors.toList());
   }

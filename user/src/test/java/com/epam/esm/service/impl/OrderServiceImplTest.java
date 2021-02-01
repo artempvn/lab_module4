@@ -59,11 +59,11 @@ class OrderServiceImplTest {
 
   @Test
   void readAllByUserOrderDaoInvocation() {
-    when(orderDao.readAllByUser(anyLong(),any())).thenReturn(anyList());
+    when(orderDao.readAllByUser(anyLong(), any())).thenReturn(anyList());
 
-    orderService.readAllByUser(anyLong(),null);
+    orderService.readAllByUser(anyLong(), null);
 
-    verify(orderDao).readAllByUser(anyLong(),any());
+    verify(orderDao).readAllByUser(anyLong(), any());
   }
 
   @Test
@@ -85,7 +85,8 @@ class OrderServiceImplTest {
   }
 
   OrderDtoWithCertificatesWithTagsForCreation givenOrder() {
-    OrderDtoWithCertificatesWithTagsForCreation order = new OrderDtoWithCertificatesWithTagsForCreation();
+    OrderDtoWithCertificatesWithTagsForCreation order =
+        new OrderDtoWithCertificatesWithTagsForCreation();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
     order.setUserId(USER_ID);

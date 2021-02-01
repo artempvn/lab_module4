@@ -5,12 +5,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CertificateDtoWithoutTags {
+public class CertificateDtoWithoutTags extends RepresentationModel<CertificateDtoWithoutTags> {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
 

@@ -1,6 +1,9 @@
 package com.epam.esm.dao.impl;
 
-import com.epam.esm.dao.*;
+import com.epam.esm.dao.CertificateDao;
+import com.epam.esm.dao.OrderDao;
+import com.epam.esm.dao.TagDao;
+import com.epam.esm.dao.UserDao;
 import com.epam.esm.dto.*;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
@@ -34,8 +37,8 @@ class OrderDaoImplTest {
     try (Session session = sessionFactory.openSession()) {
       session.beginTransaction();
       String sql =
-              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
-                      + "DELETE FROM orders;DELETE FROM users;";
+          "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
+              + "DELETE FROM orders;DELETE FROM users;";
       session.createNativeQuery(sql).executeUpdate();
       session.getTransaction().commit();
     }
@@ -73,7 +76,7 @@ class OrderDaoImplTest {
     order.setCertificates(List.of(certificate1));
     orderDao.create(order);
 
-    List<OrderDto> actualList = orderDao.readAllByUser(id,new PaginationParameter());
+    List<OrderDto> actualList = orderDao.readAllByUser(id, new PaginationParameter());
 
     assertEquals(1, actualList.size());
   }
@@ -82,7 +85,8 @@ class OrderDaoImplTest {
   void readAllByNotExistingUser() {
 
     assertThrows(
-        ResourceValidationException.class, () -> orderDao.readAllByUser(NOT_EXISTING_USER_ID,new PaginationParameter()));
+        ResourceValidationException.class,
+        () -> orderDao.readAllByUser(NOT_EXISTING_USER_ID, new PaginationParameter()));
   }
 
   @Test
@@ -117,7 +121,8 @@ class OrderDaoImplTest {
     order.setUserId(userId);
     order.setCertificates(List.of(certificate1));
 
-    Optional<OrderDtoWithCertificates> actualOrder = orderDao.readOrderByUser(userId, NOT_EXISTING_ORDER_ID);
+    Optional<OrderDtoWithCertificates> actualOrder =
+        orderDao.readOrderByUser(userId, NOT_EXISTING_ORDER_ID);
 
     assertTrue(actualOrder.isEmpty());
   }
@@ -131,7 +136,8 @@ class OrderDaoImplTest {
   }
 
   OrderDtoWithCertificatesWithTagsForCreation givenOrder() {
-    OrderDtoWithCertificatesWithTagsForCreation order = new OrderDtoWithCertificatesWithTagsForCreation();
+    OrderDtoWithCertificatesWithTagsForCreation order =
+        new OrderDtoWithCertificatesWithTagsForCreation();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
     return order;

@@ -1,7 +1,6 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.PaginationParameter;

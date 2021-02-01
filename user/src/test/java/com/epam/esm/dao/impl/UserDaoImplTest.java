@@ -1,10 +1,9 @@
 package com.epam.esm.dao.impl;
 
-import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.dto.PaginationParameter;
-import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
+import com.epam.esm.dto.UserDtoWithOrders;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
@@ -33,8 +32,8 @@ class UserDaoImplTest {
     try (Session session = sessionFactory.openSession()) {
       session.beginTransaction();
       String sql =
-              "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
-                      + "DELETE FROM orders;DELETE FROM users;";
+          "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
+              + "DELETE FROM orders;DELETE FROM users;";
       session.createNativeQuery(sql).executeUpdate();
       session.getTransaction().commit();
     }

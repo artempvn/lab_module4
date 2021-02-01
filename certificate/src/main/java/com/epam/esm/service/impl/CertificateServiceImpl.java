@@ -46,8 +46,9 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
-  public List<CertificateDtoWithoutTags> readAll(CertificatesRequest request, PaginationParameter parameter) {
-    return certificateDao.readAll(request,parameter);
+  public List<CertificateDtoWithoutTags> readAll(
+      CertificatesRequest request, PaginationParameter parameter) {
+    return certificateDao.readAll(request, parameter);
   }
 
   @Override

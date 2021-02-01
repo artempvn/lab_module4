@@ -1,11 +1,10 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
+import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.UserService;
 import org.springframework.stereotype.Service;
@@ -38,7 +37,6 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public TagDto takeMostWidelyTagFromUserWithHighestCostOrders() {
-    return userDao
-        .takeMostWidelyTagFromUserWithHighestCostOrders();
+    return userDao.takeMostWidelyTagFromUserWithHighestCostOrders();
   }
 }

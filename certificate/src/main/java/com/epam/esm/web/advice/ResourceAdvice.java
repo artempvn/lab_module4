@@ -69,7 +69,7 @@ public class ResourceAdvice {
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler({MethodArgumentNotValidException.class,BindException.class})
+  @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
   public ResponseEntity<ErrorResponse> handleException(BindException e) {
     StringBuilder errorMessage = new StringBuilder();
     (e.getBindingResult().getFieldErrors())

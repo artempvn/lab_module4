@@ -52,8 +52,8 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public List<OrderDto> readAllByUser(long userId,PaginationParameter parameter) {
-    return orderDao.readAllByUser(userId,parameter);
+  public List<OrderDto> readAllByUser(long userId, PaginationParameter parameter) {
+    return orderDao.readAllByUser(userId, parameter);
   }
 
   @Override

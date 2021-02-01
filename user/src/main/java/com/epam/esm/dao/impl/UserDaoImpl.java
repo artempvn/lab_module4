@@ -2,12 +2,11 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dao.entity.Tag;
+import com.epam.esm.dao.entity.User;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
-import com.epam.esm.dao.entity.User;
+import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.exception.TagException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -74,13 +73,12 @@ public class UserDaoImpl implements UserDao {
   public List<UserDto> readAll(PaginationParameter parameter) {
     Session session = sessionFactory.getCurrentSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
-    CriteriaQuery<User> criteriaQuery = builder
-            .createQuery(User.class);
+    CriteriaQuery<User> criteriaQuery = builder.createQuery(User.class);
     Root<User> from = criteriaQuery.from(User.class);
     CriteriaQuery<User> select = criteriaQuery.select(from);
 
     TypedQuery<User> typedQuery = session.createQuery(select);
-    paginationHandler.setPageToQuery(typedQuery,parameter);
+    paginationHandler.setPageToQuery(typedQuery, parameter);
 
     List<User> users = typedQuery.getResultList();
     return users.stream().map(UserDto::new).collect(Collectors.toList());

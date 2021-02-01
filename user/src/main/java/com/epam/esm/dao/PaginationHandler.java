@@ -1,12 +1,17 @@
 package com.epam.esm.dao;
 
 import com.epam.esm.dto.PaginationParameter;
-import org.hibernate.query.Query;
 
 import javax.persistence.TypedQuery;
 
+/** The interface Pagination handler. */
 public interface PaginationHandler {
 
-    void setPageToQuery(TypedQuery<?> typedQuery, PaginationParameter parameter);
-
+  /**
+   * Sets page to query.
+   *
+   * @param typedQuery the typed query
+   * @param parameter the parameter
+   */
+  void setPageToQuery(TypedQuery<?> typedQuery, PaginationParameter parameter);
 }

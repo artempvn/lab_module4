@@ -5,7 +5,7 @@ import java.util.List;
 
 public class CertificatesRequest {
 
-  private List<String> tags= Collections.emptyList();
+  private List<String> tags = Collections.emptyList();
   private String name;
   private String description;
   private SortParam sort;

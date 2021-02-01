@@ -19,7 +19,7 @@ public class OrderDtoWithCertificates {
   public OrderDtoWithCertificates(Order entity) {
     this.id = entity.getId();
     this.createDate = entity.getCreateDate();
-    this.price=entity.getPrice();
+    this.price = entity.getPrice();
     this.certificates =
         entity.getCertificates().stream().map(CertificateDto::new).collect(Collectors.toList());
   }

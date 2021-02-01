@@ -31,8 +31,9 @@ public class OrderController {
 
   @GetMapping
   @RequestMapping("/users/{userId}/orders")
-  public ResponseEntity<List<OrderDto>> readUserOrders(@PathVariable long userId, @Valid PaginationParameter parameter) {
-    List<OrderDto> orders = orderService.readAllByUser(userId,parameter);
+  public ResponseEntity<List<OrderDto>> readUserOrders(
+      @PathVariable long userId, @Valid PaginationParameter parameter) {
+    List<OrderDto> orders = orderService.readAllByUser(userId, parameter);
     return ResponseEntity.status(HttpStatus.OK).body(orders);
   }
 

@@ -1,7 +1,6 @@
 package com.epam.esm.dao.entity;
 
 import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
@@ -25,10 +24,8 @@ public class Order {
   @JoinColumn(name = "user_id")
   private User user;
 
-
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
   private List<Certificate> certificates;
-
 
   @Formula(
       "( Select SUM(ordered_certificates.price) FROM ordered_certificates WHERE ordered_certificates.order_id=id)")

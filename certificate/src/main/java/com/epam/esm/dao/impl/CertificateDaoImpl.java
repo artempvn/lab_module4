@@ -3,10 +3,9 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.CriteriaHandler;
 import com.epam.esm.dao.PaginationHandler;
-import com.epam.esm.dao.entity.Tag;
+import com.epam.esm.dao.entity.Certificate;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.CertificateDtoWithoutTags;
-import com.epam.esm.dao.entity.Certificate;
 import com.epam.esm.dto.CertificatesRequest;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.exception.ResourceValidationException;
@@ -21,7 +20,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,7 +35,10 @@ public class CertificateDaoImpl implements CertificateDao {
   private final CriteriaHandler criteriaHandler;
   private final PaginationHandler paginationHandler;
 
-  public CertificateDaoImpl(SessionFactory sessionFactory, CriteriaHandler criteriaHandler, PaginationHandler paginationHandler) {
+  public CertificateDaoImpl(
+      SessionFactory sessionFactory,
+      CriteriaHandler criteriaHandler,
+      PaginationHandler paginationHandler) {
     this.sessionFactory = sessionFactory;
     this.criteriaHandler = criteriaHandler;
     this.paginationHandler = paginationHandler;
@@ -64,13 +65,14 @@ public class CertificateDaoImpl implements CertificateDao {
   }
 
   @Override
-  public List<CertificateDtoWithoutTags> readAll(CertificatesRequest request, PaginationParameter parameter) {
+  public List<CertificateDtoWithoutTags> readAll(
+      CertificatesRequest request, PaginationParameter parameter) {
     Session session = sessionFactory.getCurrentSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Certificate> criteria = criteriaHandler.filterWithParameters(builder, request);
 
     TypedQuery<Certificate> typedQuery = session.createQuery(criteria);
-    paginationHandler.setPageToQuery(typedQuery,parameter);
+    paginationHandler.setPageToQuery(typedQuery, parameter);
 
     List<Certificate> certificates = typedQuery.getResultList();
     return certificates.stream().map(CertificateDtoWithoutTags::new).collect(Collectors.toList());

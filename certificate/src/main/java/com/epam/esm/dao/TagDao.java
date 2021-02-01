@@ -30,6 +30,7 @@ public interface TagDao {
   /**
    * Read all list.
    *
+   * @param parameter the parameter
    * @return the list
    */
   List<TagDto> readAll(PaginationParameter parameter);

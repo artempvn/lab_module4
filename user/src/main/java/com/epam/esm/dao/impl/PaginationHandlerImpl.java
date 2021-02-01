@@ -2,7 +2,6 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dto.PaginationParameter;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.TypedQuery;

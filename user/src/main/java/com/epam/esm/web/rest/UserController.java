@@ -2,8 +2,8 @@ package com.epam.esm.web.rest;
 
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.dto.UserDto;
+import com.epam.esm.dto.UserDtoWithOrders;
 import com.epam.esm.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,5 +38,5 @@ public class UserController {
   public ResponseEntity<TagDto> readMostWidelyTagFromUserWithHighestCostOrders() {
     TagDto tag = userService.takeMostWidelyTagFromUserWithHighestCostOrders();
     return ResponseEntity.status(HttpStatus.OK).body(tag);
-    }
+  }
 }
