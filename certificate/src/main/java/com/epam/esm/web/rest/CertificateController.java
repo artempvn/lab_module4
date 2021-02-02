@@ -2,6 +2,8 @@ package com.epam.esm.web.rest;
 
 import com.epam.esm.dto.*;
 import com.epam.esm.service.CertificateService;
+import com.epam.esm.web.service.HateoasHandler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,32 +19,40 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class CertificateController {
 
   private final CertificateService certificateService;
+  private final HateoasHandler hateoasHandler;
 
-  public CertificateController(CertificateService certificateService) {
+  public CertificateController(
+      CertificateService certificateService, HateoasHandler hateoasHandler) {
     this.certificateService = certificateService;
+    this.hateoasHandler = hateoasHandler;
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<CertificateDtoWithTags> readCertificate(@PathVariable long id) {
-    CertificateDtoWithTags certificate = certificateService.read(id);
-    Link selfLink = linkTo(CertificateController.class).slash(id).withSelfRel();
-    certificate.add(selfLink);
-    certificate
-        .getTags()
-        .forEach(tag -> tag.add(linkTo(TagController.class).slash(tag.getId()).withSelfRel()));
+  public ResponseEntity<EntityModel<CertificateDtoWithTags>> readCertificate(
+      @PathVariable long id) {
+    EntityModel<CertificateDtoWithTags> certificate = EntityModel.of(certificateService.read(id));
+    certificate.add(takeCertificateLinks(certificate.getContent().getId()));
     return ResponseEntity.status(HttpStatus.OK).body(certificate);
   }
 
   @GetMapping
-  public List<CertificateDtoWithoutTags> readCertificates(
-      CertificatesRequest request, @Valid PaginationParameter parameter) {
-    List<CertificateDtoWithoutTags> certificates = certificateService.readAll(request, parameter);
-    certificates.forEach(
-        certificate ->
-            certificate.add(
-                linkTo(CertificateController.class).slash(certificate.getId()).withSelfRel()));
+  public ResponseEntity<EntityModel<PageData<EntityModel<CertificateDtoWithoutTags>>>>
+      readCertificates(CertificatesRequest request, @Valid PaginationParameter parameter) {
+    PageData<CertificateDtoWithoutTags> page = certificateService.readAll(request, parameter);
 
-    return certificates;
+    EntityModel<PageData<EntityModel<CertificateDtoWithoutTags>>> hateoasPage =
+        hateoasHandler.wrapPageWithEntityModel(page);
+    hateoasPage
+        .getContent()
+        .getContent()
+        .forEach(
+            certificate -> certificate.add(takeCertificateLinks(certificate.getContent().getId())));
+
+    hateoasPage.add(
+        hateoasHandler.takeLinksForPagination(
+            CertificateController.class, parameter, page.getNumberOfPages()));
+    hateoasPage.add(takeCertificatesLinks());
+    return ResponseEntity.status(HttpStatus.OK).body(hateoasPage);
   }
 
   @PostMapping
@@ -73,5 +83,17 @@ public class CertificateController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteCertificate(@PathVariable long id) {
     certificateService.delete(id);
+  }
+
+  List<Link> takeCertificateLinks(long id) {
+    return List.of(
+        linkTo(CertificateController.class).slash(id).withSelfRel(),
+        linkTo(CertificateController.class).slash(id).withRel("put certificate"),
+        linkTo(CertificateController.class).slash(id).withRel("patch certificate"),
+        linkTo(CertificateController.class).slash(id).withRel("delete certificate"));
+  }
+
+  List<Link> takeCertificatesLinks() {
+    return List.of(linkTo(CertificateController.class).withRel("create certificate"));
   }
 }

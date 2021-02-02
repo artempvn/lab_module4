@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CertificateDtoWithoutTags extends RepresentationModel<CertificateDtoWithoutTags> {
+public class CertificateDtoWithoutTags{
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
 

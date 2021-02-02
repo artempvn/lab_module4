@@ -52,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public List<OrderDto> readAllByUser(long userId, PaginationParameter parameter) {
+  public PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter) {
     return orderDao.readAllByUser(userId, parameter);
   }
 

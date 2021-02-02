@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CertificateDtoWithTags extends RepresentationModel<CertificateDtoWithTags> {
+public class CertificateDtoWithTags {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
 

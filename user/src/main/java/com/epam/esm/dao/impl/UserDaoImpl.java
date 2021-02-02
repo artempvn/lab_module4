@@ -2,11 +2,9 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.UserDao;
+import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.dao.entity.User;
-import com.epam.esm.dto.PaginationParameter;
-import com.epam.esm.dto.TagDto;
-import com.epam.esm.dto.UserDto;
-import com.epam.esm.dto.UserDtoWithOrders;
+import com.epam.esm.dto.*;
 import com.epam.esm.exception.TagException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -29,16 +27,24 @@ import java.util.stream.Collectors;
 public class UserDaoImpl implements UserDao {
 
   private static final String SQL_REQUEST_FOR_USER_ID_WITH_HIGHEST_COST_ORDERS =
-      "(SELECT id FROM  (SELECT SUM(price) AS summa,users.id FROM ordered_certificates "
-          + "JOIN orders ON order_id=orders.id JOIN users ON user_id=users.id GROUP BY users.id) AS user_orders_cost"
+      "(SELECT id "
+          + "FROM  "
+          + "(SELECT SUM(price) AS summa,users.id "
+          + "FROM ordered_certificates "
+          + "JOIN orders ON order_id=orders.id JOIN users ON user_id=users.id "
+          + "GROUP BY users.id) AS user_orders_cost"
           + " ORDER BY summa desc limit 1)";
 
   private static final String SQL_REQUEST_FOR_WIDELY_USED_TAG_FROM_HIGHEST_COST_ORDERS_USER =
-      "SELECT ordered_tags.id, ordered_tags.name FROM ordered_tags JOIN ordered_certificates_tags "
-          + "ON ordered_tags.id=tag_id JOIN ordered_certificates ON ordered_certificates.id=certificate_id "
-          + "JOIN orders ON orders.id=order_id JOIN users ON users.id=user_id WHERE users.id="
+      "SELECT ordered_tags.id, ordered_tags.name "
+          + "FROM ordered_tags "
+          + "JOIN ordered_certificates_tags ON ordered_tags.id=tag_id "
+          + "JOIN ordered_certificates ON ordered_certificates.id=certificate_id "
+          + "JOIN orders ON orders.id=order_id JOIN users ON users.id=user_id "
+          + "WHERE users.id="
           + SQL_REQUEST_FOR_USER_ID_WITH_HIGHEST_COST_ORDERS
-          + " GROUP BY ordered_tags.name ORDER BY count(ordered_tags.name) desc limit 1;";
+          + " GROUP BY ordered_tags.name "
+          + "ORDER BY count(ordered_tags.name) desc limit 1;";
   private final SessionFactory sessionFactory;
   private final PaginationHandler paginationHandler;
 
@@ -70,18 +76,24 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public List<UserDto> readAll(PaginationParameter parameter) {
+  public PageData<UserDto> readAll(PaginationParameter parameter) {
     Session session = sessionFactory.getCurrentSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
+
     CriteriaQuery<User> criteriaQuery = builder.createQuery(User.class);
     Root<User> from = criteriaQuery.from(User.class);
     CriteriaQuery<User> select = criteriaQuery.select(from);
 
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    countQuery.select(builder.count(countQuery.from(User.class)));
+    Long numberOfElements = session.createQuery(countQuery).getSingleResult();
+    long numberOfPages= paginationHandler.calculateNumberOfPages(numberOfElements,parameter.getSize());
+
     TypedQuery<User> typedQuery = session.createQuery(select);
     paginationHandler.setPageToQuery(typedQuery, parameter);
+    List<UserDto> users = typedQuery.getResultList().stream().map(UserDto::new).collect(Collectors.toList());
 
-    List<User> users = typedQuery.getResultList();
-    return users.stream().map(UserDto::new).collect(Collectors.toList());
+    return new PageData<>(parameter.getPage(),numberOfElements,numberOfPages,users);
   }
 
   @Override

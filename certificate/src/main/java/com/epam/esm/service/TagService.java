@@ -1,10 +1,9 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagAction;
 import com.epam.esm.dto.TagDto;
-
-import java.util.List;
 
 /** The interface Tag service. */
 public interface TagService {
@@ -31,7 +30,7 @@ public interface TagService {
    * @param parameter the parameter
    * @return the list
    */
-  List<TagDto> readAll(PaginationParameter parameter);
+  PageData<TagDto> readAll(PaginationParameter parameter);
 
   /**
    * Delete.

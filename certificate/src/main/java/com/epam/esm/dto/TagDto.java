@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TagDto extends RepresentationModel<TagDto> {
+public class TagDto  {
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;

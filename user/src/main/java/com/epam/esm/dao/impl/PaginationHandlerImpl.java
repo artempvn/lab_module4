@@ -11,11 +11,14 @@ public class PaginationHandlerImpl implements PaginationHandler {
 
   @Override
   public void setPageToQuery(TypedQuery<?> typedQuery, PaginationParameter parameter) {
-    if (parameter.getPage() != null && parameter.getSize() != null) {
-      int page = parameter.getPage();
-      int pageSize = parameter.getSize();
-      typedQuery.setFirstResult((page - 1) * pageSize);
-      typedQuery.setMaxResults(pageSize);
-    }
+    int page = parameter.getPage();
+    int pageSize = parameter.getSize();
+    typedQuery.setFirstResult((page - 1) * pageSize);
+    typedQuery.setMaxResults(pageSize);
+  }
+
+  @Override
+  public long calculateNumberOfPages(long numberOfElements, int pageSize){
+    return (long) Math.ceil(1.0*numberOfElements/pageSize);
   }
 }

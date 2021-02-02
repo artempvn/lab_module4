@@ -1,11 +1,6 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.OrderDto;
-import com.epam.esm.dto.OrderDtoWithCertificates;
-import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
-import com.epam.esm.dto.PaginationParameter;
-
-import java.util.List;
+import com.epam.esm.dto.*;
 
 /** The interface Order service. */
 public interface OrderService {
@@ -26,7 +21,7 @@ public interface OrderService {
    * @param parameter the parameter
    * @return the list
    */
-  List<OrderDto> readAllByUser(long userId, PaginationParameter parameter);
+  PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter);
 
   /**
    * Read order by user order dto with certificates.

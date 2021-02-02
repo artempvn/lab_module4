@@ -1,6 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagAction;
 import com.epam.esm.dto.TagDto;
@@ -41,7 +42,7 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
-  public List<TagDto> readAll(PaginationParameter parameter) {
+  public PageData<TagDto> readAll(PaginationParameter parameter) {
     return tagDao.readAll(parameter);
   }
 

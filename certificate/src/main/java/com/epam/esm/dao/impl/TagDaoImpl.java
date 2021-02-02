@@ -2,9 +2,10 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.dao.entity.Tag;
+import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -49,7 +50,7 @@ public class TagDaoImpl implements TagDao {
   }
 
   @Override
-  public List<TagDto> readAll(PaginationParameter parameter) {
+  public PageData<TagDto> readAll(PaginationParameter parameter) {
     Session session = sessionFactory.getCurrentSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
 
@@ -57,10 +58,16 @@ public class TagDaoImpl implements TagDao {
     Root<Tag> from = criteriaQuery.from(Tag.class);
     CriteriaQuery<Tag> select = criteriaQuery.select(from);
 
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    countQuery.select(builder.count(countQuery.from(Tag.class)));
+    Long numberOfElements = session.createQuery(countQuery).getSingleResult();
+    long numberOfPages= paginationHandler.calculateNumberOfPages(numberOfElements,parameter.getSize());
+
     TypedQuery<Tag> typedQuery = session.createQuery(select);
     paginationHandler.setPageToQuery(typedQuery, parameter);
-    List<Tag> tags = typedQuery.getResultList();
-    return tags.stream().map(TagDto::new).collect(Collectors.toList());
+    List<TagDto> tags = typedQuery.getResultList().stream().map(TagDto::new).collect(Collectors.toList());
+
+    return new PageData<>(parameter.getPage(),numberOfElements,numberOfPages,tags);
   }
 
   @Override

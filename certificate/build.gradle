@@ -23,10 +23,12 @@ dependencies {
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.12.0'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.4.2'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
     implementation group: 'org.hibernate', name: 'hibernate-validator', version: '7.0.0.Final'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '2.4.2'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.3'
+
 }
 
 test {

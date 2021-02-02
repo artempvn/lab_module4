@@ -1,10 +1,12 @@
 package com.epam.esm.web.rest;
 
+import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagAction;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.TagService;
-import org.springframework.hateoas.CollectionModel;
+import com.epam.esm.web.service.HateoasHandler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,30 +23,38 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class TagController {
 
   private final TagService tagService;
+  private final HateoasHandler hateoasHandler;
 
-  public TagController(TagService tagService) {
+  public TagController(TagService tagService, HateoasHandler hateoasHandler) {
     this.tagService = tagService;
+    this.hateoasHandler = hateoasHandler;
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<TagDto> readTag(@PathVariable long id) {
-    TagDto tag = tagService.read(id);
-    Link selfLink = linkTo(TagController.class).slash(id).withSelfRel();
-    tag.add(selfLink);
+  public ResponseEntity<EntityModel<TagDto>> readTag(@PathVariable long id) {
+    EntityModel<TagDto> tag = EntityModel.of(tagService.read(id));
+    tag.add(takeTagLinks(id));
     return ResponseEntity.status(HttpStatus.OK).body(tag);
   }
 
-  @GetMapping(produces = {"application/hal+json"})
+  @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  public CollectionModel<TagDto> readTags(@Valid PaginationParameter parameter) {
-    List<TagDto> tags = tagService.readAll(parameter);
-    tags.forEach(tag -> tag.add(linkTo(TagController.class).slash(tag.getId()).withSelfRel()));
+  public ResponseEntity<EntityModel<PageData<EntityModel<TagDto>>>> readTags(
+      @Valid PaginationParameter parameter) {
+    PageData<TagDto> page = tagService.readAll(parameter);
 
-    Link selfLink = linkTo(TagController.class).withSelfRel();
-    ResponseEntity<Void> methodLinkBuilder =
-        methodOn(TagController.class).processTagAction(new TagAction());
-    Link tagAction = linkTo(methodLinkBuilder).withRel("tag action with certificate");
-    return CollectionModel.of(tags, selfLink, tagAction);
+    EntityModel<PageData<EntityModel<TagDto>>> hateoasPage =
+        hateoasHandler.wrapPageWithEntityModel(page);
+    hateoasPage
+        .getContent()
+        .getContent()
+        .forEach(tag -> tag.add(takeTagLinks(tag.getContent().getId())));
+
+    hateoasPage.add(
+        hateoasHandler.takeLinksForPagination(
+            TagController.class, parameter, page.getNumberOfPages()));
+    hateoasPage.add(takeTagsLinks());
+    return ResponseEntity.status(HttpStatus.OK).body(hateoasPage);
   }
 
   @PostMapping
@@ -64,5 +74,17 @@ public class TagController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteTag(@PathVariable long id) {
     tagService.delete(id);
+  }
+
+  List<Link> takeTagLinks(long id) {
+    return List.of(
+        linkTo(TagController.class).slash(id).withSelfRel(),
+        linkTo(TagController.class).slash(id).withRel("delete tag"));
+  }
+
+  List<Link> takeTagsLinks() {
+    return List.of(
+        linkTo(methodOn(TagController.class).processTagAction(new TagAction()))
+            .withRel("tag action with certificate"));
   }
 }

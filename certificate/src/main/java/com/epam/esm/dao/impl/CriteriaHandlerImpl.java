@@ -1,27 +1,28 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CriteriaHandler;
+import com.epam.esm.dao.PredicateFactory;
+import com.epam.esm.dao.ReflectionService;
 import com.epam.esm.dao.entity.Certificate;
-import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.dto.CertificatesRequest;
 import com.epam.esm.dto.SortParam;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.*;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class CriteriaHandlerImpl implements CriteriaHandler {
-
   private static final List<String> CERTIFICATE_FIELD_NAMES =
       List.of("name", "description", "price", "duration", "lastUpdateDate");
   private static final Map<String, String> SORTING_FIELD_NAMES =
       Map.of("date", "createDate", "name", "name");
-  private static final List<String> FILTER_REQUEST_FIELDS = List.of("name", "description");
 
   private static final Map<
           SortParam.SortingType, BiFunction<CriteriaBuilder, Path<Certificate>, Order>>
@@ -32,13 +33,23 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
               SortParam.SortingType.DESC,
               CriteriaBuilder::desc);
 
+  private final ReflectionService reflectionService;
+  private final List<PredicateFactory> predicateFactories;
+
+  public CriteriaHandlerImpl(
+      ReflectionService reflectionService, List<PredicateFactory> predicateFactories) {
+    this.reflectionService = reflectionService;
+    this.predicateFactories = predicateFactories;
+  }
+
   @Override
   public CriteriaUpdate<Certificate> updateWithNotNullFields(
       CriteriaBuilder builder, Certificate certificate) {
     CriteriaUpdate<Certificate> criteria = builder.createCriteriaUpdate(Certificate.class);
     Root<Certificate> root = criteria.from(Certificate.class);
 
-    List<Field> notNullFields = takeNotNullFields(certificate, CERTIFICATE_FIELD_NAMES);
+    List<Field> notNullFields =
+        reflectionService.takeNotNullFields(certificate, CERTIFICATE_FIELD_NAMES);
     criteria = addCriteriaValuableFields(certificate, criteria, root, notNullFields);
 
     criteria.where(builder.equal(root.get("id"), certificate.getId()));
@@ -51,17 +62,16 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
     CriteriaQuery<Certificate> criteria = builder.createQuery(Certificate.class);
     Root<Certificate> root = criteria.from(Certificate.class);
 
-    List<Field> notNullFilterFields = takeNotNullFields(request, FILTER_REQUEST_FIELDS);
-    Predicate[] arrayOfPredicates =
-        takeFilteringPredicatesAsArray(builder, request, root, notNullFilterFields);
-    criteria.where(arrayOfPredicates);
-
-    Predicate[] arrayOfPredicatesTags = takeTagsPredicatesAsArray(builder, request, root);
-    criteria.where(arrayOfPredicatesTags);
+    List<Predicate> predicates=new ArrayList<>();
+    predicateFactories.stream().map(factory ->
+             factory.buildPredicates(builder, request, root)).forEach(predicates::addAll);
+    Predicate[] predicatesArray=convertListPredicatesToArray(predicates);
+    criteria.where(predicatesArray);
 
     SortParam param = request.getSort();
     if (param != null) {
-      List<Field> notNullSortingFields = takeNotNullFields(param, SORTING_FIELD_NAMES.keySet());
+      List<Field> notNullSortingFields =
+          reflectionService.takeNotNullFields(param, SORTING_FIELD_NAMES.keySet());
       List<Order> orders = takeSortingOrders(builder, root, param, notNullSortingFields);
       criteria.orderBy(orders);
     }
@@ -69,26 +79,11 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
     return criteria;
   }
 
-  Predicate[] takeTagsPredicatesAsArray(
-      CriteriaBuilder builder, CertificatesRequest request, Root<Certificate> root) {
-    List<Predicate> predicates = takeTagsPredicates(builder, request, root);
-
+  Predicate[] convertListPredicatesToArray(
+      List<Predicate> predicates) {
     Predicate[] arrayOfPredicates = new Predicate[predicates.size()];
     predicates.toArray(arrayOfPredicates);
-
     return arrayOfPredicates;
-  }
-
-  List<Predicate> takeTagsPredicates(
-      CriteriaBuilder builder, CertificatesRequest request, Root<Certificate> root) {
-    List<Predicate> predicates = new ArrayList<>();
-    List<String> tags = request.getTags();
-
-    for (String tag : tags) {
-      Join<Certificate, Tag> join = root.join("tags");
-      predicates.add(builder.equal(join.get("name"), tag));
-    }
-    return predicates;
   }
 
   List<Order> takeSortingOrders(
@@ -105,7 +100,9 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
       CriteriaBuilder builder, Root<Certificate> root, SortParam param) {
     return field -> {
       SortParam.SortingType sortingType =
-          takeValueFromField(field, param, SortParam.SortingType.class).orElseThrow();
+          reflectionService
+              .takeValueFromField(field, param, SortParam.SortingType.class)
+              .orElseThrow();
 
       String fieldName = field.getName();
       String sortingFieldName = SORTING_FIELD_NAMES.get(fieldName);
@@ -115,63 +112,6 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
     };
   }
 
-  Predicate[] takeFilteringPredicatesAsArray(
-      CriteriaBuilder builder,
-      CertificatesRequest request,
-      Root<Certificate> root,
-      List<Field> notNullFilterFields) {
-    List<Predicate> predicates =
-        takeFilteringPredicates(builder, request, root, notNullFilterFields);
-
-    Predicate[] arrayOfPredicates = new Predicate[predicates.size()];
-    predicates.toArray(arrayOfPredicates);
-
-    return arrayOfPredicates;
-  }
-
-  List<Predicate> takeFilteringPredicates(
-      CriteriaBuilder builder,
-      CertificatesRequest request,
-      Root<Certificate> root,
-      List<Field> notNullFilterFields) {
-    return notNullFilterFields.stream()
-        .map(takeFieldPredicateFunction(builder, request, root))
-        .collect(Collectors.toList());
-  }
-
-  Function<Field, Predicate> takeFieldPredicateFunction(
-      CriteriaBuilder builder, CertificatesRequest request, Root<Certificate> root) {
-    return field -> {
-      String fieldName = field.getName();
-      String value = takeValueFromField(field, request).orElseThrow().toString();
-      return builder.like(root.get(fieldName), String.format("%%%s%%", value));
-    };
-  }
-
-  List<Field> takeNotNullFields(Object obj, Collection<String> requiredFields) {
-    Class<?> clazz = obj.getClass();
-    Field[] fields = clazz.getDeclaredFields();
-    return Arrays.stream(fields)
-        .filter(field -> requiredFields.contains(field.getName()))
-        .filter(field -> takeValueFromField(field, obj).isPresent())
-        .collect(Collectors.toList());
-  }
-
-  Optional<Object> takeValueFromField(Field field, Object inputObject) {
-    field.setAccessible(true);
-    Object fieldValue;
-    try {
-      fieldValue = field.get(inputObject);
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException("impossible exception");
-    }
-    return Optional.ofNullable(fieldValue);
-  }
-
-  <T> Optional<T> takeValueFromField(Field field, Object inputObject, Class<T> clazz) {
-    return takeValueFromField(field, inputObject).map(value -> (T) value);
-  }
-
   CriteriaUpdate<Certificate> addCriteriaValuableFields(
       Certificate certificate,
       CriteriaUpdate<Certificate> criteria,
@@ -179,7 +119,7 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
       List<Field> notNullFields) {
     for (Field field : notNullFields) {
       String fieldName = field.getName();
-      Object value = takeValueFromField(field, certificate).orElseThrow();
+      Object value = reflectionService.takeValueFromField(field, certificate).orElseThrow();
       criteria.set(root.get(fieldName), value);
     }
     return criteria;

@@ -1,11 +1,7 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dto.OrderDto;
-import com.epam.esm.dto.OrderDtoWithCertificates;
-import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
-import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.dto.*;
 
-import java.util.List;
 import java.util.Optional;
 
 /** The interface Order dao. */
@@ -27,7 +23,7 @@ public interface OrderDao {
    * @param parameter the parameter
    * @return the list
    */
-  List<OrderDto> readAllByUser(long userId, PaginationParameter parameter);
+  PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter);
 
   /**
    * Read order by user optional.

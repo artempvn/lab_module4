@@ -4,10 +4,7 @@ import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.CriteriaHandler;
 import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.entity.Certificate;
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.CertificateDtoWithoutTags;
-import com.epam.esm.dto.CertificatesRequest;
-import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.dto.*;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -65,7 +62,7 @@ public class CertificateDaoImpl implements CertificateDao {
   }
 
   @Override
-  public List<CertificateDtoWithoutTags> readAll(
+  public PageData<CertificateDtoWithoutTags> readAll(
       CertificatesRequest request, PaginationParameter parameter) {
     Session session = sessionFactory.getCurrentSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -74,8 +71,18 @@ public class CertificateDaoImpl implements CertificateDao {
     TypedQuery<Certificate> typedQuery = session.createQuery(criteria);
     paginationHandler.setPageToQuery(typedQuery, parameter);
 
-    List<Certificate> certificates = typedQuery.getResultList();
-    return certificates.stream().map(CertificateDtoWithoutTags::new).collect(Collectors.toList());
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    countQuery.select(builder.count(countQuery.from(Certificate.class)));
+    Long numberOfElements = session.createQuery(countQuery).getSingleResult();
+    long numberOfPages =
+        paginationHandler.calculateNumberOfPages(numberOfElements, parameter.getSize());
+
+    List<CertificateDtoWithoutTags> certificates =
+        typedQuery.getResultList().stream()
+            .map(CertificateDtoWithoutTags::new)
+            .collect(Collectors.toList());
+
+    return new PageData<>(parameter.getPage(), numberOfElements, numberOfPages, certificates);
   }
 
   @Override

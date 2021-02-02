@@ -1,17 +1,13 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.PaginationParameter;
-import com.epam.esm.dto.TagDto;
-import com.epam.esm.dto.UserDto;
-import com.epam.esm.dto.UserDtoWithOrders;
+import com.epam.esm.dto.*;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,7 +27,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public List<UserDto> readAll(PaginationParameter parameter) {
+  public PageData<UserDto> readAll(PaginationParameter parameter) {
     return userDao.readAll(parameter);
   }
 

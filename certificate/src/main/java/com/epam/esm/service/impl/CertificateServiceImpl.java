@@ -1,10 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.CertificateDtoWithoutTags;
-import com.epam.esm.dto.CertificatesRequest;
-import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.dto.*;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.service.TagService;
@@ -13,7 +10,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -46,7 +42,7 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
-  public List<CertificateDtoWithoutTags> readAll(
+  public PageData<CertificateDtoWithoutTags> readAll(
       CertificatesRequest request, PaginationParameter parameter) {
     return certificateDao.readAll(request, parameter);
   }

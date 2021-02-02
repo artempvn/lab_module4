@@ -1,11 +1,6 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.PaginationParameter;
-import com.epam.esm.dto.TagDto;
-import com.epam.esm.dto.UserDto;
-import com.epam.esm.dto.UserDtoWithOrders;
-
-import java.util.List;
+import com.epam.esm.dto.*;
 
 /** The interface User service. */
 public interface UserService {
@@ -24,7 +19,7 @@ public interface UserService {
    * @param parameter the parameter
    * @return the list
    */
-  List<UserDto> readAll(PaginationParameter parameter);
+  PageData<UserDto> readAll(PaginationParameter parameter);
 
   /**
    * Take most widely tag from user with highest cost orders tag dto.
