@@ -28,6 +28,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.3'
+    implementation group: 'com.h2database', name: 'h2', version: '1.4.200'
 
 }
 

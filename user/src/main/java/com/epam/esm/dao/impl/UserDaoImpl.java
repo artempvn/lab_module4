@@ -2,7 +2,6 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.dao.entity.User;
 import com.epam.esm.dto.*;
 import com.epam.esm.exception.TagException;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -45,39 +45,40 @@ public class UserDaoImpl implements UserDao {
           + SQL_REQUEST_FOR_USER_ID_WITH_HIGHEST_COST_ORDERS
           + " GROUP BY ordered_tags.name "
           + "ORDER BY count(ordered_tags.name) desc limit 1;";
-  private final SessionFactory sessionFactory;
-  private final PaginationHandler paginationHandler;
 
-  public UserDaoImpl(SessionFactory sessionFactory, PaginationHandler paginationHandler) {
-    this.sessionFactory = sessionFactory;
+  private final PaginationHandler paginationHandler;
+  private final EntityManager entityManager;
+
+  public UserDaoImpl(PaginationHandler paginationHandler, EntityManager entityManager) {
     this.paginationHandler = paginationHandler;
+    this.entityManager = entityManager;
   }
 
   @Override
   public UserDto create(UserDto dto) {
     User user = new User(dto);
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     session.save(user);
     return new UserDto(user);
   }
 
   @Override
   public Optional<UserDtoWithOrders> read(long id) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Optional<User> user = Optional.ofNullable(session.get(User.class, id));
     return user.map(UserDtoWithOrders::new);
   }
 
   @Override
   public Optional<UserDto> readWithoutOrders(long id) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Optional<User> user = Optional.ofNullable(session.get(User.class, id));
     return user.map(UserDto::new);
   }
 
   @Override
   public PageData<UserDto> readAll(PaginationParameter parameter) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     CriteriaBuilder builder = session.getCriteriaBuilder();
 
     CriteriaQuery<User> criteriaQuery = builder.createQuery(User.class);
@@ -98,7 +99,7 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public TagDto takeMostWidelyTagFromUserWithHighestCostOrders() {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Query q =
         session.createNativeQuery(SQL_REQUEST_FOR_WIDELY_USED_TAG_FROM_HIGHEST_COST_ORDERS_USER);
 

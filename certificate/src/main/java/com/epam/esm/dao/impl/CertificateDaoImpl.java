@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -28,23 +29,23 @@ public class CertificateDaoImpl implements CertificateDao {
       "INSERT INTO certificates_tags(tag_id,certificate_id) VALUES (:tag_id,:certificate_id)";
   public static final String SQL_REMOVE_TAG =
       "DELETE FROM certificates_tags WHERE tag_id=:tag_id AND certificate_id=:certificate_id ";
-  private final SessionFactory sessionFactory;
+
   private final CriteriaHandler criteriaHandler;
   private final PaginationHandler paginationHandler;
+  private final EntityManager entityManager;
 
   public CertificateDaoImpl(
-      SessionFactory sessionFactory,
-      CriteriaHandler criteriaHandler,
-      PaginationHandler paginationHandler) {
-    this.sessionFactory = sessionFactory;
+          CriteriaHandler criteriaHandler,
+          PaginationHandler paginationHandler, EntityManager entityManager) {
     this.criteriaHandler = criteriaHandler;
     this.paginationHandler = paginationHandler;
+    this.entityManager = entityManager;
   }
 
   @Override
   public CertificateDtoWithTags create(CertificateDtoWithTags certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     session.save(certificate);
 
     certificate.getTags().forEach(session::merge);
@@ -56,7 +57,7 @@ public class CertificateDaoImpl implements CertificateDao {
 
   @Override
   public Optional<CertificateDtoWithTags> read(long id) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Optional<Certificate> certificate = Optional.ofNullable(session.get(Certificate.class, id));
     return certificate.map(CertificateDtoWithTags::new);
   }
@@ -64,7 +65,7 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public PageData<CertificateDtoWithoutTags> readAll(
       CertificatesRequest request, PaginationParameter parameter) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Certificate> criteria = criteriaHandler.filterWithParameters(builder, request);
 
@@ -88,7 +89,7 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public void update(CertificateDtoWithTags certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Optional<Certificate> existingCertificate =
         Optional.ofNullable(session.get(Certificate.class, certificate.getId()));
     existingCertificate.ifPresentOrElse(
@@ -102,7 +103,7 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public void updatePresentedFields(CertificateDtoWithoutTags certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaUpdate<Certificate> criteria =
         criteriaHandler.updateWithNotNullFields(builder, certificate);
@@ -114,7 +115,7 @@ public class CertificateDaoImpl implements CertificateDao {
 
   @Override
   public void delete(long id) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Optional<Certificate> certificate = Optional.ofNullable(session.get(Certificate.class, id));
     certificate.ifPresentOrElse(
         session::delete,
@@ -125,7 +126,7 @@ public class CertificateDaoImpl implements CertificateDao {
 
   @Override
   public void addTag(long tagId, long certificateId) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Query q =
         session
             .createNativeQuery(SQL_ADD_TAG)
@@ -136,7 +137,7 @@ public class CertificateDaoImpl implements CertificateDao {
 
   @Override
   public int removeTag(long tagId, long certificateId) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Query q =
         session
             .createNativeQuery(SQL_REMOVE_TAG)

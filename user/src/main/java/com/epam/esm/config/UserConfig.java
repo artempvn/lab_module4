@@ -21,30 +21,6 @@ import java.util.Locale;
 @Configuration
 public class UserConfig {
 
-  @Autowired private Environment environment;
-
-  @Bean
-  public DataSource getDataSource() {
-    DriverManagerDataSource dataSource =
-        new DriverManagerDataSource(
-            environment.getProperty("url"),
-            environment.getProperty("uname"),
-            environment.getProperty("password"));
-    dataSource.setDriverClassName(environment.getProperty("driver"));
-    return dataSource;
-  }
-
-  @Bean(name = "userSessionFactory")
-  public SessionFactory getSessionFactory() {
-    org.hibernate.cfg.Configuration configuration =
-        new org.hibernate.cfg.Configuration().configure();
-    configuration.addAnnotatedClass(User.class);
-    configuration.addAnnotatedClass(Tag.class);
-    configuration.addAnnotatedClass(Order.class);
-    configuration.addAnnotatedClass(Certificate.class);
-    return configuration.buildSessionFactory();
-  }
-
   @Bean
   public LocalValidatorFactoryBean getValidator() {
     LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();

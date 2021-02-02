@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -26,32 +27,32 @@ import java.util.stream.Collectors;
 @Transactional(propagation = Propagation.REQUIRED)
 public class TagDaoImpl implements TagDao {
 
-  private final SessionFactory sessionFactory;
   private final PaginationHandler paginationHandler;
+  private final EntityManager entityManager;
 
-  public TagDaoImpl(SessionFactory sessionFactory, PaginationHandler paginationHandler) {
-    this.sessionFactory = sessionFactory;
+  public TagDaoImpl(PaginationHandler paginationHandler, EntityManager entityManager) {
     this.paginationHandler = paginationHandler;
+    this.entityManager = entityManager;
   }
 
   @Override
   public TagDto create(TagDto tagDto) {
     Tag tag = new Tag(tagDto);
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     session.save(tag);
     return new TagDto(tag);
   }
 
   @Override
   public Optional<TagDto> read(long id) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Optional<Tag> tag = Optional.ofNullable(session.get(Tag.class, id));
     return tag.map(TagDto::new);
   }
 
   @Override
   public PageData<TagDto> readAll(PaginationParameter parameter) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     CriteriaBuilder builder = session.getCriteriaBuilder();
 
     CriteriaQuery<Tag> criteriaQuery = builder.createQuery(Tag.class);
@@ -72,7 +73,7 @@ public class TagDaoImpl implements TagDao {
 
   @Override
   public void delete(long id) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Optional<Tag> tag = Optional.ofNullable(session.get(Tag.class, id));
     tag.ifPresentOrElse(
         session::delete,
@@ -83,7 +84,7 @@ public class TagDaoImpl implements TagDao {
 
   @Override
   public Optional<TagDto> read(String name) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     String hql = "from  Tag where name=:name";
     Query query = session.createQuery(hql).setParameter("name", name);
     Optional<Tag> tag = query.getResultStream().findFirst();

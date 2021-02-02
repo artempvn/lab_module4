@@ -4,7 +4,6 @@ import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.entity.Certificate;
 import com.epam.esm.dao.entity.Order;
-import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.dao.entity.User;
 import com.epam.esm.dto.*;
 import com.epam.esm.exception.ResourceValidationException;
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,11 +23,12 @@ import java.util.stream.Collectors;
 @Transactional(propagation = Propagation.REQUIRED)
 public class OrderDaoImpl implements OrderDao {
 
-  private final SessionFactory sessionFactory;
+  private final EntityManager entityManager;
   private final PaginationHandler paginationHandler;
 
-  public OrderDaoImpl(SessionFactory sessionFactory, PaginationHandler paginationHandler) {
-    this.sessionFactory = sessionFactory;
+  public OrderDaoImpl(EntityManager entityManager, PaginationHandler paginationHandler) {
+    this.entityManager = entityManager;
+
     this.paginationHandler = paginationHandler;
   }
 
@@ -36,7 +36,7 @@ public class OrderDaoImpl implements OrderDao {
   public OrderDtoWithCertificatesWithTagsForCreation create(
       OrderDtoWithCertificatesWithTagsForCreation dto) {
     Order order = new Order(dto);
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     session.save(order);
 
     order.getCertificates().stream()
@@ -48,7 +48,7 @@ public class OrderDaoImpl implements OrderDao {
 
   @Override
   public PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Optional.ofNullable(session.get(User.class, userId))
         .orElseThrow(ResourceValidationException.validationWithUser(userId));
 
@@ -64,7 +64,7 @@ public class OrderDaoImpl implements OrderDao {
 
   @Override
   public Optional<OrderDtoWithCertificates> readOrderByUser(long userId, long orderId) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     Optional.ofNullable(session.get(User.class, userId))
         .orElseThrow(ResourceValidationException.validationWithUser(userId));
 

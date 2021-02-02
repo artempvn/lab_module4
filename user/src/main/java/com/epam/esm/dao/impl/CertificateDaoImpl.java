@@ -8,20 +8,23 @@ import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+
 @Repository
 @Transactional
 public class CertificateDaoImpl implements CertificateDao {
 
-  private final SessionFactory sessionFactory;
 
-  public CertificateDaoImpl(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  private final EntityManager entityManager;
+
+  public CertificateDaoImpl(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override
   public CertificateDtoWithTags create(CertificateDtoWithTags certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     session.save(certificate);
 
     certificate.getTags().forEach(session::merge);

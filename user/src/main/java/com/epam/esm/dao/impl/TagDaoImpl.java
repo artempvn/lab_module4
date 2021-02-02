@@ -9,29 +9,30 @@ import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.Optional;
 
 @Repository
 @Transactional
 public class TagDaoImpl implements TagDao {
 
-  private final SessionFactory sessionFactory;
+  private final EntityManager entityManager;
 
-  public TagDaoImpl(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public TagDaoImpl(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override
   public TagDto create(TagDto tagDto) {
     Tag tag = new Tag(tagDto);
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     session.save(tag);
     return new TagDto(tag);
   }
 
   @Override
   public Optional<TagDto> read(String name) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap( Session.class );
     String hql = "from  Tag where name=:name";
     Query query = session.createQuery(hql).setParameter("name", name);
     Optional<Tag> tag = query.getResultStream().findFirst();
