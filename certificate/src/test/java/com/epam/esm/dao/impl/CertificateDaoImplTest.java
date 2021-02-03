@@ -13,19 +13,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("certificate")
 @AutoConfigureTestDatabase
 @SpringBootTest
-@Transactional
 class CertificateDaoImplTest {
 
   public static final int NOT_EXISTED_CERTIFICATE_ID = 9999999;
@@ -33,11 +33,16 @@ class CertificateDaoImplTest {
   @Autowired CertificateDao certificateDao;
   @Autowired TagDao tagDao;
   @Autowired EntityManager entityManager;
+  @Autowired TransactionTemplate txTemplate;
 
   @AfterEach
   void setDown() {
     String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
-    entityManager.createNativeQuery(sql).executeUpdate();
+    doInTransaction(() -> entityManager.createNativeQuery(sql).executeUpdate());
+  }
+
+  <T> T doInTransaction(Supplier<T> operation) {
+    return txTemplate.execute(status -> operation.get());
   }
 
   @Test
