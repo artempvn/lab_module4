@@ -62,10 +62,11 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
     CriteriaQuery<Certificate> criteria = builder.createQuery(Certificate.class);
     Root<Certificate> root = criteria.from(Certificate.class);
 
-    List<Predicate> predicates=new ArrayList<>();
-    predicateFactories.stream().map(factory ->
-             factory.buildPredicates(builder, request, root)).forEach(predicates::addAll);
-    Predicate[] predicatesArray=convertListPredicatesToArray(predicates);
+    List<Predicate> predicates = new ArrayList<>();
+    predicateFactories.stream()
+        .map(factory -> factory.buildPredicates(builder, request, root))
+        .forEach(predicates::addAll);
+    Predicate[] predicatesArray = convertListPredicatesToArray(predicates);
     criteria.where(predicatesArray);
 
     SortParam param = request.getSort();
@@ -79,8 +80,7 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
     return criteria;
   }
 
-  Predicate[] convertListPredicatesToArray(
-      List<Predicate> predicates) {
+  Predicate[] convertListPredicatesToArray(List<Predicate> predicates) {
     Predicate[] arrayOfPredicates = new Predicate[predicates.size()];
     predicates.toArray(arrayOfPredicates);
     return arrayOfPredicates;

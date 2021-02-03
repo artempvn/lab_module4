@@ -4,6 +4,7 @@ import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagAction;
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.exception.ResourceIsBoundException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.web.service.HateoasHandler;
 import org.springframework.hateoas.EntityModel;
@@ -73,7 +74,11 @@ public class TagController {
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteTag(@PathVariable long id) {
-    tagService.delete(id);
+    try {
+      tagService.delete(id);
+    } catch (Exception ex) {
+      throw ResourceIsBoundException.isBound(id).get();
+    }
   }
 
   List<Link> takeTagLinks(long id) {

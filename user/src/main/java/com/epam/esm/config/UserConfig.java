@@ -1,21 +1,12 @@
 package com.epam.esm.config;
 
-import com.epam.esm.dao.entity.Certificate;
-import com.epam.esm.dao.entity.Order;
-import com.epam.esm.dao.entity.Tag;
-import com.epam.esm.dao.entity.User;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
-import javax.sql.DataSource;
 import java.util.Locale;
 
 @Configuration

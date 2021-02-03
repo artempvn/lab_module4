@@ -10,7 +10,6 @@ import com.epam.esm.service.OrderService;
 import com.epam.esm.web.advice.ResourceAdvice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("user")
 @AutoConfigureTestDatabase
 @SpringBootTest
+@Transactional
 class OrderControllerTest {
 
   MockMvc mockMvc;
@@ -41,7 +43,7 @@ class OrderControllerTest {
   @Autowired OrderDao orderDao;
   @Autowired OrderService orderService;
   @Autowired OrderController orderController;
-  @Autowired SessionFactory sessionFactory;
+  @Autowired EntityManager entityManager;
   @Autowired ReloadableResourceBundleMessageSource messageSource;
 
   @BeforeEach
@@ -55,14 +57,11 @@ class OrderControllerTest {
 
   @AfterEach
   void setDown() {
-    try (Session session = sessionFactory.openSession()) {
-      session.beginTransaction();
-      String sql =
-          "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
-              + "DELETE FROM orders;DELETE FROM users;";
-      session.createNativeQuery(sql).executeUpdate();
-      session.getTransaction().commit();
-    }
+    Session session = entityManager.unwrap(Session.class);
+    String sql =
+        "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
+            + "DELETE FROM orders;DELETE FROM users;";
+    session.createNativeQuery(sql).executeUpdate();
   }
 
   @Test

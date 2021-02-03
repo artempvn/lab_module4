@@ -3,13 +3,12 @@ package com.epam.esm.dto;
 import com.epam.esm.dao.entity.Tag;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TagDto  {
+public class TagDto {
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;

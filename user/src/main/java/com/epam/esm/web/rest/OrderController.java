@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -44,18 +43,16 @@ public class OrderController {
       @PathVariable long userId, @Valid PaginationParameter parameter) {
     PageData<OrderDto> page = orderService.readAllByUser(userId, parameter);
 
-
     EntityModel<PageData<EntityModel<OrderDto>>> hateoasPage =
-            hateoasHandler.wrapPageWithEntityModel(page);
+        hateoasHandler.wrapPageWithEntityModel(page);
     hateoasPage
-            .getContent()
-            .getContent()
-            .forEach(
-                    order -> order.add(takeOrderLinks(userId,order.getContent().getId())));
+        .getContent()
+        .getContent()
+        .forEach(order -> order.add(takeOrderLinks(userId, order.getContent().getId())));
 
     hateoasPage.add(
-            hateoasHandler.takeLinksForPaginationWithOuterResource(
-                    OrderController.class, parameter, page.getNumberOfPages(),userId,"orders"));
+        hateoasHandler.takeLinksForPaginationWithOuterResource(
+            OrderController.class, parameter, page.getNumberOfPages(), userId, "orders"));
     hateoasPage.add(takeOrdersLinks(userId));
 
     return ResponseEntity.status(HttpStatus.OK).body(hateoasPage);
@@ -77,7 +74,6 @@ public class OrderController {
 
   List<Link> takeOrdersLinks(long userId) {
     return List.of(
-
         linkTo(
                 methodOn(OrderController.class)
                     .createOrder(userId, new OrderDtoWithCertificatesWithTagsForCreation()))

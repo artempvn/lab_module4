@@ -8,7 +8,6 @@ import com.epam.esm.dao.entity.User;
 import com.epam.esm.dto.*;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -36,7 +35,7 @@ public class OrderDaoImpl implements OrderDao {
   public OrderDtoWithCertificatesWithTagsForCreation create(
       OrderDtoWithCertificatesWithTagsForCreation dto) {
     Order order = new Order(dto);
-    Session session = entityManager.unwrap( Session.class );
+    Session session = entityManager.unwrap(Session.class);
     session.save(order);
 
     order.getCertificates().stream()
@@ -48,23 +47,24 @@ public class OrderDaoImpl implements OrderDao {
 
   @Override
   public PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter) {
-    Session session = entityManager.unwrap( Session.class );
+    Session session = entityManager.unwrap(Session.class);
     Optional.ofNullable(session.get(User.class, userId))
         .orElseThrow(ResourceValidationException.validationWithUser(userId));
 
     Query<Order> query = session.createQuery("From Order where user.id=:user");
     query.setParameter("user", userId);
-    long numberOfElements=query.getResultStream().count();
-    long numberOfPages= paginationHandler.calculateNumberOfPages(numberOfElements,parameter.getSize());
+    long numberOfElements = query.getResultStream().count();
+    long numberOfPages =
+        paginationHandler.calculateNumberOfPages(numberOfElements, parameter.getSize());
     paginationHandler.setPageToQuery(query, parameter);
     List<OrderDto> orders = query.list().stream().map(OrderDto::new).collect(Collectors.toList());
 
-    return new PageData<>(parameter.getPage(),numberOfElements,numberOfPages,orders);
+    return new PageData<>(parameter.getPage(), numberOfElements, numberOfPages, orders);
   }
 
   @Override
   public Optional<OrderDtoWithCertificates> readOrderByUser(long userId, long orderId) {
-    Session session = entityManager.unwrap( Session.class );
+    Session session = entityManager.unwrap(Session.class);
     Optional.ofNullable(session.get(User.class, userId))
         .orElseThrow(ResourceValidationException.validationWithUser(userId));
 

@@ -2,7 +2,6 @@ package com.epam.esm.web.service.impl;
 
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
-import com.epam.esm.web.rest.OrderController;
 import com.epam.esm.web.service.HateoasHandler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -45,25 +44,35 @@ public class HateoasHandlerImpl implements HateoasHandler {
 
   @Override
   public List<Link> takeLinksForPaginationWithOuterResource(
-          Class<?> clazz, PaginationParameter parameter, long numberOfPages, long outerId, String outerName) {
+      Class<?> clazz,
+      PaginationParameter parameter,
+      long numberOfPages,
+      long outerId,
+      String outerName) {
     long currentPage = parameter.getPage();
     List<Link> links = new ArrayList<>();
     links.add(
-            linkTo(clazz).slash(outerId).slash(outerName)
-                    .slash(String.format("?page=%d&size=%d", currentPage, parameter.getSize()))
-                    .withSelfRel());
+        linkTo(clazz)
+            .slash(outerId)
+            .slash(outerName)
+            .slash(String.format("?page=%d&size=%d", currentPage, parameter.getSize()))
+            .withSelfRel());
     if (currentPage > 1) {
       links.add(
-              linkTo(clazz).slash(outerId).slash(outerName)
-                      .slash(String.format("?page=%d&size=%d", currentPage - 1, parameter.getSize()))
-                      .withRel("previous page"));
+          linkTo(clazz)
+              .slash(outerId)
+              .slash(outerName)
+              .slash(String.format("?page=%d&size=%d", currentPage - 1, parameter.getSize()))
+              .withRel("previous page"));
     }
 
     if (currentPage < numberOfPages) {
       links.add(
-              linkTo(clazz).slash(outerId).slash(outerName)
-                      .slash(String.format("?page=%d&size=%d", currentPage + 1, parameter.getSize()))
-                      .withRel("next page"));
+          linkTo(clazz)
+              .slash(outerId)
+              .slash(outerName)
+              .slash(String.format("?page=%d&size=%d", currentPage + 1, parameter.getSize()))
+              .withRel("next page"));
     }
     return links;
   }

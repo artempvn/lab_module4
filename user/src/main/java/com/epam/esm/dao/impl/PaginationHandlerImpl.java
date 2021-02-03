@@ -18,7 +18,7 @@ public class PaginationHandlerImpl implements PaginationHandler {
   }
 
   @Override
-  public long calculateNumberOfPages(long numberOfElements, int pageSize){
-    return (long) Math.ceil(1.0*numberOfElements/pageSize);
+  public long calculateNumberOfPages(long numberOfElements, int pageSize) {
+    return (long) Math.ceil(1.0 * numberOfElements / pageSize);
   }
 }

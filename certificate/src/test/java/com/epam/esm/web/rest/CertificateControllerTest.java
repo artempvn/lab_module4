@@ -9,7 +9,6 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.web.advice.ResourceAdvice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,8 +21,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.LocaleResolver;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -32,12 +33,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("certificate")
 @AutoConfigureTestDatabase
 @SpringBootTest
+@Transactional
 class CertificateControllerTest {
   MockMvc mockMvc;
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
   @Autowired CertificateController certificateController;
-  @Autowired SessionFactory sessionFactory;
+  @Autowired EntityManager entityManager;
 
   @Autowired ReloadableResourceBundleMessageSource messageSource;
   @Autowired LocaleResolver localeResolver;
@@ -53,12 +55,9 @@ class CertificateControllerTest {
 
   @AfterEach
   void setDown() {
-    try (Session session = sessionFactory.openSession()) {
-      session.beginTransaction();
-      String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
-      session.createNativeQuery(sql).executeUpdate();
-      session.getTransaction().commit();
-    }
+    Session session = entityManager.unwrap(Session.class);
+    String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
+    session.createNativeQuery(sql).executeUpdate();
   }
 
   @Test

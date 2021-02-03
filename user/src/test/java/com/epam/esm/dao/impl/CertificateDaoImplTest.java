@@ -6,14 +6,15 @@ import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.TagDto;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,24 +22,22 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ActiveProfiles("user")
 @AutoConfigureTestDatabase
 @SpringBootTest
+@Transactional
 class CertificateDaoImplTest {
 
   @Autowired OrderDao orderDao;
 
   @Autowired CertificateDao certificateDao;
   @Autowired TagDao tagDao;
-  @Autowired SessionFactory sessionFactory;
+  @Autowired EntityManager entityManager;
 
   @AfterEach
   void setDown() {
-    try (Session session = sessionFactory.openSession()) {
-      session.beginTransaction();
-      String sql =
-          "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
-              + "DELETE FROM orders;DELETE FROM users;";
-      session.createNativeQuery(sql).executeUpdate();
-      session.getTransaction().commit();
-    }
+    Session session = entityManager.unwrap(Session.class);
+    String sql =
+        "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
+            + "DELETE FROM orders;DELETE FROM users;";
+    session.createNativeQuery(sql).executeUpdate();
   }
 
   @Test

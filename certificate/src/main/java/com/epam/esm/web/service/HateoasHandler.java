@@ -8,8 +8,8 @@ import org.springframework.hateoas.Link;
 import java.util.List;
 
 public interface HateoasHandler {
-    List<Link> takeLinksForPagination(
-            Class<?> clazz, PaginationParameter parameter, long numberOfPages);
+  List<Link> takeLinksForPagination(
+      Class<?> clazz, PaginationParameter parameter, long numberOfPages);
 
-    <T> EntityModel<PageData<EntityModel<T>>> wrapPageWithEntityModel(PageData<?> page);
+  <T> EntityModel<PageData<EntityModel<T>>> wrapPageWithEntityModel(PageData<?> page);
 }

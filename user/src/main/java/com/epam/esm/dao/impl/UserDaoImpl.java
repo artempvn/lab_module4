@@ -6,7 +6,6 @@ import com.epam.esm.dao.entity.User;
 import com.epam.esm.dto.*;
 import com.epam.esm.exception.TagException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -57,28 +56,28 @@ public class UserDaoImpl implements UserDao {
   @Override
   public UserDto create(UserDto dto) {
     User user = new User(dto);
-    Session session = entityManager.unwrap( Session.class );
+    Session session = entityManager.unwrap(Session.class);
     session.save(user);
     return new UserDto(user);
   }
 
   @Override
   public Optional<UserDtoWithOrders> read(long id) {
-    Session session = entityManager.unwrap( Session.class );
+    Session session = entityManager.unwrap(Session.class);
     Optional<User> user = Optional.ofNullable(session.get(User.class, id));
     return user.map(UserDtoWithOrders::new);
   }
 
   @Override
   public Optional<UserDto> readWithoutOrders(long id) {
-    Session session = entityManager.unwrap( Session.class );
+    Session session = entityManager.unwrap(Session.class);
     Optional<User> user = Optional.ofNullable(session.get(User.class, id));
     return user.map(UserDto::new);
   }
 
   @Override
   public PageData<UserDto> readAll(PaginationParameter parameter) {
-    Session session = entityManager.unwrap( Session.class );
+    Session session = entityManager.unwrap(Session.class);
     CriteriaBuilder builder = session.getCriteriaBuilder();
 
     CriteriaQuery<User> criteriaQuery = builder.createQuery(User.class);
@@ -88,18 +87,20 @@ public class UserDaoImpl implements UserDao {
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
     countQuery.select(builder.count(countQuery.from(User.class)));
     Long numberOfElements = session.createQuery(countQuery).getSingleResult();
-    long numberOfPages= paginationHandler.calculateNumberOfPages(numberOfElements,parameter.getSize());
+    long numberOfPages =
+        paginationHandler.calculateNumberOfPages(numberOfElements, parameter.getSize());
 
     TypedQuery<User> typedQuery = session.createQuery(select);
     paginationHandler.setPageToQuery(typedQuery, parameter);
-    List<UserDto> users = typedQuery.getResultList().stream().map(UserDto::new).collect(Collectors.toList());
+    List<UserDto> users =
+        typedQuery.getResultList().stream().map(UserDto::new).collect(Collectors.toList());
 
-    return new PageData<>(parameter.getPage(),numberOfElements,numberOfPages,users);
+    return new PageData<>(parameter.getPage(), numberOfElements, numberOfPages, users);
   }
 
   @Override
   public TagDto takeMostWidelyTagFromUserWithHighestCostOrders() {
-    Session session = entityManager.unwrap( Session.class );
+    Session session = entityManager.unwrap(Session.class);
     Query q =
         session.createNativeQuery(SQL_REQUEST_FOR_WIDELY_USED_TAG_FROM_HIGHEST_COST_ORDERS_USER);
 

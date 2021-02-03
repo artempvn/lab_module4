@@ -23,7 +23,7 @@ public class User {
       mappedBy = "user",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.ALL})
-  private List<Order> orders;
+  private List<Order> orders = Collections.emptyList();
 
   public User() {}
 

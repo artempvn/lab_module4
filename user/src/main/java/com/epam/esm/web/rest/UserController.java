@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -44,16 +43,15 @@ public class UserController {
     PageData<UserDto> page = userService.readAll(parameter);
 
     EntityModel<PageData<EntityModel<UserDto>>> hateoasPage =
-            hateoasHandler.wrapPageWithEntityModel(page);
+        hateoasHandler.wrapPageWithEntityModel(page);
     hateoasPage
-            .getContent()
-            .getContent()
-            .forEach(
-                    certificate -> certificate.add(takeUserLinks(certificate.getContent().getId())));
+        .getContent()
+        .getContent()
+        .forEach(certificate -> certificate.add(takeUserLinks(certificate.getContent().getId())));
 
     hateoasPage.add(
-            hateoasHandler.takeLinksForPagination(
-                    UserController.class, parameter, page.getNumberOfPages()));
+        hateoasHandler.takeLinksForPagination(
+            UserController.class, parameter, page.getNumberOfPages()));
     hateoasPage.add(takeUsersLinks());
     return ResponseEntity.status(HttpStatus.OK).body(hateoasPage);
   }
