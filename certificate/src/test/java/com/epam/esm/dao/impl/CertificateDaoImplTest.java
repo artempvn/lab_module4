@@ -3,9 +3,7 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.entity.Tag;
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.CertificateDtoWithoutTags;
-import com.epam.esm.dto.TagDto;
+import com.epam.esm.dto.*;
 import com.epam.esm.exception.ResourceValidationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +17,6 @@ import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,11 +35,7 @@ class CertificateDaoImplTest {
   @AfterEach
   void setDown() {
     String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
-    doInTransaction(() -> entityManager.createNativeQuery(sql).executeUpdate());
-  }
-
-  <T> T doInTransaction(Supplier<T> operation) {
-    return txTemplate.execute(status -> operation.get());
+    txTemplate.execute(status -> entityManager.createNativeQuery(sql).executeUpdate());
   }
 
   @Test
@@ -74,16 +67,18 @@ class CertificateDaoImplTest {
 
   @Test
   void readAll() {
-    //    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
-    //    CertificateDtoWithTags certificate2 = givenExistingCertificate2();
-    //    certificateDao.create(certificate1);
-    //    certificateDao.create(certificate2);
-    //    List<Certificate> expectedList =
-    //        List.of(new Certificate(certificate1), new Certificate(certificate2));
-    //
-    //    List<CertificateDtoWithoutTags> actualList =
-    //        certificateDao.readAll(new CertificatesRequest(), new PaginationParameter());
-    //    assertEquals(expectedList.size(), actualList.size());
+    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateDtoWithTags certificate2 = givenExistingCertificate2();
+    certificateDao.create(certificate1);
+    certificateDao.create(certificate2);
+    List<CertificateDtoWithTags> expectedList = List.of(certificate1, certificate2);
+    PaginationParameter parameter = new PaginationParameter();
+    parameter.setPage(1);
+    parameter.setSize(10);
+
+    PageData<CertificateDtoWithoutTags> actualPage =
+        certificateDao.readAll(new CertificatesRequest(), parameter);
+    assertEquals(expectedList.size(), actualPage.getContent().size());
   }
 
   @Test
@@ -102,6 +97,7 @@ class CertificateDaoImplTest {
   @Test
   void updateNotExisted() {
     CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    certificate1.setId(1L);
     CertificateDtoWithTags expectedCertificate =
         CertificateDtoWithTags.builder().id(certificate1.getId()).name("new name").build();
 
@@ -121,7 +117,6 @@ class CertificateDaoImplTest {
     expectedCertificate.setName(updateCertificate.getName());
 
     certificateDao.updatePresentedFields(updateCertificate);
-    entityManager.clear();
 
     CertificateDtoWithTags actualCertificate = certificateDao.read(id).get();
 
@@ -153,10 +148,9 @@ class CertificateDaoImplTest {
 
   @Test
   void deleteNotExisted() {
-    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
 
     assertThrows(
-        ResourceValidationException.class, () -> certificateDao.delete(certificate1.getId()));
+        ResourceValidationException.class, () -> certificateDao.delete(NOT_EXISTED_CERTIFICATE_ID));
   }
 
   @Test
@@ -168,7 +162,6 @@ class CertificateDaoImplTest {
     List<Tag> expectedTags = List.of(new Tag(tag1));
 
     certificateDao.addTag(tagId, certificateId);
-    entityManager.clear();
 
     List<TagDto> actualTags = certificateDao.read(certificateId).get().getTags();
     assertEquals(expectedTags.size(), actualTags.size());
@@ -188,7 +181,6 @@ class CertificateDaoImplTest {
     List<TagDto> expectedTags = List.of(tag1);
 
     certificateDao.removeTag(tagId2, certificateId);
-    entityManager.clear();
 
     List<TagDto> actualTags = certificateDao.read(certificateId).get().getTags();
     assertEquals(expectedTags, actualTags);
@@ -196,7 +188,6 @@ class CertificateDaoImplTest {
 
   private static CertificateDtoWithTags givenExistingCertificate1() {
     return CertificateDtoWithTags.builder()
-        .id(1L)
         .name("first certificate")
         .description("first description")
         .price(1.33)
@@ -208,7 +199,6 @@ class CertificateDaoImplTest {
 
   private static CertificateDtoWithTags givenExistingCertificate2() {
     return CertificateDtoWithTags.builder()
-        .id(2L)
         .name("second certificate")
         .description("second description")
         .price(2.33)
@@ -230,10 +220,10 @@ class CertificateDaoImplTest {
   }
 
   private static TagDto givenExistingTag1() {
-    return TagDto.builder().id(1L).name("first tag").build();
+    return TagDto.builder().name("first tag").build();
   }
 
   private static TagDto givenExistingTag2() {
-    return TagDto.builder().id(2L).name("second tag").build();
+    return TagDto.builder().name("second tag").build();
   }
 }

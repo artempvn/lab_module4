@@ -2,6 +2,9 @@ package com.epam.esm.dto;
 
 import com.epam.esm.dao.entity.Certificate;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,9 +12,9 @@ import java.util.stream.Collectors;
 public class CertificateDtoWithTags {
 
   private Long id;
-  private Long previousId;
-  private Double price;
-  private List<TagDto> tags = Collections.emptyList();
+  @NotNull private Long previousId;
+  @NotNull @PositiveOrZero private Double price;
+  @Valid private List<TagDto> tags = Collections.emptyList();
 
   public CertificateDtoWithTags() {}
 

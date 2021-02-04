@@ -7,13 +7,12 @@ import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.ResourceValidationException;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -37,22 +36,19 @@ public class TagDaoImpl implements TagDao {
   @Override
   public TagDto create(TagDto tagDto) {
     Tag tag = new Tag(tagDto);
-    Session session = entityManager.unwrap(Session.class);
-    session.save(tag);
+    entityManager.persist(tag);
     return new TagDto(tag);
   }
 
   @Override
   public Optional<TagDto> read(long id) {
-    Session session = entityManager.unwrap(Session.class);
-    Optional<Tag> tag = Optional.ofNullable(session.get(Tag.class, id));
+    Optional<Tag> tag = Optional.ofNullable(entityManager.find(Tag.class, id));
     return tag.map(TagDto::new);
   }
 
   @Override
   public PageData<TagDto> readAll(PaginationParameter parameter) {
-    Session session = entityManager.unwrap(Session.class);
-    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tag> criteriaQuery = builder.createQuery(Tag.class);
     Root<Tag> from = criteriaQuery.from(Tag.class);
@@ -60,11 +56,11 @@ public class TagDaoImpl implements TagDao {
 
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
     countQuery.select(builder.count(countQuery.from(Tag.class)));
-    Long numberOfElements = session.createQuery(countQuery).getSingleResult();
+    Long numberOfElements = entityManager.createQuery(countQuery).getSingleResult();
     long numberOfPages =
         paginationHandler.calculateNumberOfPages(numberOfElements, parameter.getSize());
 
-    TypedQuery<Tag> typedQuery = session.createQuery(select);
+    TypedQuery<Tag> typedQuery = entityManager.createQuery(select);
     paginationHandler.setPageToQuery(typedQuery, parameter);
     List<TagDto> tags =
         typedQuery.getResultList().stream().map(TagDto::new).collect(Collectors.toList());
@@ -73,11 +69,11 @@ public class TagDaoImpl implements TagDao {
   }
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void delete(long id) {
-    Session session = entityManager.unwrap(Session.class);
-    Optional<Tag> tag = Optional.ofNullable(session.get(Tag.class, id));
+    Optional<Tag> tag = Optional.ofNullable(entityManager.find(Tag.class, id));
     tag.ifPresentOrElse(
-        session::delete,
+        entityManager::remove,
         () -> {
           throw ResourceValidationException.validationWithTagId(id).get();
         });
@@ -85,9 +81,8 @@ public class TagDaoImpl implements TagDao {
 
   @Override
   public Optional<TagDto> read(String name) {
-    Session session = entityManager.unwrap(Session.class);
     String hql = "from  Tag where name=:name";
-    Query query = session.createQuery(hql).setParameter("name", name);
+    Query query = entityManager.createQuery(hql).setParameter("name", name);
     Optional<Tag> tag = query.getResultStream().findFirst();
     return tag.map(TagDto::new);
   }

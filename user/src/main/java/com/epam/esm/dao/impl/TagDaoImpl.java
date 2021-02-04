@@ -3,12 +3,11 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.dto.TagDto;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.Optional;
 
 @Repository
@@ -24,16 +23,14 @@ public class TagDaoImpl implements TagDao {
   @Override
   public TagDto create(TagDto tagDto) {
     Tag tag = new Tag(tagDto);
-    Session session = entityManager.unwrap(Session.class);
-    session.save(tag);
+    entityManager.persist(tag);
     return new TagDto(tag);
   }
 
   @Override
   public Optional<TagDto> read(String name) {
-    Session session = entityManager.unwrap(Session.class);
     String hql = "from  Tag where name=:name";
-    Query query = session.createQuery(hql).setParameter("name", name);
+    Query query = entityManager.createQuery(hql).setParameter("name", name);
     Optional<Tag> tag = query.getResultStream().findFirst();
     return tag.map(TagDto::new);
   }

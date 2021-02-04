@@ -25,10 +25,10 @@ public interface TagService {
   TagDto read(long id);
 
   /**
-   * Read all list.
+   * Read all page data.
    *
    * @param parameter the parameter
-   * @return the list
+   * @return the page data
    */
   PageData<TagDto> readAll(PaginationParameter parameter);
 

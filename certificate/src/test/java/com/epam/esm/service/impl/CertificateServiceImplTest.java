@@ -3,11 +3,13 @@ package com.epam.esm.service.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dto.CertificateDtoWithTags;
 import com.epam.esm.dto.CertificateDtoWithoutTags;
+import com.epam.esm.dto.PageData;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.TagService;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -51,12 +53,13 @@ class CertificateServiceImplTest {
 
   @Test
   void readAllCertificateDaoReadAllInvocation() {
-    //    CertificateDtoWithoutTags certificate = new CertificateDtoWithoutTags();
-    //    when(certificateDao.readAll(any(), any())).thenReturn(List.of(certificate));
-    //
-    //    certificateService.readAll(any(), any());
-    //
-    //    verify(certificateDao).readAll(any(), any());
+    CertificateDtoWithoutTags certificate = new CertificateDtoWithoutTags();
+    PageData<CertificateDtoWithoutTags> page = new PageData<>(1, 1, 1, List.of(certificate));
+    when(certificateDao.readAll(any(), any())).thenReturn(page);
+
+    certificateService.readAll(any(), any());
+
+    verify(certificateDao).readAll(any(), any());
   }
 
   @Test

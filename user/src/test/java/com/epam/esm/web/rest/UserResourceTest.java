@@ -3,8 +3,6 @@ package com.epam.esm.web.rest;
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.web.advice.ResourceAdvice;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.Session;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,26 +14,27 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManager;
-import java.util.List;
 
+import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("user")
 @AutoConfigureTestDatabase
 @SpringBootTest
-@Transactional
-class UserControllerTest {
+class UserResourceTest {
 
   public static final int NOT_EXISTING_ID = 99999;
   MockMvc mockMvc;
   @Autowired UserDao userDao;
-  @Autowired UserController userController;
+  @Autowired UserResource userController;
   @Autowired EntityManager entityManager;
   @Autowired ReloadableResourceBundleMessageSource messageSource;
+  @Autowired TransactionTemplate txTemplate;
 
   @BeforeEach
   public void setup() {
@@ -48,11 +47,10 @@ class UserControllerTest {
 
   @AfterEach
   void setDown() {
-    Session session = entityManager.unwrap(Session.class);
     String sql =
         "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
             + "DELETE FROM orders;DELETE FROM users;";
-    session.createNativeQuery(sql).executeUpdate();
+    txTemplate.execute(status -> entityManager.createNativeQuery(sql).executeUpdate());
   }
 
   @Test
@@ -86,9 +84,13 @@ class UserControllerTest {
     user2WO.setId(userId2);
 
     mockMvc
-        .perform(get("/users"))
+        .perform(get("/users?page=1&size=10"))
+        .andExpect(jsonPath("$.currentPage").value(1))
+        .andExpect(jsonPath("$.content").isNotEmpty())
         .andExpect(
-            content().json(new ObjectMapper().writeValueAsString(List.of(user1WO, user2WO))));
+            jsonPath(
+                "$.links[?(@.rel=='self')].href",
+                contains("http://localhost/users?page=1&size=10")));
   }
 
   UserDto givenUserWO1() {

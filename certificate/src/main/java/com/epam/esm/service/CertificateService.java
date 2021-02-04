@@ -22,11 +22,11 @@ public interface CertificateService {
   CertificateDtoWithTags read(long id);
 
   /**
-   * Read all list.
+   * Read all page data.
    *
    * @param request the request
    * @param parameter the parameter
-   * @return the list
+   * @return the page data
    */
   PageData<CertificateDtoWithoutTags> readAll(
       CertificatesRequest request, PaginationParameter parameter);

@@ -9,7 +9,6 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.web.advice.ResourceAdvice;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.Session;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -35,16 +34,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("user")
 @AutoConfigureTestDatabase
 @SpringBootTest
-@Transactional
-class OrderControllerTest {
+class OrderResourceTest {
 
   MockMvc mockMvc;
   @Autowired UserDao userDao;
   @Autowired OrderDao orderDao;
   @Autowired OrderService orderService;
-  @Autowired OrderController orderController;
+  @Autowired OrderResource orderController;
   @Autowired EntityManager entityManager;
   @Autowired ReloadableResourceBundleMessageSource messageSource;
+  @Autowired TransactionTemplate txTemplate;
 
   @BeforeEach
   public void setup() {
@@ -57,11 +56,10 @@ class OrderControllerTest {
 
   @AfterEach
   void setDown() {
-    Session session = entityManager.unwrap(Session.class);
     String sql =
         "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
             + "DELETE FROM orders;DELETE FROM users;";
-    session.createNativeQuery(sql).executeUpdate();
+    txTemplate.execute(status -> entityManager.createNativeQuery(sql).executeUpdate());
   }
 
   @Test
@@ -101,7 +99,9 @@ class OrderControllerTest {
     order.setUserId(userId);
     orderService.create(order);
 
-    mockMvc.perform(get("/users/{userId}/orders", userId)).andExpect(status().isOk());
+    mockMvc
+        .perform(get("/users/{userId}/orders?page=1&size=10", userId))
+        .andExpect(status().isOk());
   }
 
   OrderDtoWithCertificatesWithTagsForCreation givenOrder() {
@@ -114,7 +114,6 @@ class OrderControllerTest {
 
   UserDto givenUser() {
     UserDto user = new UserDto();
-    user.setId(1L);
     user.setName("name");
     user.setSurname("surname");
     return user;

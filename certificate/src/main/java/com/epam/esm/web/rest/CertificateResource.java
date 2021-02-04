@@ -2,7 +2,6 @@ package com.epam.esm.web.rest;
 
 import com.epam.esm.dto.*;
 import com.epam.esm.service.CertificateService;
-import com.epam.esm.web.service.HateoasHandler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -14,27 +13,46 @@ import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
+/** The type Certificate resource. */
 @RestController
 @RequestMapping("/certificates")
-public class CertificateController {
+public class CertificateResource {
 
   private final CertificateService certificateService;
   private final HateoasHandler hateoasHandler;
 
-  public CertificateController(
-      CertificateService certificateService, HateoasHandler hateoasHandler) {
+  /**
+   * Instantiates a new Certificate resource.
+   *
+   * @param certificateService the certificate service
+   * @param hateoasHandler the hateoas handler
+   */
+  public CertificateResource(CertificateService certificateService, HateoasHandler hateoasHandler) {
     this.certificateService = certificateService;
     this.hateoasHandler = hateoasHandler;
   }
 
+  /**
+   * Read certificate response entity.
+   *
+   * @param id the id
+   * @return the response entity
+   */
   @GetMapping("/{id}")
   public ResponseEntity<EntityModel<CertificateDtoWithTags>> readCertificate(
       @PathVariable long id) {
     EntityModel<CertificateDtoWithTags> certificate = EntityModel.of(certificateService.read(id));
-    certificate.add(takeCertificateLinks(certificate.getContent().getId()));
+    certificate.add(buildCertificateLinks(certificate.getContent().getId()));
     return ResponseEntity.status(HttpStatus.OK).body(certificate);
   }
 
+  /**
+   * Read certificates response entity.
+   *
+   * @param request the request
+   * @param parameter the parameter
+   * @return the response entity
+   */
   @GetMapping
   public ResponseEntity<EntityModel<PageData<EntityModel<CertificateDtoWithoutTags>>>>
       readCertificates(CertificatesRequest request, @Valid PaginationParameter parameter) {
@@ -42,19 +60,27 @@ public class CertificateController {
 
     EntityModel<PageData<EntityModel<CertificateDtoWithoutTags>>> hateoasPage =
         hateoasHandler.wrapPageWithEntityModel(page);
-    hateoasPage
-        .getContent()
-        .getContent()
-        .forEach(
-            certificate -> certificate.add(takeCertificateLinks(certificate.getContent().getId())));
+
+    for (EntityModel<CertificateDtoWithoutTags> certificate :
+        hateoasPage.getContent().getContent()) {
+      long id = certificate.getContent().getId();
+      List<Link> links = buildCertificateLinks(id);
+      certificate.add(links);
+    }
 
     hateoasPage.add(
-        hateoasHandler.takeLinksForPagination(
-            CertificateController.class, parameter, page.getNumberOfPages()));
-    hateoasPage.add(takeCertificatesLinks());
+        hateoasHandler.buildLinksForPagination(
+            CertificateResource.class, parameter, page.getNumberOfPages()));
+    hateoasPage.add(buildCertificatesLinks());
     return ResponseEntity.status(HttpStatus.OK).body(hateoasPage);
   }
 
+  /**
+   * Create certificate response entity.
+   *
+   * @param certificate the certificate
+   * @return the response entity
+   */
   @PostMapping
   public ResponseEntity<CertificateDtoWithTags> createCertificate(
       @Valid @RequestBody CertificateDtoWithTags certificate) {
@@ -62,6 +88,13 @@ public class CertificateController {
     return ResponseEntity.status(HttpStatus.CREATED).body(createdCertificate);
   }
 
+  /**
+   * Update certificate put response entity.
+   *
+   * @param id the id
+   * @param certificate the certificate
+   * @return the response entity
+   */
   @PutMapping("/{id}")
   public ResponseEntity<CertificateDtoWithTags> updateCertificatePut(
       @PathVariable long id, @Valid @RequestBody CertificateDtoWithTags certificate) {
@@ -70,6 +103,13 @@ public class CertificateController {
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 
+  /**
+   * Update certificate patch response entity.
+   *
+   * @param id the id
+   * @param certificate the certificate
+   * @return the response entity
+   */
   @PatchMapping("/{id}")
   public ResponseEntity<CertificateDtoWithoutTags> updateCertificatePatch(
       @PathVariable long id, @Valid @RequestBody CertificateDtoPatch certificate) {
@@ -79,21 +119,44 @@ public class CertificateController {
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 
+  /**
+   * Delete certificate.
+   *
+   * @param id the id
+   */
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteCertificate(@PathVariable long id) {
     certificateService.delete(id);
   }
 
-  List<Link> takeCertificateLinks(long id) {
+  /**
+   * Build certificate links list.
+   *
+   * @param id the id
+   * @return the list
+   */
+  List<Link> buildCertificateLinks(long id) {
     return List.of(
-        linkTo(CertificateController.class).slash(id).withSelfRel(),
-        linkTo(CertificateController.class).slash(id).withRel("put certificate"),
-        linkTo(CertificateController.class).slash(id).withRel("patch certificate"),
-        linkTo(CertificateController.class).slash(id).withRel("delete certificate"));
+        linkTo(CertificateResource.class).slash(id).withSelfRel(),
+        linkTo(CertificateResource.class).slash(id).withRel("put").withName("update certificate"),
+        linkTo(CertificateResource.class)
+            .slash(id)
+            .withRel("patch")
+            .withName("update certificate's fields"),
+        linkTo(CertificateResource.class)
+            .slash(id)
+            .withRel("delete")
+            .withName("delete certificate"));
   }
 
-  List<Link> takeCertificatesLinks() {
-    return List.of(linkTo(CertificateController.class).withRel("create certificate"));
+  /**
+   * Build certificates links list.
+   *
+   * @return the list
+   */
+  List<Link> buildCertificatesLinks() {
+    return List.of(
+        linkTo(CertificateResource.class).withRel("post").withName("create certificate"));
   }
 }

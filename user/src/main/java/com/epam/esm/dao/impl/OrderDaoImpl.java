@@ -35,11 +35,10 @@ public class OrderDaoImpl implements OrderDao {
   public OrderDtoWithCertificatesWithTagsForCreation create(
       OrderDtoWithCertificatesWithTagsForCreation dto) {
     Order order = new Order(dto);
-    Session session = entityManager.unwrap(Session.class);
-    session.save(order);
+    entityManager.persist(order);
 
     order.getCertificates().stream()
-        .map(certificate -> session.load(Certificate.class, certificate.getId()))
+        .map(certificate -> entityManager.find(Certificate.class, certificate.getId()))
         .forEach(certificate -> certificate.setOrder(order));
 
     return new OrderDtoWithCertificatesWithTagsForCreation(order);
@@ -64,11 +63,10 @@ public class OrderDaoImpl implements OrderDao {
 
   @Override
   public Optional<OrderDtoWithCertificates> readOrderByUser(long userId, long orderId) {
-    Session session = entityManager.unwrap(Session.class);
-    Optional.ofNullable(session.get(User.class, userId))
+    Optional.ofNullable(entityManager.find(User.class, userId))
         .orElseThrow(ResourceValidationException.validationWithUser(userId));
 
-    Optional<Order> order = Optional.ofNullable(session.get(Order.class, orderId));
+    Optional<Order> order = Optional.ofNullable(entityManager.find(Order.class, orderId));
     return order.map(OrderDtoWithCertificates::new);
   }
 }

@@ -7,7 +7,6 @@ import com.epam.esm.dto.TagAction;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.web.advice.ResourceAdvice;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.Session;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,25 +19,27 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManager;
-import java.util.List;
 
+import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("certificate")
 @AutoConfigureTestDatabase
 @SpringBootTest
-@Transactional
-class TagControllerTest {
+class TagResourceTest {
+  public static final long NOT_EXISTING_ID = 99999L;
   MockMvc mockMvc;
   @Autowired TagDao tagDao;
   @Autowired CertificateDao certificateDao;
-  @Autowired TagController tagController;
+  @Autowired TagResource tagController;
   @Autowired EntityManager entityManager;
   @Autowired ReloadableResourceBundleMessageSource messageSource;
+  @Autowired TransactionTemplate txTemplate;
 
   @BeforeEach
   public void setup() {
@@ -51,9 +52,8 @@ class TagControllerTest {
 
   @AfterEach
   void setDown() {
-    Session session = entityManager.unwrap(Session.class);
     String sql = "DELETE FROM CERTIFICATES_TAGS;DELETE FROM tag;DELETE FROM gift_certificates";
-    session.createNativeQuery(sql).executeUpdate();
+    txTemplate.execute(status -> entityManager.createNativeQuery(sql).executeUpdate());
   }
 
   @Test
@@ -77,9 +77,8 @@ class TagControllerTest {
 
   @Test
   void readTagNegativeStatusCheck() throws Exception {
-    TagDto tag1 = givenExistingTag1();
 
-    mockMvc.perform(get("/tags/{id}", tag1.getId())).andExpect(status().isNotFound());
+    mockMvc.perform(get("/tags/{id}", NOT_EXISTING_ID)).andExpect(status().isNotFound());
   }
 
   @Test
@@ -89,7 +88,7 @@ class TagControllerTest {
     tagDao.create(tag1);
     tagDao.create(tag2);
 
-    mockMvc.perform(get("/tags")).andExpect(status().isOk());
+    mockMvc.perform(get("/tags?page=1&size=10")).andExpect(status().isOk());
   }
 
   @Test
@@ -102,14 +101,18 @@ class TagControllerTest {
     tag2.setId(tagId2);
 
     mockMvc
-        .perform(get("/tags"))
-        .andExpect(content().json(new ObjectMapper().writeValueAsString(List.of(tag1, tag2))));
+        .perform(get("/tags?page=1&size=10"))
+        .andExpect(jsonPath("$.currentPage").value(1))
+        .andExpect(jsonPath("$.content").isNotEmpty())
+        .andExpect(
+            jsonPath(
+                "$.links[?(@.rel=='self')].href",
+                contains("http://localhost/tags?page=1&size=10")));
   }
 
   @Test
   void createTagStatusCheck() throws Exception {
     TagDto tag1 = givenExistingTag1();
-    tag1.setId(null);
 
     mockMvc
         .perform(
@@ -155,6 +158,7 @@ class TagControllerTest {
     CertificateDtoWithTags certificate1 = givenExistingCertificate1();
     long id = certificateDao.create(certificate1).getId();
     TagDto tag1 = givenExistingTag1();
+    tag1.setId(NOT_EXISTING_ID);
     TagAction tagAction = new TagAction(TagAction.ActionType.ADD, id, tag1.getId());
 
     mockMvc
@@ -185,22 +189,20 @@ class TagControllerTest {
 
   @Test
   void deleteTagNegative() throws Exception {
-    TagDto tag1 = givenExistingTag1();
 
-    mockMvc.perform(delete("/tags/{id}", tag1.getId())).andExpect(status().isBadRequest());
+    mockMvc.perform(delete("/tags/{id}", NOT_EXISTING_ID)).andExpect(status().isBadRequest());
   }
 
   private static TagDto givenExistingTag1() {
-    return TagDto.builder().id(1L).name("first tag").build();
+    return TagDto.builder().name("first tag").build();
   }
 
   private static TagDto givenExistingTag2() {
-    return TagDto.builder().id(2L).name("second tag").build();
+    return TagDto.builder().name("second tag").build();
   }
 
   private static CertificateDtoWithTags givenExistingCertificate1() {
     return CertificateDtoWithTags.builder()
-        .id(1L)
         .name("first certificate")
         .description("first description")
         .price(1.33)

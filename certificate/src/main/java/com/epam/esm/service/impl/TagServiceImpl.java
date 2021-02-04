@@ -9,7 +9,7 @@ import com.epam.esm.exception.ResourceIsBoundException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.TagActionService;
 import com.epam.esm.service.TagService;
-import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +50,7 @@ public class TagServiceImpl implements TagService {
   public void delete(long id) {
     try {
       tagDao.delete(id);
-    } catch (JpaSystemException ex) {
+    } catch (DataIntegrityViolationException ex) {
       throw ResourceIsBoundException.isBound(id).get();
     }
   }

@@ -32,10 +32,10 @@ public interface UserDao {
   Optional<UserDto> readWithoutOrders(long id);
 
   /**
-   * Read all list.
+   * Read all page data.
    *
    * @param parameter the parameter
-   * @return the list
+   * @return the page data
    */
   PageData<UserDto> readAll(PaginationParameter parameter);
 

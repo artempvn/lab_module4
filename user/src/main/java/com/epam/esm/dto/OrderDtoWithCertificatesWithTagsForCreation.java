@@ -2,6 +2,7 @@ package com.epam.esm.dto;
 
 import com.epam.esm.dao.entity.Order;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +13,7 @@ public class OrderDtoWithCertificatesWithTagsForCreation {
   private Long id;
   private Long userId;
   private LocalDateTime createDate;
-  private List<CertificateDtoWithTags> certificates = Collections.emptyList();
+  @Valid private List<CertificateDtoWithTags> certificates = Collections.emptyList();
 
   public OrderDtoWithCertificatesWithTagsForCreation() {}
 

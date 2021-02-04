@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.*;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -62,12 +61,12 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
     CriteriaQuery<Certificate> criteria = builder.createQuery(Certificate.class);
     Root<Certificate> root = criteria.from(Certificate.class);
 
-    List<Predicate> predicates = new ArrayList<>();
-    predicateFactories.stream()
-        .map(factory -> factory.buildPredicates(builder, request, root))
-        .forEach(predicates::addAll);
-    Predicate[] predicatesArray = convertListPredicatesToArray(predicates);
-    criteria.where(predicatesArray);
+    Predicate[] predicates =
+        predicateFactories.stream()
+            .map(factory -> factory.buildPredicates(builder, request, root))
+            .flatMap(List::stream)
+            .toArray(Predicate[]::new);
+    criteria.where(predicates);
 
     SortParam param = request.getSort();
     if (param != null) {

@@ -6,13 +6,12 @@ import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.entity.Certificate;
 import com.epam.esm.dto.*;
 import com.epam.esm.exception.ResourceValidationException;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -45,10 +44,9 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public CertificateDtoWithTags create(CertificateDtoWithTags certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
-    Session session = entityManager.unwrap(Session.class);
-    session.save(certificate);
+    entityManager.persist(certificate);
 
-    certificate.getTags().forEach(session::merge);
+    certificate.getTags().forEach(entityManager::merge);
 
     certificate.getTags().forEach(tag -> tag.withCertificate(certificate));
 
@@ -57,24 +55,23 @@ public class CertificateDaoImpl implements CertificateDao {
 
   @Override
   public Optional<CertificateDtoWithTags> read(long id) {
-    Session session = entityManager.unwrap(Session.class);
-    Optional<Certificate> certificate = Optional.ofNullable(session.get(Certificate.class, id));
+    Optional<Certificate> certificate =
+        Optional.ofNullable(entityManager.find(Certificate.class, id));
     return certificate.map(CertificateDtoWithTags::new);
   }
 
   @Override
   public PageData<CertificateDtoWithoutTags> readAll(
       CertificatesRequest request, PaginationParameter parameter) {
-    Session session = entityManager.unwrap(Session.class);
-    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Certificate> criteria = criteriaHandler.filterWithParameters(builder, request);
 
-    TypedQuery<Certificate> typedQuery = session.createQuery(criteria);
+    TypedQuery<Certificate> typedQuery = entityManager.createQuery(criteria);
     paginationHandler.setPageToQuery(typedQuery, parameter);
 
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
     countQuery.select(builder.count(countQuery.from(Certificate.class)));
-    Long numberOfElements = session.createQuery(countQuery).getSingleResult();
+    Long numberOfElements = entityManager.createQuery(countQuery).getSingleResult();
     long numberOfPages =
         paginationHandler.calculateNumberOfPages(numberOfElements, parameter.getSize());
 
@@ -89,25 +86,23 @@ public class CertificateDaoImpl implements CertificateDao {
   @Override
   public void update(CertificateDtoWithTags certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
-    Session session = entityManager.unwrap(Session.class);
     Optional<Certificate> existingCertificate =
-        Optional.ofNullable(session.get(Certificate.class, certificate.getId()));
+        Optional.ofNullable(entityManager.find(Certificate.class, certificate.getId()));
     existingCertificate.ifPresentOrElse(
-        session::detach,
+        entityManager::detach,
         () -> {
           throw ResourceValidationException.validationWithCertificateId(certificate.getId()).get();
         });
-    session.update(certificate);
+    entityManager.merge(certificate);
   }
 
   @Override
   public void updatePresentedFields(CertificateDtoWithoutTags certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
-    Session session = entityManager.unwrap(Session.class);
-    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaUpdate<Certificate> criteria =
         criteriaHandler.updateWithNotNullFields(builder, certificate);
-    int result = session.createQuery(criteria).executeUpdate();
+    int result = entityManager.createQuery(criteria).executeUpdate();
     if (result == 0) {
       throw ResourceValidationException.validationWithCertificateId(certificate.getId()).get();
     }
@@ -115,10 +110,10 @@ public class CertificateDaoImpl implements CertificateDao {
 
   @Override
   public void delete(long id) {
-    Session session = entityManager.unwrap(Session.class);
-    Optional<Certificate> certificate = Optional.ofNullable(session.get(Certificate.class, id));
+    Optional<Certificate> certificate =
+        Optional.ofNullable(entityManager.find(Certificate.class, id));
     certificate.ifPresentOrElse(
-        session::delete,
+        entityManager::remove,
         () -> {
           throw ResourceValidationException.validationWithCertificateId(id).get();
         });
@@ -126,24 +121,21 @@ public class CertificateDaoImpl implements CertificateDao {
 
   @Override
   public void addTag(long tagId, long certificateId) {
-    Session session = entityManager.unwrap(Session.class);
-    Query q =
-        session
+    Query query =
+        entityManager
             .createNativeQuery(SQL_ADD_TAG)
             .setParameter("tag_id", tagId)
             .setParameter("certificate_id", certificateId);
-    q.executeUpdate();
+    query.executeUpdate();
   }
 
   @Override
   public int removeTag(long tagId, long certificateId) {
-    Session session = entityManager.unwrap(Session.class);
     Query q =
-        session
+        entityManager
             .createNativeQuery(SQL_REMOVE_TAG)
             .setParameter("tag_id", tagId)
             .setParameter("certificate_id", certificateId);
-    int result = q.executeUpdate();
-    return result;
+    return q.executeUpdate();
   }
 }

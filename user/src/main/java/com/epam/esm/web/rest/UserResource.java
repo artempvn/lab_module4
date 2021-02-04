@@ -2,7 +2,6 @@ package com.epam.esm.web.rest;
 
 import com.epam.esm.dto.*;
 import com.epam.esm.service.UserService;
-import com.epam.esm.web.service.HateoasHandler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -18,25 +17,44 @@ import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/** The type User resource. */
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public class UserResource {
 
   private final UserService userService;
   private final HateoasHandler hateoasHandler;
 
-  public UserController(UserService userService, HateoasHandler hateoasHandler) {
+  /**
+   * Instantiates a new User resource.
+   *
+   * @param userService the user service
+   * @param hateoasHandler the hateoas handler
+   */
+  public UserResource(UserService userService, HateoasHandler hateoasHandler) {
     this.userService = userService;
     this.hateoasHandler = hateoasHandler;
   }
 
+  /**
+   * Read user response entity.
+   *
+   * @param id the id
+   * @return the response entity
+   */
   @GetMapping("/{id}")
   public ResponseEntity<EntityModel<UserDtoWithOrders>> readUser(@PathVariable long id) {
     EntityModel<UserDtoWithOrders> user = EntityModel.of(userService.read(id));
-    user.add(takeUserLinks(user.getContent().getId()));
+    user.add(buildUserLinks(user.getContent().getId()));
     return ResponseEntity.status(HttpStatus.OK).body(user);
   }
 
+  /**
+   * Read users response entity.
+   *
+   * @param parameter the parameter
+   * @return the response entity
+   */
   @GetMapping
   public ResponseEntity<EntityModel<PageData<EntityModel<UserDto>>>> readUsers(
       @Valid PaginationParameter parameter) {
@@ -44,31 +62,50 @@ public class UserController {
 
     EntityModel<PageData<EntityModel<UserDto>>> hateoasPage =
         hateoasHandler.wrapPageWithEntityModel(page);
-    hateoasPage
-        .getContent()
-        .getContent()
-        .forEach(certificate -> certificate.add(takeUserLinks(certificate.getContent().getId())));
+
+    for (EntityModel<UserDto> user : hateoasPage.getContent().getContent()) {
+      long id = user.getContent().getId();
+      List<Link> links = buildUserLinks(id);
+      user.add(links);
+    }
 
     hateoasPage.add(
-        hateoasHandler.takeLinksForPagination(
-            UserController.class, parameter, page.getNumberOfPages()));
-    hateoasPage.add(takeUsersLinks());
+        hateoasHandler.buildLinksForPagination(
+            UserResource.class, parameter, page.getNumberOfPages()));
+    hateoasPage.add(buildUsersLinks());
     return ResponseEntity.status(HttpStatus.OK).body(hateoasPage);
   }
 
+  /**
+   * Read most widely tag from user with highest cost orders response entity.
+   *
+   * @return the response entity
+   */
   @GetMapping("/most-popular-tag")
   public ResponseEntity<TagDto> readMostWidelyTagFromUserWithHighestCostOrders() {
     TagDto tag = userService.takeMostWidelyTagFromUserWithHighestCostOrders();
     return ResponseEntity.status(HttpStatus.OK).body(tag);
   }
 
-  List<Link> takeUserLinks(long id) {
-    return List.of(linkTo(UserController.class).slash(id).withSelfRel());
+  /**
+   * Build user links list.
+   *
+   * @param id the id
+   * @return the list
+   */
+  List<Link> buildUserLinks(long id) {
+    return List.of(linkTo(UserResource.class).slash(id).withSelfRel());
   }
 
-  List<Link> takeUsersLinks() {
+  /**
+   * Build users links list.
+   *
+   * @return the list
+   */
+  List<Link> buildUsersLinks() {
     return List.of(
-        linkTo(methodOn(UserController.class).readMostWidelyTagFromUserWithHighestCostOrders())
-            .withRel("read most popular tag"));
+        linkTo(methodOn(UserResource.class).readMostWidelyTagFromUserWithHighestCostOrders())
+            .withRel("get")
+            .withName("read most popular tag"));
   }
 }

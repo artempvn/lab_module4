@@ -15,5 +15,12 @@ public interface PaginationHandler {
    */
   void setPageToQuery(TypedQuery<?> typedQuery, PaginationParameter parameter);
 
+  /**
+   * Calculate number of pages long.
+   *
+   * @param numberOfElements the number of elements
+   * @param pageSize the page size
+   * @return the long
+   */
   long calculateNumberOfPages(long numberOfElements, int pageSize);
 }

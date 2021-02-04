@@ -5,13 +5,12 @@ import com.epam.esm.dao.UserDao;
 import com.epam.esm.dao.entity.User;
 import com.epam.esm.dto.*;
 import com.epam.esm.exception.TagException;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -56,29 +55,25 @@ public class UserDaoImpl implements UserDao {
   @Override
   public UserDto create(UserDto dto) {
     User user = new User(dto);
-    Session session = entityManager.unwrap(Session.class);
-    session.save(user);
+    entityManager.persist(user);
     return new UserDto(user);
   }
 
   @Override
   public Optional<UserDtoWithOrders> read(long id) {
-    Session session = entityManager.unwrap(Session.class);
-    Optional<User> user = Optional.ofNullable(session.get(User.class, id));
+    Optional<User> user = Optional.ofNullable(entityManager.find(User.class, id));
     return user.map(UserDtoWithOrders::new);
   }
 
   @Override
   public Optional<UserDto> readWithoutOrders(long id) {
-    Session session = entityManager.unwrap(Session.class);
-    Optional<User> user = Optional.ofNullable(session.get(User.class, id));
+    Optional<User> user = Optional.ofNullable(entityManager.find(User.class, id));
     return user.map(UserDto::new);
   }
 
   @Override
   public PageData<UserDto> readAll(PaginationParameter parameter) {
-    Session session = entityManager.unwrap(Session.class);
-    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<User> criteriaQuery = builder.createQuery(User.class);
     Root<User> from = criteriaQuery.from(User.class);
@@ -86,11 +81,11 @@ public class UserDaoImpl implements UserDao {
 
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
     countQuery.select(builder.count(countQuery.from(User.class)));
-    Long numberOfElements = session.createQuery(countQuery).getSingleResult();
+    Long numberOfElements = entityManager.createQuery(countQuery).getSingleResult();
     long numberOfPages =
         paginationHandler.calculateNumberOfPages(numberOfElements, parameter.getSize());
 
-    TypedQuery<User> typedQuery = session.createQuery(select);
+    TypedQuery<User> typedQuery = entityManager.createQuery(select);
     paginationHandler.setPageToQuery(typedQuery, parameter);
     List<UserDto> users =
         typedQuery.getResultList().stream().map(UserDto::new).collect(Collectors.toList());
@@ -100,9 +95,9 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public TagDto takeMostWidelyTagFromUserWithHighestCostOrders() {
-    Session session = entityManager.unwrap(Session.class);
     Query q =
-        session.createNativeQuery(SQL_REQUEST_FOR_WIDELY_USED_TAG_FROM_HIGHEST_COST_ORDERS_USER);
+        entityManager.createNativeQuery(
+            SQL_REQUEST_FOR_WIDELY_USED_TAG_FROM_HIGHEST_COST_ORDERS_USER);
 
     Optional<Object[]> tagValue = q.getResultStream().findFirst();
     if (tagValue.isPresent()) {

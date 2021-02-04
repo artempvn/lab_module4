@@ -17,11 +17,11 @@ public interface OrderDao {
       OrderDtoWithCertificatesWithTagsForCreation order);
 
   /**
-   * Read all by user list.
+   * Read all by user page data.
    *
    * @param userId the user id
    * @param parameter the parameter
-   * @return the list
+   * @return the page data
    */
   PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter);
 
