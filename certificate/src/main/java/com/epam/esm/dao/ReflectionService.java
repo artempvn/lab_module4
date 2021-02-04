@@ -13,7 +13,7 @@ public interface ReflectionService {
    *
    * @param obj the obj
    * @param requiredFields the required fields
-   * @return the list
+   * @return the list of not null fields
    */
   List<Field> takeNotNullFields(Object obj, Collection<String> requiredFields);
 
@@ -22,7 +22,7 @@ public interface ReflectionService {
    *
    * @param field the field
    * @param inputObject the input object
-   * @return the optional
+   * @return the optional of field's value
    */
   Optional<Object> takeValueFromField(Field field, Object inputObject);
 
@@ -33,7 +33,7 @@ public interface ReflectionService {
    * @param field the field
    * @param inputObject the input object
    * @param clazz the clazz
-   * @return the optional
+   * @return the optional of field's value
    */
   <T> Optional<T> takeValueFromField(Field field, Object inputObject, Class<T> clazz);
 }

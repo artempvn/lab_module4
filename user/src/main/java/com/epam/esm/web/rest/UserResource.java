@@ -52,7 +52,7 @@ public class UserResource {
   /**
    * Read users response entity.
    *
-   * @param parameter the parameter
+   * @param parameter the parameter of pagination
    * @return the response entity
    */
   @GetMapping

@@ -145,13 +145,14 @@ class CertificateResourceTest {
     c2.setLastUpdateDate(cert2.getLastUpdateDate());
 
     mockMvc
-        .perform(get("/certificates?page=1&size=10&name=cert"))
+        .perform(get("/certificates?page=1&size=10&name=cert&sort.name=ASC&tags=tag1"))
         .andExpect(jsonPath("$.currentPage").value(1))
-        .andExpect(jsonPath("$.content").isNotEmpty())
+        .andExpect(jsonPath("$.content").isEmpty())
         .andExpect(
             jsonPath(
                 "$.links[?(@.rel=='self')].href",
-                contains("http://localhost/certificates?page=1&size=10")));
+                contains(
+                    "http://localhost/certificates?page=1&size=10&tags=tag1&name=cert&sort.name=ASC")));
   }
 
   @Test

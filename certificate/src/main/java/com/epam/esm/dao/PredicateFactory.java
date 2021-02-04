@@ -15,7 +15,7 @@ public interface PredicateFactory {
    * Build predicates list.
    *
    * @param builder the builder
-   * @param request the request
+   * @param request the request contains sorting and filtering staff
    * @param root the root
    * @return the list
    */

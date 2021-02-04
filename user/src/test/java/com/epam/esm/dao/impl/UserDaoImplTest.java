@@ -1,10 +1,8 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.PageData;
-import com.epam.esm.dto.PaginationParameter;
-import com.epam.esm.dto.UserDto;
-import com.epam.esm.dto.UserDtoWithOrders;
+import com.epam.esm.dto.*;
+import com.epam.esm.service.OrderService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,7 @@ class UserDaoImplTest {
   @Autowired UserDao userDao;
   @Autowired EntityManager entityManager;
   @Autowired TransactionTemplate txTemplate;
+  @Autowired OrderService orderService;
 
   @AfterEach
   void setDown() {
@@ -76,6 +75,43 @@ class UserDaoImplTest {
     PageData<UserDto> actualPage = userDao.readAll(parameter);
 
     assertEquals(expectedList.size(), actualPage.getContent().size());
+  }
+
+  @Test
+  void takeMostWidelyTagFromUserWithHighestCostOrders() {
+    UserDto userWithHighestCostOfOrders = givenUser1WO();
+    UserDto user = givenUser2WO();
+    long userHighestCostId = userDao.create(userWithHighestCostOfOrders).getId();
+    long userId = userDao.create(user).getId();
+    TagDto tag1 = TagDto.builder().name("tag1").build();
+    TagDto tag2 = TagDto.builder().name("tag2").build();
+    CertificateDtoWithTags certificate1 =
+        CertificateDtoWithTags.builder().price(9999.).tags(List.of(tag1, tag2)).build();
+    CertificateDtoWithTags certificate2 =
+        CertificateDtoWithTags.builder().price(1.).tags(List.of(tag1)).build();
+    OrderDtoWithCertificatesWithTagsForCreation order1 =
+        OrderDtoWithCertificatesWithTagsForCreation.builder()
+            .userId(userHighestCostId)
+            .certificates(List.of(certificate1, certificate2))
+            .build();
+    OrderDtoWithCertificatesWithTagsForCreation order2 =
+        OrderDtoWithCertificatesWithTagsForCreation.builder()
+            .userId(userHighestCostId)
+            .certificates(List.of(certificate2))
+            .build();
+    OrderDtoWithCertificatesWithTagsForCreation order3 =
+        OrderDtoWithCertificatesWithTagsForCreation.builder()
+            .userId(userId)
+            .certificates(List.of(certificate2))
+            .build();
+    orderService.create(order1);
+    orderService.create(order2);
+    orderService.create(order3);
+    String expectedTagName = tag1.getName();
+
+    String actualTagName = userDao.takeMostWidelyTagFromUserWithHighestCostOrders().getName();
+
+    assertEquals(expectedTagName, actualTagName);
   }
 
   UserDto givenUser1WO() {

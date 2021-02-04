@@ -43,6 +43,13 @@ class UserServiceImplTest {
     verify(userDao).readAll(any());
   }
 
+  @Test
+  void takeMostWidelyTagFromUserWithHighestCostOrders() {
+    userService.takeMostWidelyTagFromUserWithHighestCostOrders();
+
+    verify(userDao).takeMostWidelyTagFromUserWithHighestCostOrders();
+  }
+
   UserDtoWithOrders givenUser() {
     UserDtoWithOrders user = new UserDtoWithOrders();
     user.setName("name");

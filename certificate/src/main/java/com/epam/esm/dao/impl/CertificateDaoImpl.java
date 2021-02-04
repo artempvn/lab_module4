@@ -67,11 +67,9 @@ public class CertificateDaoImpl implements CertificateDao {
     CriteriaQuery<Certificate> criteria = criteriaHandler.filterWithParameters(builder, request);
 
     TypedQuery<Certificate> typedQuery = entityManager.createQuery(criteria);
+    int numberOfElements = typedQuery.getResultList().size();
     paginationHandler.setPageToQuery(typedQuery, parameter);
 
-    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    countQuery.select(builder.count(countQuery.from(Certificate.class)));
-    Long numberOfElements = entityManager.createQuery(countQuery).getSingleResult();
     long numberOfPages =
         paginationHandler.calculateNumberOfPages(numberOfElements, parameter.getSize());
 

@@ -16,7 +16,7 @@ public interface UserService {
   /**
    * Read all page data.
    *
-   * @param parameter the parameter
+   * @param parameter the parameter of pagination
    * @return the page data
    */
   PageData<UserDto> readAll(PaginationParameter parameter);

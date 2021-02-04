@@ -11,7 +11,7 @@ public interface PaginationHandler {
    * Sets page to query.
    *
    * @param typedQuery the typed query
-   * @param parameter the parameter
+   * @param parameter the parameter of pagination
    */
   void setPageToQuery(TypedQuery<?> typedQuery, PaginationParameter parameter);
 

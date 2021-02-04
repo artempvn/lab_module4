@@ -24,8 +24,8 @@ public interface CertificateService {
   /**
    * Read all page data.
    *
-   * @param request the request
-   * @param parameter the parameter
+   * @param request the request contains sorting and filtering staff
+   * @param parameter the parameter of pagination
    * @return the page data
    */
   PageData<CertificateDtoWithoutTags> readAll(

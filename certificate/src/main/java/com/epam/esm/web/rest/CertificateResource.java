@@ -49,8 +49,8 @@ public class CertificateResource {
   /**
    * Read certificates response entity.
    *
-   * @param request the request
-   * @param parameter the parameter
+   * @param request the request contains sorting and filtering staff
+   * @param parameter the parameter of pagination
    * @return the response entity
    */
   @GetMapping
@@ -70,7 +70,7 @@ public class CertificateResource {
 
     hateoasPage.add(
         hateoasHandler.buildLinksForPagination(
-            CertificateResource.class, parameter, page.getNumberOfPages()));
+            CertificateResource.class, parameter, page.getNumberOfPages(), request));
     hateoasPage.add(buildCertificatesLinks());
     return ResponseEntity.status(HttpStatus.OK).body(hateoasPage);
   }

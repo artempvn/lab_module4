@@ -54,7 +54,7 @@ public class OrderResource {
    * Read user orders response entity.
    *
    * @param userId the user id
-   * @param parameter the parameter
+   * @param parameter the parameter of pagination
    * @return the response entity
    */
   @GetMapping

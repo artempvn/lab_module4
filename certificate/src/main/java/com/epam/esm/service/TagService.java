@@ -27,7 +27,7 @@ public interface TagService {
   /**
    * Read all page data.
    *
-   * @param parameter the parameter
+   * @param parameter the parameter of pagination
    * @return the page data
    */
   PageData<TagDto> readAll(PaginationParameter parameter);

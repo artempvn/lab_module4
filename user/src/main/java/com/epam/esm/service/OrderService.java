@@ -18,7 +18,7 @@ public interface OrderService {
    * Read all by user page data.
    *
    * @param userId the user id
-   * @param parameter the parameter
+   * @param parameter the parameter of pagination
    * @return the page data
    */
   PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter);

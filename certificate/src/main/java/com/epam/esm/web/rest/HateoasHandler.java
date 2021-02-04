@@ -1,5 +1,6 @@
 package com.epam.esm.web.rest;
 
+import com.epam.esm.dto.CertificatesRequest;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import org.springframework.hateoas.EntityModel;
@@ -9,6 +10,7 @@ import java.util.List;
 
 /** The interface Hateoas handler. */
 public interface HateoasHandler {
+
   /**
    * Build links for pagination list.
    *
@@ -19,6 +21,21 @@ public interface HateoasHandler {
    */
   List<Link> buildLinksForPagination(
       Class<?> clazz, PaginationParameter parameter, long numberOfPages);
+
+  /**
+   * Build links for pagination list.
+   *
+   * @param clazz the clazz
+   * @param parameter the parameter
+   * @param numberOfPages the number of pages
+   * @param request the request
+   * @return the list
+   */
+  List<Link> buildLinksForPagination(
+      Class<?> clazz,
+      PaginationParameter parameter,
+      long numberOfPages,
+      CertificatesRequest request);
 
   /**
    * Wrap page with entity model entity model.

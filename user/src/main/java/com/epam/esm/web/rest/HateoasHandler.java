@@ -14,9 +14,9 @@ public interface HateoasHandler {
    * Build links for pagination list.
    *
    * @param clazz the clazz
-   * @param parameter the parameter
+   * @param parameter the parameter of pagination
    * @param numberOfPages the number of pages
-   * @return the list
+   * @return the list of links
    */
   List<Link> buildLinksForPagination(
       Class<?> clazz, PaginationParameter parameter, long numberOfPages);
@@ -29,7 +29,7 @@ public interface HateoasHandler {
    * @param numberOfPages the number of pages
    * @param outerId the outer id
    * @param innerName the inner name
-   * @return the list
+   * @return the list of links
    */
   List<Link> buildLinksForPaginationWithOuterResource(
       Class<?> clazz,

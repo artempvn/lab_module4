@@ -79,12 +79,6 @@ public class CriteriaHandlerImpl implements CriteriaHandler {
     return criteria;
   }
 
-  Predicate[] convertListPredicatesToArray(List<Predicate> predicates) {
-    Predicate[] arrayOfPredicates = new Predicate[predicates.size()];
-    predicates.toArray(arrayOfPredicates);
-    return arrayOfPredicates;
-  }
-
   List<Order> takeSortingOrders(
       CriteriaBuilder builder,
       Root<Certificate> root,

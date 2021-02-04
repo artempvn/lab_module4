@@ -1,7 +1,11 @@
 package com.epam.esm.web.rest;
 
 import com.epam.esm.dao.UserDao;
+import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
+import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
+import com.epam.esm.service.OrderService;
 import com.epam.esm.web.advice.ResourceAdvice;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,6 +40,7 @@ class UserResourceTest {
   @Autowired EntityManager entityManager;
   @Autowired ReloadableResourceBundleMessageSource messageSource;
   @Autowired TransactionTemplate txTemplate;
+  @Autowired OrderService orderService;
 
   @BeforeEach
   public void setup() {
@@ -91,6 +97,35 @@ class UserResourceTest {
             jsonPath(
                 "$.links[?(@.rel=='self')].href",
                 contains("http://localhost/users?page=1&size=10")));
+  }
+
+  @Test
+  void readMostWidelyTagFromUserWithHighestCostOrders() throws Exception {
+    UserDto userWithHighestCostOfOrders = givenUserWO1();
+    long userHighestCostId = userDao.create(userWithHighestCostOfOrders).getId();
+    TagDto tag1 = TagDto.builder().name("tag1").build();
+    TagDto tag2 = TagDto.builder().name("tag2").build();
+    CertificateDtoWithTags certificate1 =
+        CertificateDtoWithTags.builder().price(9999.).tags(List.of(tag1, tag2)).build();
+    CertificateDtoWithTags certificate2 =
+        CertificateDtoWithTags.builder().price(1.).tags(List.of(tag1)).build();
+    OrderDtoWithCertificatesWithTagsForCreation order1 =
+        OrderDtoWithCertificatesWithTagsForCreation.builder()
+            .userId(userHighestCostId)
+            .certificates(List.of(certificate1, certificate2))
+            .build();
+    OrderDtoWithCertificatesWithTagsForCreation order2 =
+        OrderDtoWithCertificatesWithTagsForCreation.builder()
+            .userId(userHighestCostId)
+            .certificates(List.of(certificate2))
+            .build();
+    orderService.create(order1);
+    orderService.create(order2);
+
+    mockMvc
+        .perform(get("/users/most-popular-tag"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("tag1"));
   }
 
   UserDto givenUserWO1() {

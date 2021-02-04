@@ -1,5 +1,6 @@
 package com.epam.esm.web.rest.impl;
 
+import com.epam.esm.dto.CertificatesRequest;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.web.rest.HateoasHandler;
@@ -42,6 +43,44 @@ public class HateoasHandlerImpl implements HateoasHandler {
     return links;
   }
 
+  @Override
+  public List<Link> buildLinksForPagination(
+      Class<?> clazz,
+      PaginationParameter parameter,
+      long numberOfPages,
+      CertificatesRequest request) {
+    long currentPage = parameter.getPage();
+    List<Link> links = new ArrayList<>();
+    links.add(
+        linkTo(clazz)
+            .slash(
+                String.format(
+                    "?page=%d&size=%d&%s", currentPage, parameter.getSize(), request.toUrlString()))
+            .withSelfRel());
+
+    if (currentPage > 1) {
+      links.add(
+          linkTo(clazz)
+              .slash(
+                  String.format(
+                      "?page=%d&size=%d&%s",
+                      currentPage - 1, parameter.getSize(), request.toUrlString()))
+              .withRel("previous page"));
+    }
+
+    if (currentPage < numberOfPages) {
+      links.add(
+          linkTo(clazz)
+              .slash(
+                  String.format(
+                      "?page=%d&size=%d&%s",
+                      currentPage + 1, parameter.getSize(), request.toUrlString()))
+              .withRel("next page"));
+    }
+    return links;
+  }
+
+  @Override
   public <T> EntityModel<PageData<EntityModel<T>>> wrapPageWithEntityModel(PageData<T> page) {
     List<EntityModel<T>> innerList =
         page.getContent().stream().map(EntityModel::of).collect(Collectors.toList());

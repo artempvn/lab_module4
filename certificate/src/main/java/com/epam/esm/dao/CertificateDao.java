@@ -26,8 +26,8 @@ public interface CertificateDao {
   /**
    * Read all page data.
    *
-   * @param request the request
-   * @param parameter the parameter
+   * @param request the request contains sorting and filtering staff
+   * @param parameter the parameter of pagination
    * @return the page data
    */
   PageData<CertificateDtoWithoutTags> readAll(
@@ -60,7 +60,7 @@ public interface CertificateDao {
    *
    * @param tagId the tag id
    * @param certificateId the certificate id
-   * @return the int
+   * @return the int number of changed rows
    */
   int removeTag(long tagId, long certificateId);
 

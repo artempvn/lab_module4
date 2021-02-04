@@ -11,7 +11,7 @@ public interface PaginationHandler {
    * Sets page to query.
    *
    * @param typedQuery the typed query
-   * @param parameter the parameter
+   * @param parameter the parameter of pagination
    */
   void setPageToQuery(TypedQuery<?> typedQuery, PaginationParameter parameter);
 
@@ -20,7 +20,7 @@ public interface PaginationHandler {
    *
    * @param numberOfElements the number of elements
    * @param pageSize the page size
-   * @return the long
+   * @return the long number of pages
    */
   long calculateNumberOfPages(long numberOfElements, int pageSize);
 }
