@@ -1,7 +1,7 @@
 package com.epam.esm.dao.entity;
 
 import com.epam.esm.dto.UserDto;
-import com.epam.esm.dto.UserDtoWithOrders;
+import com.epam.esm.dto.UserWithOrdersDto;
 
 import javax.persistence.*;
 import java.util.Collections;
@@ -27,7 +27,7 @@ public class User {
 
   public User() {}
 
-  public User(UserDtoWithOrders dto) {
+  public User(UserWithOrdersDto dto) {
     this.id = dto.getId();
     this.name = dto.getName();
     this.surname = dto.getSurname();

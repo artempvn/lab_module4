@@ -21,7 +21,7 @@ public interface UserDao {
    * @param id the id
    * @return the optional
    */
-  Optional<UserDtoWithOrders> read(long id);
+  Optional<UserWithOrdersDto> read(long id);
 
   /**
    * Read without orders optional.

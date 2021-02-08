@@ -11,8 +11,8 @@ public interface OrderService {
    * @param order the order
    * @return the order dto with certificates with tags for creation
    */
-  OrderDtoWithCertificatesWithTagsForCreation create(
-      OrderDtoWithCertificatesWithTagsForCreation order);
+  OrderWithCertificatesWithTagsForCreationDto create(
+      OrderWithCertificatesWithTagsForCreationDto order);
 
   /**
    * Read all by user page data.
@@ -30,5 +30,5 @@ public interface OrderService {
    * @param orderId the order id
    * @return the order dto with certificates
    */
-  OrderDtoWithCertificates readOrderByUser(long userId, long orderId);
+  OrderWithCertificatesDto readOrderByUser(long userId, long orderId);
 }

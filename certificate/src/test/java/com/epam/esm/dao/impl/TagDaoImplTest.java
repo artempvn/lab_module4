@@ -2,7 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateWithTagsDto;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
@@ -100,7 +100,7 @@ class TagDaoImplTest {
   void deleteWithBoundFk() {
     TagDto tag = givenExistingTag1();
     long tagId = tagDao.create(tag).getId();
-    CertificateDtoWithTags certificate = givenExistingCertificate1();
+    CertificateWithTagsDto certificate = givenExistingCertificate1();
     long certificateId = certificateDao.create(certificate).getId();
     certificateDao.addTag(tagId, certificateId);
 
@@ -134,8 +134,8 @@ class TagDaoImplTest {
     return TagDto.builder().name("third tag").build();
   }
 
-  private static CertificateDtoWithTags givenExistingCertificate1() {
-    return CertificateDtoWithTags.builder()
+  private static CertificateWithTagsDto givenExistingCertificate1() {
+    return CertificateWithTagsDto.builder()
         .name("first certificate")
         .description("first description")
         .price(1.33)

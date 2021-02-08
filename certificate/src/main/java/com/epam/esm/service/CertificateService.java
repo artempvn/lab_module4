@@ -11,7 +11,7 @@ public interface CertificateService {
    * @param certificate the certificate
    * @return the certificate dto with tags
    */
-  CertificateDtoWithTags create(CertificateDtoWithTags certificate);
+  CertificateWithTagsDto create(CertificateWithTagsDto certificate);
 
   /**
    * Read certificate dto with tags.
@@ -19,7 +19,7 @@ public interface CertificateService {
    * @param id the id
    * @return the certificate dto with tags
    */
-  CertificateDtoWithTags read(long id);
+  CertificateWithTagsDto read(long id);
 
   /**
    * Read all page data.
@@ -28,7 +28,7 @@ public interface CertificateService {
    * @param parameter the parameter of pagination
    * @return the page data
    */
-  PageData<CertificateDtoWithoutTags> readAll(
+  PageData<CertificateWithoutTagsDto> readAll(
       CertificatesRequest request, PaginationParameter parameter);
 
   /**
@@ -37,7 +37,7 @@ public interface CertificateService {
    * @param certificate the certificate
    * @return the certificate dto with tags
    */
-  CertificateDtoWithTags update(CertificateDtoWithTags certificate);
+  CertificateWithTagsDto update(CertificateWithTagsDto certificate);
 
   /**
    * Update presented fields certificate dto without tags.
@@ -45,7 +45,7 @@ public interface CertificateService {
    * @param certificate the certificate
    * @return the certificate dto without tags
    */
-  CertificateDtoWithoutTags updatePresentedFields(CertificateDtoWithoutTags certificate);
+  CertificateWithoutTagsDto updatePresentedFields(CertificateWithoutTagsDto certificate);
 
   /**
    * Delete.

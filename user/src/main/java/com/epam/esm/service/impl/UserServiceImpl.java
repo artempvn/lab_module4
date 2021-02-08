@@ -21,8 +21,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDtoWithOrders read(long id) {
-    Optional<UserDtoWithOrders> user = userDao.read(id);
+  public UserWithOrdersDto read(long id) {
+    Optional<UserWithOrdersDto> user = userDao.read(id);
     return user.orElseThrow(ResourceNotFoundException.notFoundWithUser(id));
   }
 

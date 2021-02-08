@@ -47,14 +47,14 @@ class OrderDaoImplTest {
     long id = userDao.create(user).getId();
     TagDto tag = givenTag();
     var tag1 = tagDao.create(tag);
-    CertificateDtoWithTags certificate = givenCertificate();
+    CertificateWithTagsDto certificate = givenCertificate();
     certificate.setTags(List.of(tag1));
     var certificate1 = certificateDao.create(certificate);
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
     order.setUserId(id);
     order.setCertificates(List.of(certificate1));
 
-    OrderDtoWithCertificatesWithTagsForCreation actualOrder = orderDao.create(order);
+    OrderWithCertificatesWithTagsForCreationDto actualOrder = orderDao.create(order);
 
     assertNotNull(actualOrder.getId());
   }
@@ -65,10 +65,10 @@ class OrderDaoImplTest {
     long id = userDao.create(user).getId();
     TagDto tag = givenTag();
     var tag1 = tagDao.create(tag);
-    CertificateDtoWithTags certificate = givenCertificate();
+    CertificateWithTagsDto certificate = givenCertificate();
     certificate.setTags(List.of(tag1));
     var certificate1 = certificateDao.create(certificate);
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
     order.setUserId(id);
     order.setCertificates(List.of(certificate1));
     orderDao.create(order);
@@ -95,15 +95,15 @@ class OrderDaoImplTest {
     long userId = userDao.create(user).getId();
     TagDto tag = givenTag();
     var tag1 = tagDao.create(tag);
-    CertificateDtoWithTags certificate = givenCertificate();
+    CertificateWithTagsDto certificate = givenCertificate();
     certificate.setTags(List.of(tag1));
     var certificate1 = certificateDao.create(certificate);
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
     order.setUserId(userId);
     order.setCertificates(List.of(certificate1));
     long orderId = orderDao.create(order).getId();
 
-    Optional<OrderDtoWithCertificates> actualOrder = orderDao.readOrderByUser(userId, orderId);
+    Optional<OrderWithCertificatesDto> actualOrder = orderDao.readOrderByUser(userId, orderId);
 
     assertTrue(actualOrder.isPresent());
   }
@@ -114,14 +114,14 @@ class OrderDaoImplTest {
     long userId = userDao.create(user).getId();
     TagDto tag = givenTag();
     var tag1 = tagDao.create(tag);
-    CertificateDtoWithTags certificate = givenCertificate();
+    CertificateWithTagsDto certificate = givenCertificate();
     certificate.setTags(List.of(tag1));
     var certificate1 = certificateDao.create(certificate);
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
     order.setUserId(userId);
     order.setCertificates(List.of(certificate1));
 
-    Optional<OrderDtoWithCertificates> actualOrder =
+    Optional<OrderWithCertificatesDto> actualOrder =
         orderDao.readOrderByUser(userId, NOT_EXISTING_ORDER_ID);
 
     assertTrue(actualOrder.isEmpty());
@@ -135,9 +135,9 @@ class OrderDaoImplTest {
         () -> orderDao.readOrderByUser(NOT_EXISTING_USER_ID, NOT_EXISTING_ORDER_ID));
   }
 
-  OrderDtoWithCertificatesWithTagsForCreation givenOrder() {
-    OrderDtoWithCertificatesWithTagsForCreation order =
-        new OrderDtoWithCertificatesWithTagsForCreation();
+  OrderWithCertificatesWithTagsForCreationDto givenOrder() {
+    OrderWithCertificatesWithTagsForCreationDto order =
+        new OrderWithCertificatesWithTagsForCreationDto();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
     return order;
@@ -150,8 +150,8 @@ class OrderDaoImplTest {
     return user;
   }
 
-  CertificateDtoWithTags givenCertificate() {
-    CertificateDtoWithTags certificate = new CertificateDtoWithTags();
+  CertificateWithTagsDto givenCertificate() {
+    CertificateWithTagsDto certificate = new CertificateWithTagsDto();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();

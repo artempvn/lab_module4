@@ -1,6 +1,6 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateWithTagsDto;
 
 /** The interface Certificate dao. */
 public interface CertificateDao {
@@ -11,5 +11,5 @@ public interface CertificateDao {
    * @param certificate the certificate
    * @return the certificate dto with tags
    */
-  CertificateDtoWithTags create(CertificateDtoWithTags certificate);
+  CertificateWithTagsDto create(CertificateWithTagsDto certificate);
 }

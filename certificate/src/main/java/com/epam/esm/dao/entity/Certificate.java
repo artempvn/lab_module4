@@ -1,7 +1,7 @@
 package com.epam.esm.dao.entity;
 
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.CertificateDtoWithoutTags;
+import com.epam.esm.dto.CertificateWithTagsDto;
+import com.epam.esm.dto.CertificateWithoutTagsDto;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -43,7 +43,7 @@ public class Certificate {
 
   public Certificate() {}
 
-  public Certificate(CertificateDtoWithTags dto) {
+  public Certificate(CertificateWithTagsDto dto) {
     this.id = dto.getId();
     this.name = dto.getName();
     this.description = dto.getDescription();
@@ -54,7 +54,7 @@ public class Certificate {
     this.tags = dto.getTags().stream().map(Tag::new).collect(Collectors.toList());
   }
 
-  public Certificate(CertificateDtoWithoutTags dto) {
+  public Certificate(CertificateWithoutTagsDto dto) {
     this.id = dto.getId();
     this.name = dto.getName();
     this.description = dto.getDescription();

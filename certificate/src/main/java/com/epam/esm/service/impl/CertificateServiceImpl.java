@@ -26,7 +26,7 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
-  public CertificateDtoWithTags create(CertificateDtoWithTags certificate) {
+  public CertificateWithTagsDto create(CertificateWithTagsDto certificate) {
     LocalDateTime timeNow = LocalDateTime.now();
     certificate.setCreateDate(timeNow);
     certificate.setLastUpdateDate(timeNow);
@@ -36,19 +36,19 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
-  public CertificateDtoWithTags read(long id) {
-    Optional<CertificateDtoWithTags> certificate = certificateDao.read(id);
+  public CertificateWithTagsDto read(long id) {
+    Optional<CertificateWithTagsDto> certificate = certificateDao.read(id);
     return certificate.orElseThrow(ResourceNotFoundException.notFoundWithCertificateId(id));
   }
 
   @Override
-  public PageData<CertificateDtoWithoutTags> readAll(
+  public PageData<CertificateWithoutTagsDto> readAll(
       CertificatesRequest request, PaginationParameter parameter) {
     return certificateDao.readAll(request, parameter);
   }
 
   @Override
-  public CertificateDtoWithoutTags updatePresentedFields(CertificateDtoWithoutTags certificate) {
+  public CertificateWithoutTagsDto updatePresentedFields(CertificateWithoutTagsDto certificate) {
     LocalDateTime timeNow = LocalDateTime.now();
     certificate.setLastUpdateDate(timeNow);
     certificateDao.updatePresentedFields(certificate);
@@ -56,7 +56,7 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
-  public CertificateDtoWithTags update(CertificateDtoWithTags certificate) {
+  public CertificateWithTagsDto update(CertificateWithTagsDto certificate) {
     LocalDateTime timeNow = LocalDateTime.now();
     certificate.setCreateDate(timeNow);
     certificate.setLastUpdateDate(timeNow);

@@ -42,7 +42,7 @@ public class CertificateDaoImpl implements CertificateDao {
   }
 
   @Override
-  public CertificateDtoWithTags create(CertificateDtoWithTags certificateDto) {
+  public CertificateWithTagsDto create(CertificateWithTagsDto certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
     entityManager.persist(certificate);
 
@@ -50,18 +50,18 @@ public class CertificateDaoImpl implements CertificateDao {
 
     certificate.getTags().forEach(tag -> tag.withCertificate(certificate));
 
-    return new CertificateDtoWithTags(certificate);
+    return new CertificateWithTagsDto(certificate);
   }
 
   @Override
-  public Optional<CertificateDtoWithTags> read(long id) {
+  public Optional<CertificateWithTagsDto> read(long id) {
     Optional<Certificate> certificate =
         Optional.ofNullable(entityManager.find(Certificate.class, id));
-    return certificate.map(CertificateDtoWithTags::new);
+    return certificate.map(CertificateWithTagsDto::new);
   }
 
   @Override
-  public PageData<CertificateDtoWithoutTags> readAll(
+  public PageData<CertificateWithoutTagsDto> readAll(
       CertificatesRequest request, PaginationParameter parameter) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Certificate> criteria = criteriaHandler.filterWithParameters(builder, request);
@@ -73,16 +73,16 @@ public class CertificateDaoImpl implements CertificateDao {
     long numberOfPages =
         paginationHandler.calculateNumberOfPages(numberOfElements, parameter.getSize());
 
-    List<CertificateDtoWithoutTags> certificates =
+    List<CertificateWithoutTagsDto> certificates =
         typedQuery.getResultList().stream()
-            .map(CertificateDtoWithoutTags::new)
+            .map(CertificateWithoutTagsDto::new)
             .collect(Collectors.toList());
 
     return new PageData<>(parameter.getPage(), numberOfElements, numberOfPages, certificates);
   }
 
   @Override
-  public void update(CertificateDtoWithTags certificateDto) {
+  public void update(CertificateWithTagsDto certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
     Optional<Certificate> existingCertificate =
         Optional.ofNullable(entityManager.find(Certificate.class, certificate.getId()));
@@ -95,7 +95,7 @@ public class CertificateDaoImpl implements CertificateDao {
   }
 
   @Override
-  public void updatePresentedFields(CertificateDtoWithoutTags certificateDto) {
+  public void updatePresentedFields(CertificateWithoutTagsDto certificateDto) {
     Certificate certificate = new Certificate(certificateDto);
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaUpdate<Certificate> criteria =

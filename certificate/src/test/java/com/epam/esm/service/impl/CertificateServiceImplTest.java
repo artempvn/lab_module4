@@ -1,8 +1,8 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.CertificateDtoWithoutTags;
+import com.epam.esm.dto.CertificateWithTagsDto;
+import com.epam.esm.dto.CertificateWithoutTagsDto;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.TagService;
@@ -26,7 +26,7 @@ class CertificateServiceImplTest {
 
   @Test
   void createCertificateDaoCreateInvocation() {
-    CertificateDtoWithTags certificate = givenCertificate1();
+    CertificateWithTagsDto certificate = givenCertificate1();
     when(certificateDao.create(any())).thenReturn(certificate);
 
     certificateService.create(certificate);
@@ -36,7 +36,7 @@ class CertificateServiceImplTest {
 
   @Test
   void readExistedCertificateDaoReadInvocation() {
-    CertificateDtoWithTags certificate = givenCertificate1();
+    CertificateWithTagsDto certificate = givenCertificate1();
     when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));
 
     certificateService.read(certificate.getId());
@@ -53,8 +53,8 @@ class CertificateServiceImplTest {
 
   @Test
   void readAllCertificateDaoReadAllInvocation() {
-    CertificateDtoWithoutTags certificate = new CertificateDtoWithoutTags();
-    PageData<CertificateDtoWithoutTags> page = new PageData<>(1, 1, 1, List.of(certificate));
+    CertificateWithoutTagsDto certificate = new CertificateWithoutTagsDto();
+    PageData<CertificateWithoutTagsDto> page = new PageData<>(1, 1, 1, List.of(certificate));
     when(certificateDao.readAll(any(), any())).thenReturn(page);
 
     certificateService.readAll(any(), any());
@@ -64,7 +64,7 @@ class CertificateServiceImplTest {
 
   @Test
   void updateCertificateDaoUpdatePatchInvocation() {
-    CertificateDtoWithoutTags certificate = new CertificateDtoWithoutTags();
+    CertificateWithoutTagsDto certificate = new CertificateWithoutTagsDto();
 
     certificateService.updatePresentedFields(certificate);
 
@@ -73,7 +73,7 @@ class CertificateServiceImplTest {
 
   @Test
   void updatePut() {
-    CertificateDtoWithTags certificate = givenCertificate1();
+    CertificateWithTagsDto certificate = givenCertificate1();
 
     certificateService.update(certificate);
 
@@ -88,8 +88,8 @@ class CertificateServiceImplTest {
     verify(certificateDao).delete(ID);
   }
 
-  private static CertificateDtoWithTags givenCertificate1() {
-    return CertificateDtoWithTags.builder()
+  private static CertificateWithTagsDto givenCertificate1() {
+    return CertificateWithTagsDto.builder()
         .id(ID)
         .name("first certificate")
         .description("first description")

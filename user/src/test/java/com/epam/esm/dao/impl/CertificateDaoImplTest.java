@@ -3,7 +3,7 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateWithTagsDto;
 import com.epam.esm.dto.TagDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -43,16 +43,16 @@ class CertificateDaoImplTest {
     TagDto tag = givenTag();
     long id = tagDao.create(tag).getId();
     tag.setId(id);
-    CertificateDtoWithTags expectedCertificate = givenCertificate();
+    CertificateWithTagsDto expectedCertificate = givenCertificate();
     expectedCertificate.setTags(List.of(tag));
 
-    CertificateDtoWithTags actualCertificate = certificateDao.create(expectedCertificate);
+    CertificateWithTagsDto actualCertificate = certificateDao.create(expectedCertificate);
 
     assertNotNull(actualCertificate.getId());
   }
 
-  CertificateDtoWithTags givenCertificate() {
-    CertificateDtoWithTags certificate = new CertificateDtoWithTags();
+  CertificateWithTagsDto givenCertificate() {
+    CertificateWithTagsDto certificate = new CertificateWithTagsDto();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();

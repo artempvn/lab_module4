@@ -13,8 +13,8 @@ public interface OrderDao {
    * @param order the order
    * @return the order dto with certificates with tags for creation
    */
-  OrderDtoWithCertificatesWithTagsForCreation create(
-      OrderDtoWithCertificatesWithTagsForCreation order);
+  OrderWithCertificatesWithTagsForCreationDto create(
+      OrderWithCertificatesWithTagsForCreationDto order);
 
   /**
    * Read all by user page data.
@@ -32,5 +32,5 @@ public interface OrderDao {
    * @param orderId the order id
    * @return the optional
    */
-  Optional<OrderDtoWithCertificates> readOrderByUser(long userId, long orderId);
+  Optional<OrderWithCertificatesDto> readOrderByUser(long userId, long orderId);
 }

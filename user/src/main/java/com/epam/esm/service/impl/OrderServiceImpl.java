@@ -29,8 +29,8 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public OrderDtoWithCertificatesWithTagsForCreation create(
-      OrderDtoWithCertificatesWithTagsForCreation order) {
+  public OrderWithCertificatesWithTagsForCreationDto create(
+      OrderWithCertificatesWithTagsForCreationDto order) {
     userDao
         .readWithoutOrders(order.getUserId())
         .orElseThrow(ResourceValidationException.validationWithUser(order.getUserId()));
@@ -42,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
       throw OrderException.validationWithEmptyOrder(order.getUserId()).get();
     }
 
-    List<CertificateDtoWithTags> certificates =
+    List<CertificateWithTagsDto> certificates =
         order.getCertificates().stream()
             .map(certificateService::create)
             .collect(Collectors.toList());
@@ -57,8 +57,8 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public OrderDtoWithCertificates readOrderByUser(long userId, long orderId) {
-    Optional<OrderDtoWithCertificates> order = orderDao.readOrderByUser(userId, orderId);
+  public OrderWithCertificatesDto readOrderByUser(long userId, long orderId) {
+    Optional<OrderWithCertificatesDto> order = orderDao.readOrderByUser(userId, orderId);
     return order.orElseThrow(ResourceNotFoundException.notFoundWithOrder(orderId));
   }
 }

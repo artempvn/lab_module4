@@ -3,7 +3,7 @@ package com.epam.esm.service.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.entity.Certificate;
-import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateWithTagsDto;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.TagAction;
 import com.epam.esm.dto.TagDto;
@@ -119,8 +119,8 @@ class TagServiceImplTest {
   @Test
   void processTagActionAddTagDaoReadInvocation() {
     TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
-    CertificateDtoWithTags certificate =
-        CertificateDtoWithTags.builder().id(CERTIFICATE_ID).build();
+    CertificateWithTagsDto certificate =
+        CertificateWithTagsDto.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction = new TagAction(TagAction.ActionType.ADD, certificate.getId(), tag.getId());
     when(tagDao.read(anyLong())).thenReturn(Optional.of(tag));
     when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));
@@ -133,8 +133,8 @@ class TagServiceImplTest {
   @Test
   void processTagActionAddCertificateDaoReadInvocation() {
     TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
-    CertificateDtoWithTags certificate =
-        CertificateDtoWithTags.builder().id(CERTIFICATE_ID).build();
+    CertificateWithTagsDto certificate =
+        CertificateWithTagsDto.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction = new TagAction(TagAction.ActionType.ADD, certificate.getId(), tag.getId());
     when(tagDao.read(anyLong())).thenReturn(Optional.of(tag));
     when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));
@@ -147,8 +147,8 @@ class TagServiceImplTest {
   @Test
   void processTagActionAddCertificateDaoAddTagInvocation() {
     TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
-    CertificateDtoWithTags certificate =
-        CertificateDtoWithTags.builder().id(CERTIFICATE_ID).build();
+    CertificateWithTagsDto certificate =
+        CertificateWithTagsDto.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction = new TagAction(TagAction.ActionType.ADD, certificate.getId(), tag.getId());
     when(tagDao.read(anyLong())).thenReturn(Optional.of(tag));
     when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));
@@ -161,8 +161,8 @@ class TagServiceImplTest {
   @Test
   void processTagActionAddTagDaoReadException() {
     TagDto tag = TagDto.builder().id(TAG_ID).name("first tag").build();
-    CertificateDtoWithTags certificate =
-        CertificateDtoWithTags.builder().id(CERTIFICATE_ID).build();
+    CertificateWithTagsDto certificate =
+        CertificateWithTagsDto.builder().id(CERTIFICATE_ID).build();
     TagAction tagAction = new TagAction(TagAction.ActionType.ADD, certificate.getId(), tag.getId());
     when(tagDao.read(anyLong())).thenReturn(Optional.empty());
     when(certificateDao.read(anyLong())).thenReturn(Optional.of(certificate));

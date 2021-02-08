@@ -9,23 +9,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CertificateDtoWithTags {
+public class CertificateWithTagsDto {
 
   private Long id;
   @NotNull private Long previousId;
   @NotNull @PositiveOrZero private Double price;
   @Valid private List<TagDto> tags = Collections.emptyList();
 
-  public CertificateDtoWithTags() {}
+  public CertificateWithTagsDto() {}
 
-  public CertificateDtoWithTags(Certificate entity) {
+  public CertificateWithTagsDto(Certificate entity) {
     this.id = entity.getId();
     this.previousId = entity.getPreviousId();
     this.price = entity.getPrice();
     this.tags = entity.getTags().stream().map(TagDto::new).collect(Collectors.toList());
   }
 
-  private CertificateDtoWithTags(Builder builder) {
+  private CertificateWithTagsDto(Builder builder) {
     id = builder.id;
     previousId = builder.previousId;
     price = builder.price;
@@ -73,7 +73,7 @@ public class CertificateDtoWithTags {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    CertificateDtoWithTags that = (CertificateDtoWithTags) o;
+    CertificateWithTagsDto that = (CertificateWithTagsDto) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) return false;
     if (previousId != null ? !previousId.equals(that.previousId) : that.previousId != null)
@@ -130,8 +130,8 @@ public class CertificateDtoWithTags {
       return this;
     }
 
-    public CertificateDtoWithTags build() {
-      return new CertificateDtoWithTags(this);
+    public CertificateWithTagsDto build() {
+      return new CertificateWithTagsDto(this);
     }
   }
 }

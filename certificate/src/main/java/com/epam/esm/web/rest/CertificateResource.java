@@ -39,9 +39,9 @@ public class CertificateResource {
    * @return the response entity
    */
   @GetMapping("/{id}")
-  public ResponseEntity<EntityModel<CertificateDtoWithTags>> readCertificate(
+  public ResponseEntity<EntityModel<CertificateWithTagsDto>> readCertificate(
       @PathVariable long id) {
-    EntityModel<CertificateDtoWithTags> certificate = EntityModel.of(certificateService.read(id));
+    EntityModel<CertificateWithTagsDto> certificate = EntityModel.of(certificateService.read(id));
     certificate.add(buildCertificateLinks(certificate.getContent().getId()));
     return ResponseEntity.status(HttpStatus.OK).body(certificate);
   }
@@ -54,14 +54,14 @@ public class CertificateResource {
    * @return the response entity
    */
   @GetMapping
-  public ResponseEntity<EntityModel<PageData<EntityModel<CertificateDtoWithoutTags>>>>
+  public ResponseEntity<EntityModel<PageData<EntityModel<CertificateWithoutTagsDto>>>>
       readCertificates(CertificatesRequest request, @Valid PaginationParameter parameter) {
-    PageData<CertificateDtoWithoutTags> page = certificateService.readAll(request, parameter);
+    PageData<CertificateWithoutTagsDto> page = certificateService.readAll(request, parameter);
 
-    EntityModel<PageData<EntityModel<CertificateDtoWithoutTags>>> hateoasPage =
+    EntityModel<PageData<EntityModel<CertificateWithoutTagsDto>>> hateoasPage =
         hateoasHandler.wrapPageWithEntityModel(page);
 
-    for (EntityModel<CertificateDtoWithoutTags> certificate :
+    for (EntityModel<CertificateWithoutTagsDto> certificate :
         hateoasPage.getContent().getContent()) {
       long id = certificate.getContent().getId();
       List<Link> links = buildCertificateLinks(id);
@@ -82,9 +82,9 @@ public class CertificateResource {
    * @return the response entity
    */
   @PostMapping
-  public ResponseEntity<CertificateDtoWithTags> createCertificate(
-      @Valid @RequestBody CertificateDtoWithTags certificate) {
-    CertificateDtoWithTags createdCertificate = certificateService.create(certificate);
+  public ResponseEntity<CertificateWithTagsDto> createCertificate(
+      @Valid @RequestBody CertificateWithTagsDto certificate) {
+    CertificateWithTagsDto createdCertificate = certificateService.create(certificate);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdCertificate);
   }
 
@@ -96,10 +96,10 @@ public class CertificateResource {
    * @return the response entity
    */
   @PutMapping("/{id}")
-  public ResponseEntity<CertificateDtoWithTags> updateCertificatePut(
-      @PathVariable long id, @Valid @RequestBody CertificateDtoWithTags certificate) {
+  public ResponseEntity<CertificateWithTagsDto> updateCertificatePut(
+      @PathVariable long id, @Valid @RequestBody CertificateWithTagsDto certificate) {
     certificate.setId(id);
-    CertificateDtoWithTags updatedCertificate = certificateService.update(certificate);
+    CertificateWithTagsDto updatedCertificate = certificateService.update(certificate);
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 
@@ -111,11 +111,11 @@ public class CertificateResource {
    * @return the response entity
    */
   @PatchMapping("/{id}")
-  public ResponseEntity<CertificateDtoWithoutTags> updateCertificatePatch(
-      @PathVariable long id, @Valid @RequestBody CertificateDtoPatch certificate) {
+  public ResponseEntity<CertificateWithoutTagsDto> updateCertificatePatch(
+      @PathVariable long id, @Valid @RequestBody CertificatePatchDto certificate) {
     certificate.setId(id);
-    CertificateDtoWithoutTags updatedCertificate =
-        certificateService.updatePresentedFields(new CertificateDtoWithoutTags(certificate));
+    CertificateWithoutTagsDto updatedCertificate =
+        certificateService.updatePresentedFields(new CertificateWithoutTagsDto(certificate));
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 

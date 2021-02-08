@@ -8,26 +8,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OrderDtoWithCertificatesWithTagsForCreation {
+public class OrderWithCertificatesWithTagsForCreationDto {
 
   private Long id;
   private Long userId;
   private LocalDateTime createDate;
-  @Valid private List<CertificateDtoWithTags> certificates = Collections.emptyList();
+  @Valid private List<CertificateWithTagsDto> certificates = Collections.emptyList();
 
-  public OrderDtoWithCertificatesWithTagsForCreation() {}
+  public OrderWithCertificatesWithTagsForCreationDto() {}
 
-  public OrderDtoWithCertificatesWithTagsForCreation(Order entity) {
+  public OrderWithCertificatesWithTagsForCreationDto(Order entity) {
     this.id = entity.getId();
     this.userId = entity.getUser().getId();
     this.createDate = entity.getCreateDate();
     this.certificates =
         entity.getCertificates().stream()
-            .map(CertificateDtoWithTags::new)
+            .map(CertificateWithTagsDto::new)
             .collect(Collectors.toList());
   }
 
-  private OrderDtoWithCertificatesWithTagsForCreation(Builder builder) {
+  private OrderWithCertificatesWithTagsForCreationDto(Builder builder) {
     id = builder.id;
     userId = builder.userId;
     createDate = builder.createDate;
@@ -62,11 +62,11 @@ public class OrderDtoWithCertificatesWithTagsForCreation {
     this.createDate = createDate;
   }
 
-  public List<CertificateDtoWithTags> getCertificates() {
+  public List<CertificateWithTagsDto> getCertificates() {
     return certificates;
   }
 
-  public void setCertificates(List<CertificateDtoWithTags> certificates) {
+  public void setCertificates(List<CertificateWithTagsDto> certificates) {
     this.certificates = certificates;
   }
 
@@ -75,8 +75,8 @@ public class OrderDtoWithCertificatesWithTagsForCreation {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    OrderDtoWithCertificatesWithTagsForCreation that =
-        (OrderDtoWithCertificatesWithTagsForCreation) o;
+    OrderWithCertificatesWithTagsForCreationDto that =
+        (OrderWithCertificatesWithTagsForCreationDto) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) return false;
     if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
@@ -111,7 +111,7 @@ public class OrderDtoWithCertificatesWithTagsForCreation {
     private Long id;
     private Long userId;
     private LocalDateTime createDate;
-    private List<CertificateDtoWithTags> certificates = Collections.emptyList();
+    private List<CertificateWithTagsDto> certificates = Collections.emptyList();
 
     private Builder() {}
 
@@ -130,13 +130,13 @@ public class OrderDtoWithCertificatesWithTagsForCreation {
       return this;
     }
 
-    public Builder certificates(List<CertificateDtoWithTags> certificates) {
+    public Builder certificates(List<CertificateWithTagsDto> certificates) {
       this.certificates = certificates;
       return this;
     }
 
-    public OrderDtoWithCertificatesWithTagsForCreation build() {
-      return new OrderDtoWithCertificatesWithTagsForCreation(this);
+    public OrderWithCertificatesWithTagsForCreationDto build() {
+      return new OrderWithCertificatesWithTagsForCreationDto(this);
     }
   }
 }

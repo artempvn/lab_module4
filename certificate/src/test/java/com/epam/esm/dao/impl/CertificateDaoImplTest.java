@@ -40,26 +40,26 @@ class CertificateDaoImplTest {
 
   @Test
   void create() {
-    CertificateDtoWithTags expectedCertificate = givenNewCertificateWithoutId();
+    CertificateWithTagsDto expectedCertificate = givenNewCertificateWithoutId();
 
-    CertificateDtoWithTags actualCertificate = certificateDao.create(expectedCertificate);
+    CertificateWithTagsDto actualCertificate = certificateDao.create(expectedCertificate);
 
     assertNotNull(actualCertificate.getId());
   }
 
   @Test
   void readExisted() {
-    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateWithTagsDto certificate1 = givenExistingCertificate1();
     long id = certificateDao.create(certificate1).getId();
 
-    Optional<CertificateDtoWithTags> actualCertificate = certificateDao.read(id);
+    Optional<CertificateWithTagsDto> actualCertificate = certificateDao.read(id);
 
     assertTrue(actualCertificate.isPresent());
   }
 
   @Test
   void readNotExisted() {
-    Optional<CertificateDtoWithTags> actualCertificate =
+    Optional<CertificateWithTagsDto> actualCertificate =
         certificateDao.read(NOT_EXISTED_CERTIFICATE_ID);
 
     assertTrue(actualCertificate.isEmpty());
@@ -67,39 +67,39 @@ class CertificateDaoImplTest {
 
   @Test
   void readAll() {
-    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
-    CertificateDtoWithTags certificate2 = givenExistingCertificate2();
+    CertificateWithTagsDto certificate1 = givenExistingCertificate1();
+    CertificateWithTagsDto certificate2 = givenExistingCertificate2();
     certificateDao.create(certificate1);
     certificateDao.create(certificate2);
-    List<CertificateDtoWithTags> expectedList = List.of(certificate1, certificate2);
+    List<CertificateWithTagsDto> expectedList = List.of(certificate1, certificate2);
     PaginationParameter parameter = new PaginationParameter();
     parameter.setPage(1);
     parameter.setSize(10);
 
-    PageData<CertificateDtoWithoutTags> actualPage =
+    PageData<CertificateWithoutTagsDto> actualPage =
         certificateDao.readAll(new CertificatesRequest(), parameter);
     assertEquals(expectedList.size(), actualPage.getContent().size());
   }
 
   @Test
   void update() {
-    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateWithTagsDto certificate1 = givenExistingCertificate1();
     long id = certificateDao.create(certificate1).getId();
-    CertificateDtoWithTags expectedCertificate =
-        CertificateDtoWithTags.builder().id(id).name("new name").build();
+    CertificateWithTagsDto expectedCertificate =
+        CertificateWithTagsDto.builder().id(id).name("new name").build();
 
     certificateDao.update(expectedCertificate);
 
-    CertificateDtoWithTags actualCertificate = certificateDao.read(id).get();
+    CertificateWithTagsDto actualCertificate = certificateDao.read(id).get();
     assertEquals(expectedCertificate.getName(), actualCertificate.getName());
   }
 
   @Test
   void updateNotExisted() {
-    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateWithTagsDto certificate1 = givenExistingCertificate1();
     certificate1.setId(1L);
-    CertificateDtoWithTags expectedCertificate =
-        CertificateDtoWithTags.builder().id(certificate1.getId()).name("new name").build();
+    CertificateWithTagsDto expectedCertificate =
+        CertificateWithTagsDto.builder().id(certificate1.getId()).name("new name").build();
 
     assertThrows(
         ResourceValidationException.class, () -> certificateDao.update(expectedCertificate));
@@ -107,26 +107,26 @@ class CertificateDaoImplTest {
 
   @Test
   void updatePatch() {
-    CertificateDtoWithTags certificate = givenExistingCertificate1();
+    CertificateWithTagsDto certificate = givenExistingCertificate1();
     long id = certificateDao.create(certificate).getId();
-    CertificateDtoWithoutTags updateCertificate = new CertificateDtoWithoutTags();
+    CertificateWithoutTagsDto updateCertificate = new CertificateWithoutTagsDto();
     updateCertificate.setId(id);
     updateCertificate.setName("new name");
-    CertificateDtoWithTags expectedCertificate = givenExistingCertificate1();
+    CertificateWithTagsDto expectedCertificate = givenExistingCertificate1();
     expectedCertificate.setId(id);
     expectedCertificate.setName(updateCertificate.getName());
 
     certificateDao.updatePresentedFields(updateCertificate);
 
-    CertificateDtoWithTags actualCertificate = certificateDao.read(id).get();
+    CertificateWithTagsDto actualCertificate = certificateDao.read(id).get();
 
     assertEquals(expectedCertificate, actualCertificate);
   }
 
   @Test
   void updatePatchNotExisted() {
-    CertificateDtoWithTags certificate = givenExistingCertificate1();
-    CertificateDtoWithoutTags updateCertificate = new CertificateDtoWithoutTags();
+    CertificateWithTagsDto certificate = givenExistingCertificate1();
+    CertificateWithoutTagsDto updateCertificate = new CertificateWithoutTagsDto();
     updateCertificate.setId(certificate.getId());
     updateCertificate.setName("new name");
 
@@ -137,12 +137,12 @@ class CertificateDaoImplTest {
 
   @Test
   void delete() {
-    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateWithTagsDto certificate1 = givenExistingCertificate1();
     long id = certificateDao.create(certificate1).getId();
 
     certificateDao.delete(id);
 
-    Optional<CertificateDtoWithTags> actualCertificate = certificateDao.read(id);
+    Optional<CertificateWithTagsDto> actualCertificate = certificateDao.read(id);
     assertTrue(actualCertificate.isEmpty());
   }
 
@@ -155,7 +155,7 @@ class CertificateDaoImplTest {
 
   @Test
   void addTag() {
-    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateWithTagsDto certificate1 = givenExistingCertificate1();
     TagDto tag1 = givenExistingTag1();
     long certificateId = certificateDao.create(certificate1).getId();
     long tagId = tagDao.create(tag1).getId();
@@ -169,7 +169,7 @@ class CertificateDaoImplTest {
 
   @Test
   void removeTag() {
-    CertificateDtoWithTags certificate2 = givenExistingCertificate2();
+    CertificateWithTagsDto certificate2 = givenExistingCertificate2();
     TagDto tag1 = givenExistingTag1();
     TagDto tag2 = givenExistingTag2();
     long certificateId = certificateDao.create(certificate2).getId();
@@ -186,8 +186,8 @@ class CertificateDaoImplTest {
     assertEquals(expectedTags, actualTags);
   }
 
-  private static CertificateDtoWithTags givenExistingCertificate1() {
-    return CertificateDtoWithTags.builder()
+  private static CertificateWithTagsDto givenExistingCertificate1() {
+    return CertificateWithTagsDto.builder()
         .name("first certificate")
         .description("first description")
         .price(1.33)
@@ -197,8 +197,8 @@ class CertificateDaoImplTest {
         .build();
   }
 
-  private static CertificateDtoWithTags givenExistingCertificate2() {
-    return CertificateDtoWithTags.builder()
+  private static CertificateWithTagsDto givenExistingCertificate2() {
+    return CertificateWithTagsDto.builder()
         .name("second certificate")
         .description("second description")
         .price(2.33)
@@ -208,8 +208,8 @@ class CertificateDaoImplTest {
         .build();
   }
 
-  private static CertificateDtoWithTags givenNewCertificateWithoutId() {
-    return CertificateDtoWithTags.builder()
+  private static CertificateWithTagsDto givenNewCertificateWithoutId() {
+    return CertificateWithTagsDto.builder()
         .name("third certificate")
         .description("third description")
         .price(3.33)

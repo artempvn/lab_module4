@@ -30,8 +30,8 @@ public class UserDaoImpl implements UserDao {
           + "(SELECT SUM(price) AS summa,users.id "
           + "FROM ordered_certificates "
           + "JOIN orders ON order_id=orders.id JOIN users ON user_id=users.id "
-          + "GROUP BY users.id) AS user_orders_cost"
-          + " ORDER BY summa desc limit 1)";
+          + "GROUP BY users.id) AS user_orders_cost "
+          + "ORDER BY summa DESC LIMIT 1) ";
 
   private static final String SQL_REQUEST_FOR_WIDELY_USED_TAG_FROM_HIGHEST_COST_ORDERS_USER =
       "SELECT ordered_tags.id, ordered_tags.name "
@@ -41,8 +41,8 @@ public class UserDaoImpl implements UserDao {
           + "JOIN orders ON orders.id=order_id JOIN users ON users.id=user_id "
           + "WHERE users.id="
           + SQL_REQUEST_FOR_USER_ID_WITH_HIGHEST_COST_ORDERS
-          + " GROUP BY ordered_tags.name "
-          + "ORDER BY count(ordered_tags.name) desc limit 1;";
+          + "GROUP BY ordered_tags.name "
+          + "ORDER BY COUNT(ordered_tags.name) DESC LIMIT 1;";
 
   private final PaginationHandler paginationHandler;
   private final EntityManager entityManager;
@@ -60,9 +60,9 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public Optional<UserDtoWithOrders> read(long id) {
+  public Optional<UserWithOrdersDto> read(long id) {
     Optional<User> user = Optional.ofNullable(entityManager.find(User.class, id));
-    return user.map(UserDtoWithOrders::new);
+    return user.map(UserWithOrdersDto::new);
   }
 
   @Override
@@ -95,11 +95,11 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public TagDto takeMostWidelyTagFromUserWithHighestCostOrders() {
-    Query q =
+    Query query =
         entityManager.createNativeQuery(
             SQL_REQUEST_FOR_WIDELY_USED_TAG_FROM_HIGHEST_COST_ORDERS_USER);
 
-    Optional<Object[]> tagValue = q.getResultStream().findFirst();
+    Optional<Object[]> tagValue = query.getResultStream().findFirst();
     if (tagValue.isPresent()) {
       long id = ((BigInteger) tagValue.get()[0]).longValue();
       String name = (String) tagValue.get()[1];

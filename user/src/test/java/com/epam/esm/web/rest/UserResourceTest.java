@@ -1,8 +1,8 @@
 package com.epam.esm.web.rest;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
+import com.epam.esm.dto.CertificateWithTagsDto;
+import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.OrderService;
@@ -105,17 +105,17 @@ class UserResourceTest {
     long userHighestCostId = userDao.create(userWithHighestCostOfOrders).getId();
     TagDto tag1 = TagDto.builder().name("tag1").build();
     TagDto tag2 = TagDto.builder().name("tag2").build();
-    CertificateDtoWithTags certificate1 =
-        CertificateDtoWithTags.builder().price(9999.).tags(List.of(tag1, tag2)).build();
-    CertificateDtoWithTags certificate2 =
-        CertificateDtoWithTags.builder().price(1.).tags(List.of(tag1)).build();
-    OrderDtoWithCertificatesWithTagsForCreation order1 =
-        OrderDtoWithCertificatesWithTagsForCreation.builder()
+    CertificateWithTagsDto certificate1 =
+        CertificateWithTagsDto.builder().price(9999.).tags(List.of(tag1, tag2)).build();
+    CertificateWithTagsDto certificate2 =
+        CertificateWithTagsDto.builder().price(1.).tags(List.of(tag1)).build();
+    OrderWithCertificatesWithTagsForCreationDto order1 =
+        OrderWithCertificatesWithTagsForCreationDto.builder()
             .userId(userHighestCostId)
             .certificates(List.of(certificate1, certificate2))
             .build();
-    OrderDtoWithCertificatesWithTagsForCreation order2 =
-        OrderDtoWithCertificatesWithTagsForCreation.builder()
+    OrderWithCertificatesWithTagsForCreationDto order2 =
+        OrderWithCertificatesWithTagsForCreationDto.builder()
             .userId(userHighestCostId)
             .certificates(List.of(certificate2))
             .build();

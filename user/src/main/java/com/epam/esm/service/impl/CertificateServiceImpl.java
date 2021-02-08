@@ -1,7 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.CertificateDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateWithTagsDto;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.service.TagService;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
-  public CertificateDtoWithTags create(CertificateDtoWithTags certificate) {
+  public CertificateWithTagsDto create(CertificateWithTagsDto certificate) {
     certificate.setTags(
         certificate.getTags().stream().map(tagService::create).collect(Collectors.toList()));
     return certificateDao.create(certificate);

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.PositiveOrZero;
 
-public class CertificateDtoPatch {
+public class CertificatePatchDto {
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
@@ -64,7 +64,7 @@ public class CertificateDtoPatch {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    CertificateDtoPatch that = (CertificateDtoPatch) o;
+    CertificatePatchDto that = (CertificatePatchDto) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) return false;
     if (name != null ? !name.equals(that.name) : that.name != null) return false;
@@ -86,7 +86,7 @@ public class CertificateDtoPatch {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("CertificateDtoPatch{");
+    final StringBuilder sb = new StringBuilder("CertificatePatchDto{");
     sb.append("id=").append(id);
     sb.append(", name='").append(name).append('\'');
     sb.append(", description='").append(description).append('\'');

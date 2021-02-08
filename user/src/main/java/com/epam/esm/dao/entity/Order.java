@@ -1,6 +1,6 @@
 package com.epam.esm.dao.entity;
 
-import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
+import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
@@ -33,7 +33,7 @@ public class Order {
 
   public Order() {}
 
-  public Order(OrderDtoWithCertificatesWithTagsForCreation dto) {
+  public Order(OrderWithCertificatesWithTagsForCreationDto dto) {
     this.id = dto.getId();
     this.createDate = dto.getCreateDate();
     this.user = User.builder().id(dto.getUserId()).build();

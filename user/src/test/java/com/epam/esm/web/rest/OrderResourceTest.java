@@ -2,8 +2,8 @@ package com.epam.esm.web.rest;
 
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
+import com.epam.esm.dto.CertificateWithTagsDto;
+import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.OrderService;
@@ -64,7 +64,7 @@ class OrderResourceTest {
 
   @Test
   void createOrderValueCheck() throws Exception {
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
     UserDto user = givenUser();
     Long userId = userDao.create(user).getId();
 
@@ -79,7 +79,7 @@ class OrderResourceTest {
 
   @Test
   void readUserOrder() throws Exception {
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
     UserDto user = givenUser();
     Long userId = userDao.create(user).getId();
     order.setUserId(userId);
@@ -93,7 +93,7 @@ class OrderResourceTest {
 
   @Test
   void readUserOrders() throws Exception {
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
     UserDto user = givenUser();
     Long userId = userDao.create(user).getId();
     order.setUserId(userId);
@@ -104,9 +104,9 @@ class OrderResourceTest {
         .andExpect(status().isOk());
   }
 
-  OrderDtoWithCertificatesWithTagsForCreation givenOrder() {
-    OrderDtoWithCertificatesWithTagsForCreation order =
-        new OrderDtoWithCertificatesWithTagsForCreation();
+  OrderWithCertificatesWithTagsForCreationDto givenOrder() {
+    OrderWithCertificatesWithTagsForCreationDto order =
+        new OrderWithCertificatesWithTagsForCreationDto();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
     return order;
@@ -119,8 +119,8 @@ class OrderResourceTest {
     return user;
   }
 
-  CertificateDtoWithTags givenCertificate() {
-    CertificateDtoWithTags certificate = new CertificateDtoWithTags();
+  CertificateWithTagsDto givenCertificate() {
+    CertificateWithTagsDto certificate = new CertificateWithTagsDto();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();

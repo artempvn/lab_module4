@@ -43,8 +43,8 @@ public class UserResource {
    * @return the response entity
    */
   @GetMapping("/{id}")
-  public ResponseEntity<EntityModel<UserDtoWithOrders>> readUser(@PathVariable long id) {
-    EntityModel<UserDtoWithOrders> user = EntityModel.of(userService.read(id));
+  public ResponseEntity<EntityModel<UserWithOrdersDto>> readUser(@PathVariable long id) {
+    EntityModel<UserWithOrdersDto> user = EntityModel.of(userService.read(id));
     user.add(buildUserLinks(user.getContent().getId()));
     return ResponseEntity.status(HttpStatus.OK).body(user);
   }

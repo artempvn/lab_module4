@@ -2,7 +2,7 @@ package com.epam.esm.web.rest;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateWithTagsDto;
 import com.epam.esm.dto.TagAction;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.web.advice.ResourceAdvice;
@@ -138,7 +138,7 @@ class TagResourceTest {
 
   @Test
   void processTagAction() throws Exception {
-    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateWithTagsDto certificate1 = givenExistingCertificate1();
     long certificateId = certificateDao.create(certificate1).getId();
     TagDto tag1 = givenExistingTag1();
     long tagId = tagDao.create(tag1).getId();
@@ -155,7 +155,7 @@ class TagResourceTest {
 
   @Test
   void processTagActionNegative() throws Exception {
-    CertificateDtoWithTags certificate1 = givenExistingCertificate1();
+    CertificateWithTagsDto certificate1 = givenExistingCertificate1();
     long id = certificateDao.create(certificate1).getId();
     TagDto tag1 = givenExistingTag1();
     tag1.setId(NOT_EXISTING_ID);
@@ -201,8 +201,8 @@ class TagResourceTest {
     return TagDto.builder().name("second tag").build();
   }
 
-  private static CertificateDtoWithTags givenExistingCertificate1() {
-    return CertificateDtoWithTags.builder()
+  private static CertificateWithTagsDto givenExistingCertificate1() {
+    return CertificateWithTagsDto.builder()
         .name("first certificate")
         .description("first description")
         .price(1.33)

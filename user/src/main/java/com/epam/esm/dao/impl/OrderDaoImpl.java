@@ -5,7 +5,11 @@ import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.entity.Certificate;
 import com.epam.esm.dao.entity.Order;
 import com.epam.esm.dao.entity.User;
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.OrderWithCertificatesDto;
+import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -32,8 +36,8 @@ public class OrderDaoImpl implements OrderDao {
   }
 
   @Override
-  public OrderDtoWithCertificatesWithTagsForCreation create(
-      OrderDtoWithCertificatesWithTagsForCreation dto) {
+  public OrderWithCertificatesWithTagsForCreationDto create(
+      OrderWithCertificatesWithTagsForCreationDto dto) {
     Order order = new Order(dto);
     entityManager.persist(order);
 
@@ -41,7 +45,7 @@ public class OrderDaoImpl implements OrderDao {
         .map(certificate -> entityManager.find(Certificate.class, certificate.getId()))
         .forEach(certificate -> certificate.setOrder(order));
 
-    return new OrderDtoWithCertificatesWithTagsForCreation(order);
+    return new OrderWithCertificatesWithTagsForCreationDto(order);
   }
 
   @Override
@@ -62,11 +66,11 @@ public class OrderDaoImpl implements OrderDao {
   }
 
   @Override
-  public Optional<OrderDtoWithCertificates> readOrderByUser(long userId, long orderId) {
+  public Optional<OrderWithCertificatesDto> readOrderByUser(long userId, long orderId) {
     Optional.ofNullable(entityManager.find(User.class, userId))
         .orElseThrow(ResourceValidationException.validationWithUser(userId));
 
     Optional<Order> order = Optional.ofNullable(entityManager.find(Order.class, orderId));
-    return order.map(OrderDtoWithCertificates::new);
+    return order.map(OrderWithCertificatesDto::new);
   }
 }

@@ -13,7 +13,7 @@ public interface CertificateDao {
    * @param certificate the certificate
    * @return the certificate dto with tags
    */
-  CertificateDtoWithTags create(CertificateDtoWithTags certificate);
+  CertificateWithTagsDto create(CertificateWithTagsDto certificate);
 
   /**
    * Read optional.
@@ -21,7 +21,7 @@ public interface CertificateDao {
    * @param id the id
    * @return the optional
    */
-  Optional<CertificateDtoWithTags> read(long id);
+  Optional<CertificateWithTagsDto> read(long id);
 
   /**
    * Read all page data.
@@ -30,7 +30,7 @@ public interface CertificateDao {
    * @param parameter the parameter of pagination
    * @return the page data
    */
-  PageData<CertificateDtoWithoutTags> readAll(
+  PageData<CertificateWithoutTagsDto> readAll(
       CertificatesRequest request, PaginationParameter parameter);
 
   /**
@@ -38,7 +38,7 @@ public interface CertificateDao {
    *
    * @param certificate the certificate
    */
-  void update(CertificateDtoWithTags certificate);
+  void update(CertificateWithTagsDto certificate);
 
   /**
    * Delete.
@@ -69,5 +69,5 @@ public interface CertificateDao {
    *
    * @param certificate the certificate
    */
-  void updatePresentedFields(CertificateDtoWithoutTags certificate);
+  void updatePresentedFields(CertificateWithoutTagsDto certificate);
 }

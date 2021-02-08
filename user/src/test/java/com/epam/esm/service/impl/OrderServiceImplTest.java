@@ -29,7 +29,7 @@ class OrderServiceImplTest {
 
   @Test
   void createOrderDaoInvocation() {
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
     UserDto user = givenUser();
     when(userDao.readWithoutOrders(anyLong())).thenReturn(Optional.of(user));
 
@@ -40,7 +40,7 @@ class OrderServiceImplTest {
 
   @Test
   void createCertificateServiceInvocation() {
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
     UserDto user = givenUser();
     when(userDao.readWithoutOrders(anyLong())).thenReturn(Optional.of(user));
 
@@ -51,7 +51,7 @@ class OrderServiceImplTest {
 
   @Test
   void createException() {
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
     when(userDao.read(anyLong())).thenReturn(Optional.empty());
 
     assertThrows(ResourceValidationException.class, () -> orderService.create(order));
@@ -68,7 +68,7 @@ class OrderServiceImplTest {
 
   @Test
   void readOrderByUserOrderDaoInvocation() {
-    OrderDtoWithCertificates order = givenOrder2();
+    OrderWithCertificatesDto order = givenOrder2();
     when(orderDao.readOrderByUser(anyLong(), anyLong())).thenReturn(Optional.of(order));
 
     orderService.readOrderByUser(USER_ID, ORDER_ID);
@@ -84,17 +84,17 @@ class OrderServiceImplTest {
         ResourceNotFoundException.class, () -> orderService.readOrderByUser(USER_ID, ORDER_ID));
   }
 
-  OrderDtoWithCertificatesWithTagsForCreation givenOrder() {
-    OrderDtoWithCertificatesWithTagsForCreation order =
-        new OrderDtoWithCertificatesWithTagsForCreation();
+  OrderWithCertificatesWithTagsForCreationDto givenOrder() {
+    OrderWithCertificatesWithTagsForCreationDto order =
+        new OrderWithCertificatesWithTagsForCreationDto();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
     order.setUserId(USER_ID);
     return order;
   }
 
-  OrderDtoWithCertificates givenOrder2() {
-    return OrderDtoWithCertificates.builder().certificates(Collections.emptyList()).build();
+  OrderWithCertificatesDto givenOrder2() {
+    return OrderWithCertificatesDto.builder().certificates(Collections.emptyList()).build();
   }
 
   UserDto givenUser() {
@@ -105,8 +105,8 @@ class OrderServiceImplTest {
     return user;
   }
 
-  CertificateDtoWithTags givenCertificate() {
-    CertificateDtoWithTags certificate = new CertificateDtoWithTags();
+  CertificateWithTagsDto givenCertificate() {
+    CertificateWithTagsDto certificate = new CertificateWithTagsDto();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();

@@ -16,9 +16,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.stream.Collectors;
+
 @ControllerAdvice
 public class ResourceAdvice {
 
+  public static final String DELIMITER = "; ";
   private final ReloadableResourceBundleMessageSource messageSource;
 
   public ResourceAdvice(ReloadableResourceBundleMessageSource messageSource) {
@@ -66,14 +69,13 @@ public class ResourceAdvice {
 
   @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
   public ResponseEntity<ErrorResponse> handleException(BindException e) {
-    StringBuilder errorMessage = new StringBuilder();
-    (e.getBindingResult().getFieldErrors())
-        .forEach(
-            error ->
-                errorMessage.append(
-                    String.format("%s: %s; ", error.getField(), error.getDefaultMessage())));
+    String errorMessage =
+            (e.getBindingResult().getFieldErrors())
+                    .stream()
+                    .map(error -> String.format("%s: %s", error.getField(), error.getDefaultMessage()))
+                    .collect(Collectors.joining(DELIMITER));
     String errorCode = String.format("%s%s", HttpStatus.BAD_REQUEST.value(), e.getErrorCount());
-    ErrorResponse response = new ErrorResponse(errorMessage.toString(), errorCode);
+    ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 

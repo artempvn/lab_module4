@@ -11,7 +11,7 @@ public interface UserService {
    * @param id the id
    * @return the user dto with orders
    */
-  UserDtoWithOrders read(long id);
+  UserWithOrdersDto read(long id);
 
   /**
    * Read all page data.

@@ -42,9 +42,9 @@ public class OrderResource {
    */
   @GetMapping
   @RequestMapping("/{userId}/order/{orderId}")
-  public ResponseEntity<EntityModel<OrderDtoWithCertificates>> readUserOrder(
+  public ResponseEntity<EntityModel<OrderWithCertificatesDto>> readUserOrder(
       @PathVariable long userId, @PathVariable long orderId) {
-    EntityModel<OrderDtoWithCertificates> order =
+    EntityModel<OrderWithCertificatesDto> order =
         EntityModel.of(orderService.readOrderByUser(userId, orderId));
     order.add(buildOrderLinks(userId, order.getContent().getId()));
     return ResponseEntity.status(HttpStatus.OK).body(order);
@@ -89,11 +89,11 @@ public class OrderResource {
    */
   @PostMapping
   @RequestMapping("/{userId}/order")
-  public ResponseEntity<OrderDtoWithCertificatesWithTagsForCreation> createOrder(
+  public ResponseEntity<OrderWithCertificatesWithTagsForCreationDto> createOrder(
       @PathVariable long userId,
-      @Valid @RequestBody OrderDtoWithCertificatesWithTagsForCreation order) {
+      @Valid @RequestBody OrderWithCertificatesWithTagsForCreationDto order) {
     order.setUserId(userId);
-    OrderDtoWithCertificatesWithTagsForCreation createdOrder = orderService.create(order);
+    OrderWithCertificatesWithTagsForCreationDto createdOrder = orderService.create(order);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
   }
 
@@ -119,7 +119,7 @@ public class OrderResource {
     return List.of(
         linkTo(
                 methodOn(OrderResource.class)
-                    .createOrder(userId, new OrderDtoWithCertificatesWithTagsForCreation()))
+                    .createOrder(userId, new OrderWithCertificatesWithTagsForCreationDto()))
             .withRel("post")
             .withName("create order for user"));
   }
