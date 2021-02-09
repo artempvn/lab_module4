@@ -2,7 +2,14 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.CertificateWithTagsDto;
+import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Order;
+import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.service.CertificateService;
@@ -15,7 +22,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class OrderServiceImplTest {
 
@@ -29,29 +39,48 @@ class OrderServiceImplTest {
 
   @Test
   void createOrderDaoInvocation() {
-    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
-    UserDto user = givenUser();
+    Order order = givenOrder();
+    order.setId(1L);
+    User user = givenUser();
     when(userDao.readWithoutOrders(anyLong())).thenReturn(Optional.of(user));
+    CertificateWithTagsDto certificate = CertificateWithTagsDto.builder().id(1L).build();
+    OrderWithCertificatesWithTagsForCreationDto inputOrder =
+        OrderWithCertificatesWithTagsForCreationDto.builder()
+            .userId(1L)
+            .certificates(List.of(certificate))
+            .build();
+    when(certificateService.create(any())).thenReturn(certificate);
+    when(orderDao.create(any())).thenReturn(order);
 
-    orderService.create(order);
+    orderService.create(inputOrder);
 
-    verify(orderDao).create(order);
+    verify(orderDao).create(any());
   }
 
   @Test
   void createCertificateServiceInvocation() {
-    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
-    UserDto user = givenUser();
+    Order order = givenOrder();
+    order.setId(1L);
+    User user = givenUser();
     when(userDao.readWithoutOrders(anyLong())).thenReturn(Optional.of(user));
+    CertificateWithTagsDto certificate = CertificateWithTagsDto.builder().id(1L).build();
+    OrderWithCertificatesWithTagsForCreationDto inputOrder =
+        OrderWithCertificatesWithTagsForCreationDto.builder()
+            .userId(1L)
+            .certificates(List.of(certificate))
+            .build();
+    when(certificateService.create(any())).thenReturn(certificate);
+    when(orderDao.create(any())).thenReturn(order);
 
-    orderService.create(order);
+    orderService.create(inputOrder);
 
     verify(certificateService).create(any());
   }
 
   @Test
   void createException() {
-    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
+    OrderWithCertificatesWithTagsForCreationDto order =
+        OrderWithCertificatesWithTagsForCreationDto.builder().userId(1L).build();
     when(userDao.read(anyLong())).thenReturn(Optional.empty());
 
     assertThrows(ResourceValidationException.class, () -> orderService.create(order));
@@ -59,16 +88,25 @@ class OrderServiceImplTest {
 
   @Test
   void readAllByUserOrderDaoInvocation() {
-    when(orderDao.readAllByUser(anyLong(), any())).thenReturn(any());
+    long userId = 1L;
+    PageData<Order> pageData = new PageData<>();
+    pageData.setNumberOfElements(1);
+    pageData.setNumberOfPages(1);
+    pageData.setContent(Collections.emptyList());
+    PaginationParameter parameter = new PaginationParameter();
+    parameter.setPage(1);
+    when(orderDao.readAllByUser(anyLong(), any())).thenReturn(pageData);
 
-    orderService.readAllByUser(anyLong(), null);
+    orderService.readAllByUser(userId, parameter);
 
     verify(orderDao).readAllByUser(anyLong(), any());
   }
 
   @Test
   void readOrderByUserOrderDaoInvocation() {
-    OrderWithCertificatesDto order = givenOrder2();
+    User user = givenUser();
+    when(userDao.read(anyLong())).thenReturn(Optional.of(user));
+    Order order = givenOrder2();
     when(orderDao.readOrderByUser(anyLong(), anyLong())).thenReturn(Optional.of(order));
 
     orderService.readOrderByUser(USER_ID, ORDER_ID);
@@ -78,35 +116,45 @@ class OrderServiceImplTest {
 
   @Test
   void readOrderByUserException() {
+    User user = givenUser();
+    when(userDao.read(anyLong())).thenReturn(Optional.of(user));
     when(orderDao.readOrderByUser(anyLong(), anyLong())).thenReturn(Optional.empty());
 
     assertThrows(
         ResourceNotFoundException.class, () -> orderService.readOrderByUser(USER_ID, ORDER_ID));
   }
 
-  OrderWithCertificatesWithTagsForCreationDto givenOrder() {
-    OrderWithCertificatesWithTagsForCreationDto order =
-        new OrderWithCertificatesWithTagsForCreationDto();
+  @Test
+  void readOrderByNotExistingUser() {
+    when(userDao.read(anyLong())).thenReturn(Optional.empty());
+
+    assertThrows(
+        ResourceValidationException.class, () -> orderService.readOrderByUser(USER_ID, ORDER_ID));
+  }
+
+  Order givenOrder() {
+    Order order = new Order();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
-    order.setUserId(USER_ID);
+    User user = givenUser();
+    order.setUser(user);
     return order;
   }
 
-  OrderWithCertificatesDto givenOrder2() {
-    return OrderWithCertificatesDto.builder().certificates(Collections.emptyList()).build();
+  Order givenOrder2() {
+    return Order.builder().certificates(Collections.emptyList()).build();
   }
 
-  UserDto givenUser() {
-    UserDto user = new UserDto();
+  User givenUser() {
+    User user = new User();
     user.setId(1L);
     user.setName("name");
     user.setSurname("surname");
     return user;
   }
 
-  CertificateWithTagsDto givenCertificate() {
-    CertificateWithTagsDto certificate = new CertificateWithTagsDto();
+  Certificate givenCertificate() {
+    Certificate certificate = new Certificate();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();
@@ -114,8 +162,8 @@ class OrderServiceImplTest {
     return certificate;
   }
 
-  TagDto givenTag() {
-    TagDto tag = new TagDto();
+  Tag givenTag() {
+    Tag tag = new Tag();
     tag.setName("tag name");
     return tag;
   }

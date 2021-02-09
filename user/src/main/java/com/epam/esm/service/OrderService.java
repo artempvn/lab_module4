@@ -1,6 +1,10 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.OrderWithCertificatesDto;
+import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
 
 /** The interface Order service. */
 public interface OrderService {

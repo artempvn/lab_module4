@@ -1,6 +1,6 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dto.TagDto;
+import com.epam.esm.entity.Tag;
 
 import java.util.Optional;
 
@@ -13,7 +13,7 @@ public interface TagDao {
    * @param tag the tag
    * @return the tag dto
    */
-  TagDto create(TagDto tag);
+  Tag create(Tag tag);
 
   /**
    * Read optional.
@@ -21,5 +21,5 @@ public interface TagDao {
    * @param name the name
    * @return the optional
    */
-  Optional<TagDto> read(String name);
+  Optional<Tag> read(String name);
 }

@@ -2,7 +2,7 @@ package com.epam.esm.dao;
 
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
-import com.epam.esm.dto.TagDto;
+import com.epam.esm.entity.Tag;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -17,7 +17,7 @@ public interface TagDao {
    * @param tag the tag
    * @return the tag dto
    */
-  TagDto create(TagDto tag);
+  Tag create(Tag tag);
 
   /**
    * Read optional.
@@ -25,7 +25,7 @@ public interface TagDao {
    * @param id the id
    * @return the optional
    */
-  Optional<TagDto> read(long id);
+  Optional<Tag> read(long id);
 
   /**
    * Read all page data.
@@ -33,7 +33,7 @@ public interface TagDao {
    * @param parameter the parameter of pagination
    * @return the page data
    */
-  PageData<TagDto> readAll(PaginationParameter parameter);
+  PageData<Tag> readAll(PaginationParameter parameter);
 
   /**
    * Delete.
@@ -48,5 +48,5 @@ public interface TagDao {
    * @param name the name
    * @return the optional
    */
-  Optional<TagDto> read(String name);
+  Optional<Tag> read(String name);
 }

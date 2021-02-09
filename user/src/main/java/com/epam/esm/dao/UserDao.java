@@ -1,6 +1,9 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.User;
 
 import java.util.Optional;
 
@@ -13,7 +16,7 @@ public interface UserDao {
    * @param user the user
    * @return the user dto
    */
-  UserDto create(UserDto user);
+  User create(User user);
 
   /**
    * Read optional.
@@ -21,7 +24,7 @@ public interface UserDao {
    * @param id the id
    * @return the optional
    */
-  Optional<UserWithOrdersDto> read(long id);
+  Optional<User> read(long id);
 
   /**
    * Read without orders optional.
@@ -29,7 +32,7 @@ public interface UserDao {
    * @param id the id
    * @return the optional
    */
-  Optional<UserDto> readWithoutOrders(long id);
+  Optional<User> readWithoutOrders(long id);
 
   /**
    * Read all page data.
@@ -37,12 +40,12 @@ public interface UserDao {
    * @param parameter the parameter of pagination
    * @return the page data
    */
-  PageData<UserDto> readAll(PaginationParameter parameter);
+  PageData<User> readAll(PaginationParameter parameter);
 
   /**
    * Take most widely tag from user with highest cost orders tag dto.
    *
    * @return the tag dto
    */
-  TagDto takeMostWidelyTagFromUserWithHighestCostOrders();
+  Tag takeMostWidelyTagFromUserWithHighestCostOrders();
 }

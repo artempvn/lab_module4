@@ -1,6 +1,9 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.entity.Certificate;
 
 import java.util.Optional;
 
@@ -13,7 +16,7 @@ public interface CertificateDao {
    * @param certificate the certificate
    * @return the certificate dto with tags
    */
-  CertificateWithTagsDto create(CertificateWithTagsDto certificate);
+  Certificate create(Certificate certificate);
 
   /**
    * Read optional.
@@ -21,7 +24,7 @@ public interface CertificateDao {
    * @param id the id
    * @return the optional
    */
-  Optional<CertificateWithTagsDto> read(long id);
+  Optional<Certificate> read(long id);
 
   /**
    * Read all page data.
@@ -30,15 +33,14 @@ public interface CertificateDao {
    * @param parameter the parameter of pagination
    * @return the page data
    */
-  PageData<CertificateWithoutTagsDto> readAll(
-      CertificatesRequest request, PaginationParameter parameter);
+  PageData<Certificate> readAll(CertificatesRequest request, PaginationParameter parameter);
 
   /**
    * Update.
    *
    * @param certificate the certificate
    */
-  void update(CertificateWithTagsDto certificate);
+  void update(Certificate certificate);
 
   /**
    * Delete.
@@ -69,5 +71,5 @@ public interface CertificateDao {
    *
    * @param certificate the certificate
    */
-  void updatePresentedFields(CertificateWithoutTagsDto certificate);
+  void updatePresentedFields(Certificate certificate);
 }

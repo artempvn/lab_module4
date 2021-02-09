@@ -1,6 +1,6 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.dao.entity.Certificate;
+import com.epam.esm.entity.Certificate;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

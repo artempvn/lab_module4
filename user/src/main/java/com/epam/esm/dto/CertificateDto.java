@@ -1,6 +1,6 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.dao.entity.Certificate;
+import com.epam.esm.entity.Certificate;
 
 public class CertificateDto {
 

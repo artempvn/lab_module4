@@ -1,7 +1,7 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dao.entity.Certificate;
 import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.entity.Certificate;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;

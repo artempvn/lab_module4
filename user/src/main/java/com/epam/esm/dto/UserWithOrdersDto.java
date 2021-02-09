@@ -1,6 +1,6 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.dao.entity.User;
+import com.epam.esm.entity.User;
 
 import java.util.Collections;
 import java.util.List;

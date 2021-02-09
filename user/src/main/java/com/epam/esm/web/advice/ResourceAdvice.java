@@ -70,10 +70,10 @@ public class ResourceAdvice {
   @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
   public ResponseEntity<ErrorResponse> handleException(BindException e) {
     String errorMessage =
-            (e.getBindingResult().getFieldErrors())
-                    .stream()
-                    .map(error -> String.format("%s: %s", error.getField(), error.getDefaultMessage()))
-                    .collect(Collectors.joining(DELIMITER));
+        (e.getBindingResult().getFieldErrors())
+            .stream()
+                .map(error -> String.format("%s: %s", error.getField(), error.getDefaultMessage()))
+                .collect(Collectors.joining(DELIMITER));
     String errorCode = String.format("%s%s", HttpStatus.BAD_REQUEST.value(), e.getErrorCount());
     ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

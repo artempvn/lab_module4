@@ -1,7 +1,12 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.CertificateWithTagsDto;
+import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.dto.TagDto;
+import com.epam.esm.entity.User;
 import com.epam.esm.service.OrderService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +20,10 @@ import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("user")
 @AutoConfigureTestDatabase
@@ -37,50 +45,50 @@ class UserDaoImplTest {
 
   @Test
   void create() {
-    UserDto user = givenUser1WO();
+    User user = givenUser1WO();
 
-    UserDto actualUser = userDao.create(user);
+    User actualUser = userDao.create(user);
 
     assertNotNull(actualUser.getId());
   }
 
   @Test
   void readExisted() {
-    UserDto user = givenUser1WO();
+    User user = givenUser1WO();
     long id = userDao.create(user).getId();
 
-    Optional<UserWithOrdersDto> actualUser = userDao.read(id);
+    Optional<User> actualUser = userDao.read(id);
 
     assertTrue(actualUser.isPresent());
   }
 
   @Test
   void readNotExisted() {
-    Optional<UserWithOrdersDto> actualUser = userDao.read(NOT_EXISTING_USER_ID);
+    Optional<User> actualUser = userDao.read(NOT_EXISTING_USER_ID);
 
     assertFalse(actualUser.isPresent());
   }
 
   @Test
   void readAll() {
-    UserDto user1 = givenUser1WO();
-    UserDto user2 = givenUser2WO();
+    User user1 = givenUser1WO();
+    User user2 = givenUser2WO();
     userDao.create(user1);
     userDao.create(user2);
-    List<UserDto> expectedList = List.of(user1, user2);
+    List<User> expectedList = List.of(user1, user2);
     PaginationParameter parameter = new PaginationParameter();
     parameter.setPage(1);
     parameter.setSize(10);
 
-    PageData<UserDto> actualPage = userDao.readAll(parameter);
+    PageData<User> actualPage = userDao.readAll(parameter);
 
     assertEquals(expectedList.size(), actualPage.getContent().size());
   }
 
   @Test
   void takeMostWidelyTagFromUserWithHighestCostOrders() {
-    UserDto userWithHighestCostOfOrders = givenUser1WO();
-    UserDto user = givenUser2WO();
+    User userWithHighestCostOfOrders = givenUser1WO();
+    User user = givenUser2WO();
     long userHighestCostId = userDao.create(userWithHighestCostOfOrders).getId();
     long userId = userDao.create(user).getId();
     TagDto tag1 = TagDto.builder().name("tag1").build();
@@ -114,15 +122,15 @@ class UserDaoImplTest {
     assertEquals(expectedTagName, actualTagName);
   }
 
-  UserDto givenUser1WO() {
-    UserDto user = new UserDto();
+  User givenUser1WO() {
+    User user = new User();
     user.setName("name");
     user.setSurname("surname");
     return user;
   }
 
-  UserDto givenUser2WO() {
-    UserDto user = new UserDto();
+  User givenUser2WO() {
+    User user = new User();
     user.setName("name1");
     user.setSurname("surname1");
     return user;

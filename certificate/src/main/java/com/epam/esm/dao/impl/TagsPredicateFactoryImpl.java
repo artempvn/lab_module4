@@ -1,9 +1,9 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.PredicateFactory;
-import com.epam.esm.dao.entity.Certificate;
-import com.epam.esm.dao.entity.Tag;
 import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Tag;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.CriteriaBuilder;

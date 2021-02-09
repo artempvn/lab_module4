@@ -1,6 +1,10 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.dto.TagDto;
+import com.epam.esm.dto.UserDto;
+import com.epam.esm.dto.UserWithOrdersDto;
 
 /** The interface User service. */
 public interface UserService {

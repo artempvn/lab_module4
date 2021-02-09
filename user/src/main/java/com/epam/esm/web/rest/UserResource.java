@@ -1,6 +1,10 @@
 package com.epam.esm.web.rest;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.dto.TagDto;
+import com.epam.esm.dto.UserDto;
+import com.epam.esm.dto.UserWithOrdersDto;
 import com.epam.esm.service.UserService;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;

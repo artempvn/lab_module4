@@ -1,14 +1,20 @@
-package com.epam.esm.dao.entity;
+package com.epam.esm.entity;
 
 import com.epam.esm.dto.TagDto;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Table(name = "ordered_tags")
+@Table(name = "tag")
 public class Tag {
 
   @Id
@@ -31,7 +37,19 @@ public class Tag {
   private Tag(Builder builder) {
     id = builder.id;
     name = builder.name;
-    certificates = builder.certificates;
+  }
+
+  public void setCertificates(List<Certificate> certificates) {
+    this.certificates = certificates;
+  }
+
+  public void addCertificate(Certificate certificate) {
+    this.certificates.add(certificate);
+  }
+
+  public Tag withCertificate(Certificate certificate) {
+    this.certificates.add(certificate);
+    return this;
   }
 
   public static Builder builder() {
@@ -54,45 +72,11 @@ public class Tag {
     this.name = name;
   }
 
-  public List<Certificate> getCertificates() {
-    return certificates;
-  }
-
-  public void setCertificates(List<Certificate> certificates) {
-    this.certificates = certificates;
-  }
-
-  public Tag withCertificate(Certificate certificate) {
-    this.certificates.add(certificate);
-    return this;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    Tag tag = (Tag) o;
-
-    if (id != null ? !id.equals(tag.id) : tag.id != null) return false;
-    if (name != null ? !name.equals(tag.name) : tag.name != null) return false;
-    return certificates != null ? certificates.equals(tag.certificates) : tag.certificates == null;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = id != null ? id.hashCode() : 0;
-    result = 31 * result + (name != null ? name.hashCode() : 0);
-    result = 31 * result + (certificates != null ? certificates.hashCode() : 0);
-    return result;
-  }
-
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("Tag{");
     sb.append("id=").append(id);
     sb.append(", name='").append(name).append('\'');
-    sb.append(", certificates=").append(certificates);
     sb.append('}');
     return sb.toString();
   }
@@ -100,7 +84,6 @@ public class Tag {
   public static class Builder {
     private Long id;
     private String name;
-    private List<Certificate> certificates = Collections.emptyList();
 
     private Builder() {}
 
@@ -114,13 +97,26 @@ public class Tag {
       return this;
     }
 
-    public Builder certificates(List<Certificate> certificates) {
-      this.certificates = certificates;
-      return this;
-    }
-
     public Tag build() {
       return new Tag(this);
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Tag tag = (Tag) o;
+
+    if (id != null ? !id.equals(tag.id) : tag.id != null) return false;
+    return name != null ? name.equals(tag.name) : tag.name == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id != null ? id.hashCode() : 0;
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    return result;
   }
 }

@@ -1,6 +1,10 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.CertificateWithTagsDto;
+import com.epam.esm.dto.CertificateWithoutTagsDto;
+import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
 
 /** The interface Certificate service. */
 public interface CertificateService {

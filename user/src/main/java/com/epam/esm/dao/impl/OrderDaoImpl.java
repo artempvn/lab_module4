@@ -2,14 +2,11 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.PaginationHandler;
-import com.epam.esm.dao.entity.Certificate;
-import com.epam.esm.dao.entity.Order;
-import com.epam.esm.dao.entity.User;
-import com.epam.esm.dto.OrderDto;
-import com.epam.esm.dto.OrderWithCertificatesDto;
-import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Order;
+import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceValidationException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -20,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 @Transactional(propagation = Propagation.REQUIRED)
@@ -36,20 +32,18 @@ public class OrderDaoImpl implements OrderDao {
   }
 
   @Override
-  public OrderWithCertificatesWithTagsForCreationDto create(
-      OrderWithCertificatesWithTagsForCreationDto dto) {
-    Order order = new Order(dto);
+  public Order create(Order order) {
     entityManager.persist(order);
 
     order.getCertificates().stream()
         .map(certificate -> entityManager.find(Certificate.class, certificate.getId()))
         .forEach(certificate -> certificate.setOrder(order));
 
-    return new OrderWithCertificatesWithTagsForCreationDto(order);
+    return order;
   }
 
   @Override
-  public PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter) {
+  public PageData<Order> readAllByUser(long userId, PaginationParameter parameter) {
     Session session = entityManager.unwrap(Session.class);
     Optional.ofNullable(session.get(User.class, userId))
         .orElseThrow(ResourceValidationException.validationWithUser(userId));
@@ -60,17 +54,13 @@ public class OrderDaoImpl implements OrderDao {
     long numberOfPages =
         paginationHandler.calculateNumberOfPages(numberOfElements, parameter.getSize());
     paginationHandler.setPageToQuery(query, parameter);
-    List<OrderDto> orders = query.list().stream().map(OrderDto::new).collect(Collectors.toList());
+    List<Order> orders = query.list();
 
     return new PageData<>(parameter.getPage(), numberOfElements, numberOfPages, orders);
   }
 
   @Override
-  public Optional<OrderWithCertificatesDto> readOrderByUser(long userId, long orderId) {
-    Optional.ofNullable(entityManager.find(User.class, userId))
-        .orElseThrow(ResourceValidationException.validationWithUser(userId));
-
-    Optional<Order> order = Optional.ofNullable(entityManager.find(Order.class, orderId));
-    return order.map(OrderWithCertificatesDto::new);
+  public Optional<Order> readOrderByUser(long userId, long orderId) {
+    return Optional.ofNullable(entityManager.find(Order.class, orderId));
   }
 }

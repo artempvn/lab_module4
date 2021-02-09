@@ -1,6 +1,6 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.dao.entity.Order;
+import com.epam.esm.entity.Order;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;

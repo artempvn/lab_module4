@@ -4,7 +4,12 @@ import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Order;
+import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceValidationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +23,10 @@ import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("user")
 @AutoConfigureTestDatabase
@@ -43,40 +51,42 @@ class OrderDaoImplTest {
 
   @Test
   void create() {
-    UserDto user = givenUser();
+    User user = givenUser();
     long id = userDao.create(user).getId();
-    TagDto tag = givenTag();
+    Tag tag = givenTag();
     var tag1 = tagDao.create(tag);
-    CertificateWithTagsDto certificate = givenCertificate();
+    Certificate certificate = givenCertificate();
     certificate.setTags(List.of(tag1));
     var certificate1 = certificateDao.create(certificate);
-    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
-    order.setUserId(id);
+    Order order = givenOrder();
+    user.setId(id);
+    order.setUser(user);
     order.setCertificates(List.of(certificate1));
 
-    OrderWithCertificatesWithTagsForCreationDto actualOrder = orderDao.create(order);
+    Order actualOrder = orderDao.create(order);
 
     assertNotNull(actualOrder.getId());
   }
 
   @Test
   void readAllByUser() {
-    UserDto user = givenUser();
+    User user = givenUser();
     long id = userDao.create(user).getId();
-    TagDto tag = givenTag();
+    Tag tag = givenTag();
     var tag1 = tagDao.create(tag);
-    CertificateWithTagsDto certificate = givenCertificate();
+    Certificate certificate = givenCertificate();
     certificate.setTags(List.of(tag1));
     var certificate1 = certificateDao.create(certificate);
-    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
-    order.setUserId(id);
+    Order order = givenOrder();
+    user.setId(id);
+    order.setUser(user);
     order.setCertificates(List.of(certificate1));
     orderDao.create(order);
     PaginationParameter parameter = new PaginationParameter();
     parameter.setPage(1);
     parameter.setSize(10);
 
-    PageData<OrderDto> actualPage = orderDao.readAllByUser(id, parameter);
+    PageData<Order> actualPage = orderDao.readAllByUser(id, parameter);
 
     assertEquals(1, actualPage.getContent().size());
   }
@@ -91,67 +101,59 @@ class OrderDaoImplTest {
 
   @Test
   void readExistingOrderByUser() {
-    UserDto user = givenUser();
+    User user = givenUser();
     long userId = userDao.create(user).getId();
-    TagDto tag = givenTag();
+    Tag tag = givenTag();
     var tag1 = tagDao.create(tag);
-    CertificateWithTagsDto certificate = givenCertificate();
+    Certificate certificate = givenCertificate();
     certificate.setTags(List.of(tag1));
     var certificate1 = certificateDao.create(certificate);
-    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
-    order.setUserId(userId);
+    Order order = givenOrder();
+    user.setId(userId);
+    order.setUser(user);
     order.setCertificates(List.of(certificate1));
     long orderId = orderDao.create(order).getId();
 
-    Optional<OrderWithCertificatesDto> actualOrder = orderDao.readOrderByUser(userId, orderId);
+    Optional<Order> actualOrder = orderDao.readOrderByUser(userId, orderId);
 
     assertTrue(actualOrder.isPresent());
   }
 
   @Test
   void readNonExistingOrderByUser() {
-    UserDto user = givenUser();
+    User user = givenUser();
     long userId = userDao.create(user).getId();
-    TagDto tag = givenTag();
+    Tag tag = givenTag();
     var tag1 = tagDao.create(tag);
-    CertificateWithTagsDto certificate = givenCertificate();
+    Certificate certificate = givenCertificate();
     certificate.setTags(List.of(tag1));
     var certificate1 = certificateDao.create(certificate);
-    OrderWithCertificatesWithTagsForCreationDto order = givenOrder();
-    order.setUserId(userId);
+    Order order = givenOrder();
+    user.setId(userId);
+    order.setUser(user);
     order.setCertificates(List.of(certificate1));
 
-    Optional<OrderWithCertificatesDto> actualOrder =
-        orderDao.readOrderByUser(userId, NOT_EXISTING_ORDER_ID);
+    Optional<Order> actualOrder = orderDao.readOrderByUser(userId, NOT_EXISTING_ORDER_ID);
 
     assertTrue(actualOrder.isEmpty());
   }
 
-  @Test
-  void readOrderByNotExistingUser() {
-
-    assertThrows(
-        ResourceValidationException.class,
-        () -> orderDao.readOrderByUser(NOT_EXISTING_USER_ID, NOT_EXISTING_ORDER_ID));
-  }
-
-  OrderWithCertificatesWithTagsForCreationDto givenOrder() {
-    OrderWithCertificatesWithTagsForCreationDto order =
-        new OrderWithCertificatesWithTagsForCreationDto();
+  Order givenOrder() {
+    Order order = new Order();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
     return order;
   }
 
-  UserDto givenUser() {
-    UserDto user = new UserDto();
+  User givenUser() {
+    User user = new User();
     user.setName("name");
     user.setSurname("surname");
     return user;
   }
 
-  CertificateWithTagsDto givenCertificate() {
-    CertificateWithTagsDto certificate = new CertificateWithTagsDto();
+  Certificate givenCertificate() {
+    Certificate certificate = new Certificate();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();
@@ -159,8 +161,8 @@ class OrderDaoImplTest {
     return certificate;
   }
 
-  TagDto givenTag() {
-    TagDto tag = new TagDto();
+  Tag givenTag() {
+    Tag tag = new Tag();
     tag.setName("tag name");
     return tag;
   }

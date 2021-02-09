@@ -4,7 +4,7 @@ import com.epam.esm.dao.UserDao;
 import com.epam.esm.dto.CertificateWithTagsDto;
 import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.dto.UserDto;
+import com.epam.esm.entity.User;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.web.advice.ResourceAdvice;
 import org.junit.jupiter.api.AfterEach;
@@ -61,7 +61,7 @@ class UserResourceTest {
 
   @Test
   void readUserPositive() throws Exception {
-    UserDto user = givenUserWO1();
+    User user = givenUserWO1();
     long userId = userDao.create(user).getId();
 
     mockMvc
@@ -80,12 +80,12 @@ class UserResourceTest {
 
   @Test
   void readUsers() throws Exception {
-    UserDto user1 = givenUserWO1();
-    UserDto user2 = givenUserWO2();
+    User user1 = givenUserWO1();
+    User user2 = givenUserWO2();
     long userId1 = userDao.create(user1).getId();
     long userId2 = userDao.create(user2).getId();
-    UserDto user1WO = givenUserWO1();
-    UserDto user2WO = givenUserWO2();
+    User user1WO = givenUserWO1();
+    User user2WO = givenUserWO2();
     user1WO.setId(userId1);
     user2WO.setId(userId2);
 
@@ -101,7 +101,7 @@ class UserResourceTest {
 
   @Test
   void readMostWidelyTagFromUserWithHighestCostOrders() throws Exception {
-    UserDto userWithHighestCostOfOrders = givenUserWO1();
+    User userWithHighestCostOfOrders = givenUserWO1();
     long userHighestCostId = userDao.create(userWithHighestCostOfOrders).getId();
     TagDto tag1 = TagDto.builder().name("tag1").build();
     TagDto tag2 = TagDto.builder().name("tag2").build();
@@ -128,15 +128,15 @@ class UserResourceTest {
         .andExpect(jsonPath("$.name").value("tag1"));
   }
 
-  UserDto givenUserWO1() {
-    UserDto user = new UserDto();
+  User givenUserWO1() {
+    User user = new User();
     user.setName("name1");
     user.setSurname("surname1");
     return user;
   }
 
-  UserDto givenUserWO2() {
-    UserDto user = new UserDto();
+  User givenUserWO2() {
+    User user = new User();
     user.setName("name2");
     user.setSurname("surname2");
     return user;

@@ -2,7 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.dto.TagDto;
+import com.epam.esm.entity.Tag;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,33 +37,33 @@ class TagDaoImplTest {
 
   @Test
   void create() {
-    TagDto expectedTag = givenTag();
+    Tag expectedTag = givenTag();
 
-    TagDto actualTag = tagDao.create(expectedTag);
+    Tag actualTag = tagDao.create(expectedTag);
 
     assertNotNull(actualTag.getId());
   }
 
   @Test
   void readExistedByName() {
-    TagDto expectedTag = givenTag();
+    Tag expectedTag = givenTag();
     tagDao.create(expectedTag);
 
-    Optional<TagDto> actualTag = tagDao.read(expectedTag.getName());
+    Optional<Tag> actualTag = tagDao.read(expectedTag.getName());
 
     assertTrue(actualTag.isPresent());
   }
 
   @Test
   void readNotExistedByName() {
-    TagDto expectedTag = givenTag();
-    Optional<TagDto> actualTag = tagDao.read(expectedTag.getName());
+    Tag expectedTag = givenTag();
+    Optional<Tag> actualTag = tagDao.read(expectedTag.getName());
 
     assertTrue(actualTag.isEmpty());
   }
 
-  TagDto givenTag() {
-    TagDto tag = new TagDto();
+  Tag givenTag() {
+    Tag tag = new Tag();
     tag.setName("tag name");
     return tag;
   }
