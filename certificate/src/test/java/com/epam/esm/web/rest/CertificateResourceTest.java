@@ -16,7 +16,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -34,9 +33,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("certificate")
-@AutoConfigureTestDatabase
 @SpringBootTest
+@AutoConfigureTestDatabase
 class CertificateResourceTest {
   public static final long NOT_EXISTING_ID = 99999L;
   MockMvc mockMvc;
@@ -45,7 +43,6 @@ class CertificateResourceTest {
   @Autowired CertificateResource certificateController;
   @Autowired EntityManager entityManager;
   @Autowired TransactionTemplate txTemplate;
-
   @Autowired ReloadableResourceBundleMessageSource messageSource;
   @Autowired LocaleResolver localeResolver;
 
