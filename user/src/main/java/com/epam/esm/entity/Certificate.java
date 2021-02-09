@@ -1,8 +1,18 @@
-package com.epam.esm.dao.entity;
+package com.epam.esm.entity;
 
-import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateWithTagsDto;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +43,7 @@ public class Certificate {
 
   public Certificate() {}
 
-  public Certificate(CertificateDtoWithTags dto) {
+  public Certificate(CertificateWithTagsDto dto) {
     this.id = dto.getId();
     this.previousId = dto.getPreviousId();
     this.price = dto.getPrice();

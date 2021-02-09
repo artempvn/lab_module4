@@ -1,15 +1,15 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.CertificateDtoWithTags;
+import com.epam.esm.dto.CertificateWithTagsDto;
 
 /** The interface Certificate service. */
 public interface CertificateService {
 
   /**
-   * Create certificate dto with tags.
+   * Persist certificate with tags.
    *
    * @param certificate the certificate
-   * @return the certificate dto with tags
+   * @return saved certificate with tags
    */
-  CertificateDtoWithTags create(CertificateDtoWithTags certificate);
+  CertificateWithTagsDto create(CertificateWithTagsDto certificate);
 }

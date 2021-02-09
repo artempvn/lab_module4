@@ -1,6 +1,9 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.entity.Certificate;
 
 import java.util.Optional;
 
@@ -8,47 +11,46 @@ import java.util.Optional;
 public interface CertificateDao {
 
   /**
-   * Create certificate dto with tags.
+   * Persist certificate with binding all of its tags
    *
-   * @param certificate the certificate
-   * @return the certificate dto with tags
+   * @param certificate the certificate with tags
+   * @return saved certificate
    */
-  CertificateDtoWithTags create(CertificateDtoWithTags certificate);
+  Certificate create(Certificate certificate);
 
   /**
-   * Read optional.
+   * Read certificate by id.
    *
-   * @param id the id
-   * @return the optional
+   * @param id the id of certificate
+   * @return the optional of certificate or empty optional if it's not exist
    */
-  Optional<CertificateDtoWithTags> read(long id);
+  Optional<Certificate> read(long id);
 
   /**
-   * Read all page data.
+   * Read all certificates that meet the request and parameter of pagination.
    *
    * @param request the request contains sorting and filtering staff
    * @param parameter the parameter of pagination
-   * @return the page data
+   * @return the page data with found certificates and page info
    */
-  PageData<CertificateDtoWithoutTags> readAll(
-      CertificatesRequest request, PaginationParameter parameter);
+  PageData<Certificate> readAll(CertificatesRequest request, PaginationParameter parameter);
 
   /**
-   * Update.
+   * Update existing certificate with new data from input certificate.
    *
-   * @param certificate the certificate
+   * @param certificate the certificate for replacing existing certificate with same id
    */
-  void update(CertificateDtoWithTags certificate);
+  void update(Certificate certificate);
 
   /**
-   * Delete.
+   * Delete existing certificate by id.
    *
-   * @param id the id
+   * @param id the id of certificate
    */
   void delete(long id);
 
   /**
-   * Add tag.
+   * Add tag to certificate by their ids.
    *
    * @param tagId the tag id
    * @param certificateId the certificate id
@@ -56,18 +58,18 @@ public interface CertificateDao {
   void addTag(long tagId, long certificateId);
 
   /**
-   * Remove tag int.
+   * Remove tag from certificate by their ids.
    *
    * @param tagId the tag id
    * @param certificateId the certificate id
-   * @return the int number of changed rows
+   * @return the number of changed rows, 0- if there is no such combination of ids.
    */
   int removeTag(long tagId, long certificateId);
 
   /**
-   * Update presented fields.
+   * Update only presented fields of input certificate to existing certificate.
    *
-   * @param certificate the certificate
+   * @param certificate the certificate with fields for updating existing certificate
    */
-  void updatePresentedFields(CertificateDtoWithoutTags certificate);
+  void updatePresentedFields(Certificate certificate);
 }

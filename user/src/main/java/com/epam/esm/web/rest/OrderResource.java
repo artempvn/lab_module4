@@ -1,12 +1,21 @@
 package com.epam.esm.web.rest;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.OrderWithCertificatesDto;
+import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.service.OrderService;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -34,28 +43,28 @@ public class OrderResource {
   }
 
   /**
-   * Read user order response entity.
+   * Read user order by user id and order id.
    *
    * @param userId the user id
    * @param orderId the order id
-   * @return the response entity
+   * @return the response entity of found order
    */
   @GetMapping
   @RequestMapping("/{userId}/order/{orderId}")
-  public ResponseEntity<EntityModel<OrderDtoWithCertificates>> readUserOrder(
+  public ResponseEntity<EntityModel<OrderWithCertificatesDto>> readUserOrder(
       @PathVariable long userId, @PathVariable long orderId) {
-    EntityModel<OrderDtoWithCertificates> order =
+    EntityModel<OrderWithCertificatesDto> order =
         EntityModel.of(orderService.readOrderByUser(userId, orderId));
     order.add(buildOrderLinks(userId, order.getContent().getId()));
     return ResponseEntity.status(HttpStatus.OK).body(order);
   }
 
   /**
-   * Read user orders response entity.
+   * Read user orders meet pagination parameters.
    *
    * @param userId the user id
    * @param parameter the parameter of pagination
-   * @return the response entity
+   * @return the response entity of found orders
    */
   @GetMapping
   @RequestMapping("/{userId}/orders")
@@ -81,19 +90,19 @@ public class OrderResource {
   }
 
   /**
-   * Create order response entity.
+   * Persist order with certificates.
    *
    * @param userId the user id
    * @param order the order
-   * @return the response entity
+   * @return the response entity of saved order
    */
   @PostMapping
   @RequestMapping("/{userId}/order")
-  public ResponseEntity<OrderDtoWithCertificatesWithTagsForCreation> createOrder(
+  public ResponseEntity<OrderWithCertificatesWithTagsForCreationDto> createOrder(
       @PathVariable long userId,
-      @Valid @RequestBody OrderDtoWithCertificatesWithTagsForCreation order) {
+      @Valid @RequestBody OrderWithCertificatesWithTagsForCreationDto order) {
     order.setUserId(userId);
-    OrderDtoWithCertificatesWithTagsForCreation createdOrder = orderService.create(order);
+    OrderWithCertificatesWithTagsForCreationDto createdOrder = orderService.create(order);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
   }
 
@@ -101,8 +110,8 @@ public class OrderResource {
    * Build order links list.
    *
    * @param userId the user id
-   * @param id the id
-   * @return the list
+   * @param id the id of order
+   * @return the list of links
    */
   List<Link> buildOrderLinks(long userId, long id) {
     return List.of(
@@ -113,13 +122,13 @@ public class OrderResource {
    * Build orders links list.
    *
    * @param userId the user id
-   * @return the list
+   * @return the list of links
    */
   List<Link> buildOrdersLinks(long userId) {
     return List.of(
         linkTo(
                 methodOn(OrderResource.class)
-                    .createOrder(userId, new OrderDtoWithCertificatesWithTagsForCreation()))
+                    .createOrder(userId, new OrderWithCertificatesWithTagsForCreationDto()))
             .withRel("post")
             .withName("create order for user"));
   }

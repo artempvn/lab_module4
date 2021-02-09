@@ -1,12 +1,26 @@
 package com.epam.esm.web.rest;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.CertificatePatchDto;
+import com.epam.esm.dto.CertificateWithTagsDto;
+import com.epam.esm.dto.CertificateWithoutTagsDto;
+import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.service.CertificateService;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -33,35 +47,35 @@ public class CertificateResource {
   }
 
   /**
-   * Read certificate response entity.
+   * Read certificate by id.
    *
-   * @param id the id
-   * @return the response entity
+   * @param id the id of certificate
+   * @return the response entity with certificate
    */
   @GetMapping("/{id}")
-  public ResponseEntity<EntityModel<CertificateDtoWithTags>> readCertificate(
+  public ResponseEntity<EntityModel<CertificateWithTagsDto>> readCertificate(
       @PathVariable long id) {
-    EntityModel<CertificateDtoWithTags> certificate = EntityModel.of(certificateService.read(id));
+    EntityModel<CertificateWithTagsDto> certificate = EntityModel.of(certificateService.read(id));
     certificate.add(buildCertificateLinks(certificate.getContent().getId()));
     return ResponseEntity.status(HttpStatus.OK).body(certificate);
   }
 
   /**
-   * Read certificates response entity.
+   * Read certificates with request parameters.
    *
    * @param request the request contains sorting and filtering staff
    * @param parameter the parameter of pagination
-   * @return the response entity
+   * @return the response entity of found certificates
    */
   @GetMapping
-  public ResponseEntity<EntityModel<PageData<EntityModel<CertificateDtoWithoutTags>>>>
+  public ResponseEntity<EntityModel<PageData<EntityModel<CertificateWithoutTagsDto>>>>
       readCertificates(CertificatesRequest request, @Valid PaginationParameter parameter) {
-    PageData<CertificateDtoWithoutTags> page = certificateService.readAll(request, parameter);
+    PageData<CertificateWithoutTagsDto> page = certificateService.readAll(request, parameter);
 
-    EntityModel<PageData<EntityModel<CertificateDtoWithoutTags>>> hateoasPage =
+    EntityModel<PageData<EntityModel<CertificateWithoutTagsDto>>> hateoasPage =
         hateoasHandler.wrapPageWithEntityModel(page);
 
-    for (EntityModel<CertificateDtoWithoutTags> certificate :
+    for (EntityModel<CertificateWithoutTagsDto> certificate :
         hateoasPage.getContent().getContent()) {
       long id = certificate.getContent().getId();
       List<Link> links = buildCertificateLinks(id);
@@ -76,53 +90,53 @@ public class CertificateResource {
   }
 
   /**
-   * Create certificate response entity.
+   * Persist certificate.
    *
    * @param certificate the certificate
-   * @return the response entity
+   * @return the response entity of saved certificate
    */
   @PostMapping
-  public ResponseEntity<CertificateDtoWithTags> createCertificate(
-      @Valid @RequestBody CertificateDtoWithTags certificate) {
-    CertificateDtoWithTags createdCertificate = certificateService.create(certificate);
+  public ResponseEntity<CertificateWithTagsDto> createCertificate(
+      @Valid @RequestBody CertificateWithTagsDto certificate) {
+    CertificateWithTagsDto createdCertificate = certificateService.create(certificate);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdCertificate);
   }
 
   /**
-   * Update certificate put response entity.
+   * Update certificate with new data.
    *
-   * @param id the id
+   * @param id the id of certificate
    * @param certificate the certificate
-   * @return the response entity
+   * @return the response entity of certificate
    */
   @PutMapping("/{id}")
-  public ResponseEntity<CertificateDtoWithTags> updateCertificatePut(
-      @PathVariable long id, @Valid @RequestBody CertificateDtoWithTags certificate) {
+  public ResponseEntity<CertificateWithTagsDto> updateCertificatePut(
+      @PathVariable long id, @Valid @RequestBody CertificateWithTagsDto certificate) {
     certificate.setId(id);
-    CertificateDtoWithTags updatedCertificate = certificateService.update(certificate);
+    CertificateWithTagsDto updatedCertificate = certificateService.update(certificate);
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 
   /**
-   * Update certificate patch response entity.
+   * Update certificate with existing field.
    *
-   * @param id the id
+   * @param id the id of certificate
    * @param certificate the certificate
-   * @return the response entity
+   * @return the response entity of certificate
    */
   @PatchMapping("/{id}")
-  public ResponseEntity<CertificateDtoWithoutTags> updateCertificatePatch(
-      @PathVariable long id, @Valid @RequestBody CertificateDtoPatch certificate) {
+  public ResponseEntity<CertificateWithoutTagsDto> updateCertificatePatch(
+      @PathVariable long id, @Valid @RequestBody CertificatePatchDto certificate) {
     certificate.setId(id);
-    CertificateDtoWithoutTags updatedCertificate =
-        certificateService.updatePresentedFields(new CertificateDtoWithoutTags(certificate));
+    CertificateWithoutTagsDto updatedCertificate =
+        certificateService.updatePresentedFields(new CertificateWithoutTagsDto(certificate));
     return ResponseEntity.status(HttpStatus.OK).body(updatedCertificate);
   }
 
   /**
-   * Delete certificate.
+   * Delete certificate by id.
    *
-   * @param id the id
+   * @param id the id of certificate
    */
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -133,8 +147,8 @@ public class CertificateResource {
   /**
    * Build certificate links list.
    *
-   * @param id the id
-   * @return the list
+   * @param id the id of certificate
+   * @return the list of links
    */
   List<Link> buildCertificateLinks(long id) {
     return List.of(
@@ -153,7 +167,7 @@ public class CertificateResource {
   /**
    * Build certificates links list.
    *
-   * @return the list
+   * @return the list of links
    */
   List<Link> buildCertificatesLinks() {
     return List.of(

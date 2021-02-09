@@ -2,13 +2,20 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.*;
-import com.epam.esm.exception.OrderException;
+import com.epam.esm.dto.CertificateWithTagsDto;
+import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.OrderWithCertificatesDto;
+import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.entity.Order;
+import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.service.OrderService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class OrderServiceImpl implements OrderService {
   private final UserDao userDao;
   private final OrderDao orderDao;
@@ -29,36 +37,43 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public OrderDtoWithCertificatesWithTagsForCreation create(
-      OrderDtoWithCertificatesWithTagsForCreation order) {
+  public OrderWithCertificatesWithTagsForCreationDto create(
+      OrderWithCertificatesWithTagsForCreationDto order) {
     userDao
-        .readWithoutOrders(order.getUserId())
+        .read(order.getUserId())
         .orElseThrow(ResourceValidationException.validationWithUser(order.getUserId()));
 
     LocalDateTime timeNow = LocalDateTime.now();
     order.setCreateDate(timeNow);
 
-    if (order.getCertificates().isEmpty()) {
-      throw OrderException.validationWithEmptyOrder(order.getUserId()).get();
-    }
-
-    List<CertificateDtoWithTags> certificates =
+    List<CertificateWithTagsDto> certificates =
         order.getCertificates().stream()
             .map(certificateService::create)
             .collect(Collectors.toList());
     order.setCertificates(certificates);
 
-    return orderDao.create(order);
+    Order orderEntity = new Order(order);
+    return new OrderWithCertificatesWithTagsForCreationDto(orderDao.create(orderEntity));
   }
 
   @Override
   public PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter) {
-    return orderDao.readAllByUser(userId, parameter);
+    PageData<Order> pageData = orderDao.readAllByUser(userId, parameter);
+    long numberOfElements = pageData.getNumberOfElements();
+    long numberOfPages = pageData.getNumberOfPages();
+    List<OrderDto> orders =
+        pageData.getContent().stream().map(OrderDto::new).collect(Collectors.toList());
+    return new PageData<>(parameter.getPage(), numberOfElements, numberOfPages, orders);
   }
 
   @Override
-  public OrderDtoWithCertificates readOrderByUser(long userId, long orderId) {
-    Optional<OrderDtoWithCertificates> order = orderDao.readOrderByUser(userId, orderId);
-    return order.orElseThrow(ResourceNotFoundException.notFoundWithOrder(orderId));
+  public OrderWithCertificatesDto readOrderByUser(long userId, long orderId) {
+    Optional<User> user = userDao.read(userId);
+    user.orElseThrow(ResourceValidationException.validationWithUser(userId));
+
+    Optional<Order> order = orderDao.readOrderByUser(userId, orderId);
+    return order
+        .map(OrderWithCertificatesDto::new)
+        .orElseThrow(ResourceNotFoundException.notFoundWithOrder(orderId));
   }
 }

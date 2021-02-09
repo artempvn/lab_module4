@@ -2,10 +2,11 @@ package com.epam.esm.web.rest;
 
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.OrderDtoWithCertificatesWithTagsForCreation;
-import com.epam.esm.dto.TagDto;
-import com.epam.esm.dto.UserDto;
+import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
+import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Order;
+import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.User;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.web.advice.ResourceAdvice;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,8 +65,8 @@ class OrderResourceTest {
 
   @Test
   void createOrderValueCheck() throws Exception {
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
-    UserDto user = givenUser();
+    Order order = givenOrder();
+    User user = givenUser();
     Long userId = userDao.create(user).getId();
 
     mockMvc
@@ -79,11 +80,13 @@ class OrderResourceTest {
 
   @Test
   void readUserOrder() throws Exception {
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
-    UserDto user = givenUser();
+    Order order = givenOrder();
+    User user = givenUser();
     Long userId = userDao.create(user).getId();
-    order.setUserId(userId);
-    Long orderId = orderService.create(order).getId();
+    user.setId(userId);
+    order.setUser(user);
+    Long orderId =
+        orderService.create(new OrderWithCertificatesWithTagsForCreationDto(order)).getId();
 
     mockMvc
         .perform(get("/users/{userId}/order/{orderId}", userId, orderId))
@@ -93,34 +96,34 @@ class OrderResourceTest {
 
   @Test
   void readUserOrders() throws Exception {
-    OrderDtoWithCertificatesWithTagsForCreation order = givenOrder();
-    UserDto user = givenUser();
+    Order order = givenOrder();
+    User user = givenUser();
     Long userId = userDao.create(user).getId();
-    order.setUserId(userId);
-    orderService.create(order);
+    user.setId(userId);
+    order.setUser(user);
+    orderService.create(new OrderWithCertificatesWithTagsForCreationDto(order));
 
     mockMvc
         .perform(get("/users/{userId}/orders?page=1&size=10", userId))
         .andExpect(status().isOk());
   }
 
-  OrderDtoWithCertificatesWithTagsForCreation givenOrder() {
-    OrderDtoWithCertificatesWithTagsForCreation order =
-        new OrderDtoWithCertificatesWithTagsForCreation();
+  Order givenOrder() {
+    Order order = new Order();
     var certificate = givenCertificate();
     order.setCertificates(List.of(certificate));
     return order;
   }
 
-  UserDto givenUser() {
-    UserDto user = new UserDto();
+  User givenUser() {
+    User user = new User();
     user.setName("name");
     user.setSurname("surname");
     return user;
   }
 
-  CertificateDtoWithTags givenCertificate() {
-    CertificateDtoWithTags certificate = new CertificateDtoWithTags();
+  Certificate givenCertificate() {
+    Certificate certificate = new Certificate();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();
@@ -128,8 +131,8 @@ class OrderResourceTest {
     return certificate;
   }
 
-  TagDto givenTag() {
-    TagDto tag = new TagDto();
+  Tag givenTag() {
+    Tag tag = new Tag();
     tag.setName("tag name");
     return tag;
   }

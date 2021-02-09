@@ -1,6 +1,10 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.User;
+import com.epam.esm.exception.TagException;
 
 import java.util.Optional;
 
@@ -8,41 +12,35 @@ import java.util.Optional;
 public interface UserDao {
 
   /**
-   * Create user dto.
+   * Persist user.
    *
    * @param user the user
-   * @return the user dto
+   * @return saved user
    */
-  UserDto create(UserDto user);
+  User create(User user);
 
   /**
-   * Read optional.
+   * Read user by id.
    *
-   * @param id the id
-   * @return the optional
+   * @param id the id of user
+   * @return the optional of user or empty optional if it's not exist
    */
-  Optional<UserDtoWithOrders> read(long id);
+  Optional<User> read(long id);
 
   /**
-   * Read without orders optional.
-   *
-   * @param id the id
-   * @return the optional
-   */
-  Optional<UserDto> readWithoutOrders(long id);
-
-  /**
-   * Read all page data.
+   * Read all users meet pagination parameters.
    *
    * @param parameter the parameter of pagination
-   * @return the page data
+   * @return the page data with found users and page info
    */
-  PageData<UserDto> readAll(PaginationParameter parameter);
+  PageData<User> readAll(PaginationParameter parameter);
 
   /**
-   * Take most widely tag from user with highest cost orders tag dto.
+   * Take most widely used tag from user with highest cost of all orders.
    *
-   * @return the tag dto
+   * @return most widely used tag of user with highest cost of all orders
+   * @throws TagException if there is no any tag found in orders of user with highest cost of all
+   *     orders
    */
-  TagDto takeMostWidelyTagFromUserWithHighestCostOrders();
+  Tag takeMostWidelyTagFromUserWithHighestCostOrders();
 }

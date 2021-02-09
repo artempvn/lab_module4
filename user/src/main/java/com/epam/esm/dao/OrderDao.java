@@ -1,6 +1,8 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.entity.Order;
 
 import java.util.Optional;
 
@@ -8,29 +10,28 @@ import java.util.Optional;
 public interface OrderDao {
 
   /**
-   * Create order dto with certificates with tags for creation.
+   * Persist order with binding all of its certificates.
    *
-   * @param order the order
-   * @return the order dto with certificates with tags for creation
+   * @param order the order with certificates
+   * @return saved order
    */
-  OrderDtoWithCertificatesWithTagsForCreation create(
-      OrderDtoWithCertificatesWithTagsForCreation order);
+  Order create(Order order);
 
   /**
-   * Read all by user page data.
+   * Read all orders related to provided user id and meet pagination parameters.
    *
    * @param userId the user id
    * @param parameter the parameter of pagination
-   * @return the page data
+   * @return the page data with found orders and page info
    */
-  PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter);
+  PageData<Order> readAllByUser(long userId, PaginationParameter parameter);
 
   /**
-   * Read order by user optional.
+   * Read order by id related to provided user id.
    *
    * @param userId the user id
    * @param orderId the order id
-   * @return the optional
+   * @return the optional of order or empty optional if it's not exist
    */
-  Optional<OrderDtoWithCertificates> readOrderByUser(long userId, long orderId);
+  Optional<Order> readOrderByUser(long userId, long orderId);
 }

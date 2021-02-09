@@ -2,13 +2,17 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.service.TagService;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class TagServiceImplTest {
   TagDao tagDao = mock(TagDao.class);
@@ -16,47 +20,48 @@ class TagServiceImplTest {
 
   @Test
   void createTagDaoReadInvocation() {
-    TagDto tag = givenTag();
-    when(tagDao.read(tag.getName())).thenReturn(Optional.of(tag));
+    Tag tag = givenTag();
+    when(tagDao.read(any())).thenReturn(Optional.of(tag));
 
-    tagService.create(tag);
+    tagService.create(new TagDto());
 
-    verify(tagDao).read(tag.getName());
+    verify(tagDao).read(any());
   }
 
   @Test
   void createIfExistedTagDaoCreateInvocation() {
-    TagDto tag = givenTag();
-    when(tagDao.read(tag.getName())).thenReturn(Optional.of(tag));
+    Tag tag = givenTag();
+    when(tagDao.read(any())).thenReturn(Optional.of(tag));
 
-    tagService.create(tag);
+    tagService.create(new TagDto());
 
     verify(tagDao, never()).create(any());
   }
 
   @Test
   void createIfExistedTagDaoReadInvocation() {
-    TagDto tag = givenTag();
-    when(tagDao.read(tag.getName())).thenReturn(Optional.of(tag));
+    Tag tag = givenTag();
+    when(tagDao.read(any())).thenReturn(Optional.of(tag));
 
-    tagService.create(tag);
+    tagService.create(new TagDto());
 
-    verify(tagDao).read(tag.getName());
+    verify(tagDao).read(any());
   }
 
   @Test
   void createIfNotExistedTagDaoCreateInvocation() {
-    TagDto tag = givenTag();
-    when(tagDao.read(tag.getName())).thenReturn(Optional.empty());
-    when(tagDao.create(tag)).thenReturn(new TagDto());
+    Tag tag = givenTag();
+    when(tagDao.read(any())).thenReturn(Optional.empty());
+    when(tagDao.create(any())).thenReturn(new Tag());
 
-    tagService.create(tag);
+    tagService.create(new TagDto());
 
-    verify(tagDao).create(tag);
+    verify(tagDao).create(any());
   }
 
-  TagDto givenTag() {
-    TagDto tag = new TagDto();
+  Tag givenTag() {
+    Tag tag = new Tag();
+    tag.setId(1L);
     tag.setName("tag name");
     return tag;
   }

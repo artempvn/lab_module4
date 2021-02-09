@@ -25,7 +25,7 @@ public interface HateoasHandler {
    * Build links for pagination with outer resource list.
    *
    * @param clazz the clazz
-   * @param parameter the parameter
+   * @param parameter the parameter of pagination
    * @param numberOfPages the number of pages
    * @param outerId the outer id
    * @param innerName the inner name

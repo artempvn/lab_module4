@@ -2,8 +2,10 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.PaginationHandler;
 import com.epam.esm.dao.UserDao;
-import com.epam.esm.dao.entity.User;
-import com.epam.esm.dto.*;
+import com.epam.esm.dto.PageData;
+import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.entity.Tag;
+import com.epam.esm.entity.User;
 import com.epam.esm.exception.TagException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -18,7 +20,6 @@ import javax.persistence.criteria.Root;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 @Transactional(propagation = Propagation.REQUIRED)
@@ -30,8 +31,8 @@ public class UserDaoImpl implements UserDao {
           + "(SELECT SUM(price) AS summa,users.id "
           + "FROM ordered_certificates "
           + "JOIN orders ON order_id=orders.id JOIN users ON user_id=users.id "
-          + "GROUP BY users.id) AS user_orders_cost"
-          + " ORDER BY summa desc limit 1)";
+          + "GROUP BY users.id) AS user_orders_cost "
+          + "ORDER BY summa DESC LIMIT 1) ";
 
   private static final String SQL_REQUEST_FOR_WIDELY_USED_TAG_FROM_HIGHEST_COST_ORDERS_USER =
       "SELECT ordered_tags.id, ordered_tags.name "
@@ -41,8 +42,8 @@ public class UserDaoImpl implements UserDao {
           + "JOIN orders ON orders.id=order_id JOIN users ON users.id=user_id "
           + "WHERE users.id="
           + SQL_REQUEST_FOR_USER_ID_WITH_HIGHEST_COST_ORDERS
-          + " GROUP BY ordered_tags.name "
-          + "ORDER BY count(ordered_tags.name) desc limit 1;";
+          + "GROUP BY ordered_tags.name "
+          + "ORDER BY COUNT(ordered_tags.name) DESC LIMIT 1;";
 
   private final PaginationHandler paginationHandler;
   private final EntityManager entityManager;
@@ -53,26 +54,18 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public UserDto create(UserDto dto) {
-    User user = new User(dto);
+  public User create(User user) {
     entityManager.persist(user);
-    return new UserDto(user);
+    return user;
   }
 
   @Override
-  public Optional<UserDtoWithOrders> read(long id) {
-    Optional<User> user = Optional.ofNullable(entityManager.find(User.class, id));
-    return user.map(UserDtoWithOrders::new);
+  public Optional<User> read(long id) {
+    return Optional.ofNullable(entityManager.find(User.class, id));
   }
 
   @Override
-  public Optional<UserDto> readWithoutOrders(long id) {
-    Optional<User> user = Optional.ofNullable(entityManager.find(User.class, id));
-    return user.map(UserDto::new);
-  }
-
-  @Override
-  public PageData<UserDto> readAll(PaginationParameter parameter) {
+  public PageData<User> readAll(PaginationParameter parameter) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<User> criteriaQuery = builder.createQuery(User.class);
@@ -87,23 +80,22 @@ public class UserDaoImpl implements UserDao {
 
     TypedQuery<User> typedQuery = entityManager.createQuery(select);
     paginationHandler.setPageToQuery(typedQuery, parameter);
-    List<UserDto> users =
-        typedQuery.getResultList().stream().map(UserDto::new).collect(Collectors.toList());
+    List<User> users = typedQuery.getResultList();
 
     return new PageData<>(parameter.getPage(), numberOfElements, numberOfPages, users);
   }
 
   @Override
-  public TagDto takeMostWidelyTagFromUserWithHighestCostOrders() {
-    Query q =
+  public Tag takeMostWidelyTagFromUserWithHighestCostOrders() {
+    Query query =
         entityManager.createNativeQuery(
             SQL_REQUEST_FOR_WIDELY_USED_TAG_FROM_HIGHEST_COST_ORDERS_USER);
 
-    Optional<Object[]> tagValue = q.getResultStream().findFirst();
+    Optional<Object[]> tagValue = query.getResultStream().findFirst();
     if (tagValue.isPresent()) {
       long id = ((BigInteger) tagValue.get()[0]).longValue();
       String name = (String) tagValue.get()[1];
-      return TagDto.builder().id(id).name(name).build();
+      return Tag.builder().id(id).name(name).build();
     }
     throw new TagException("There is no any tags in orders");
   }

@@ -1,22 +1,22 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.dao.entity.Order;
+import com.epam.esm.entity.Order;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OrderDtoWithCertificates {
+public class OrderWithCertificatesDto {
 
   private Long id;
   private LocalDateTime createDate;
   private Double price;
   private List<CertificateDto> certificates;
 
-  public OrderDtoWithCertificates() {}
+  public OrderWithCertificatesDto() {}
 
-  public OrderDtoWithCertificates(Order entity) {
+  public OrderWithCertificatesDto(Order entity) {
     this.id = entity.getId();
     this.createDate = entity.getCreateDate();
     this.price = entity.getPrice();
@@ -24,7 +24,7 @@ public class OrderDtoWithCertificates {
         entity.getCertificates().stream().map(CertificateDto::new).collect(Collectors.toList());
   }
 
-  private OrderDtoWithCertificates(Builder builder) {
+  private OrderWithCertificatesDto(Builder builder) {
     id = builder.id;
     createDate = builder.createDate;
     price = builder.price;
@@ -72,7 +72,7 @@ public class OrderDtoWithCertificates {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    OrderDtoWithCertificates that = (OrderDtoWithCertificates) o;
+    OrderWithCertificatesDto that = (OrderWithCertificatesDto) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) return false;
     if (createDate != null ? !createDate.equals(that.createDate) : that.createDate != null)
@@ -131,8 +131,8 @@ public class OrderDtoWithCertificates {
       return this;
     }
 
-    public OrderDtoWithCertificates build() {
-      return new OrderDtoWithCertificates(this);
+    public OrderWithCertificatesDto build() {
+      return new OrderWithCertificatesDto(this);
     }
   }
 }

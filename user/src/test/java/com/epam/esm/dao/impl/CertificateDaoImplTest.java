@@ -3,8 +3,8 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.CertificateDao;
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.dto.CertificateDtoWithTags;
-import com.epam.esm.dto.TagDto;
+import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Tag;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,19 +40,19 @@ class CertificateDaoImplTest {
 
   @Test
   void create() {
-    TagDto tag = givenTag();
+    Tag tag = givenTag();
     long id = tagDao.create(tag).getId();
     tag.setId(id);
-    CertificateDtoWithTags expectedCertificate = givenCertificate();
+    Certificate expectedCertificate = givenCertificate();
     expectedCertificate.setTags(List.of(tag));
 
-    CertificateDtoWithTags actualCertificate = certificateDao.create(expectedCertificate);
+    Certificate actualCertificate = certificateDao.create(expectedCertificate);
 
     assertNotNull(actualCertificate.getId());
   }
 
-  CertificateDtoWithTags givenCertificate() {
-    CertificateDtoWithTags certificate = new CertificateDtoWithTags();
+  Certificate givenCertificate() {
+    Certificate certificate = new Certificate();
     certificate.setPreviousId(99L);
     certificate.setPrice(99.99);
     var tag = givenTag();
@@ -60,8 +60,8 @@ class CertificateDaoImplTest {
     return certificate;
   }
 
-  TagDto givenTag() {
-    TagDto tag = new TagDto();
+  Tag givenTag() {
+    Tag tag = new Tag();
     tag.setName("tag name");
     return tag;
   }

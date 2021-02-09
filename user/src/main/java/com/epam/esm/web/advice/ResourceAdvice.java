@@ -1,6 +1,5 @@
 package com.epam.esm.web.advice;
 
-import com.epam.esm.exception.OrderException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.exception.TagException;
@@ -16,9 +15,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.stream.Collectors;
+
 @ControllerAdvice
 public class ResourceAdvice {
 
+  public static final String DELIMITER = "; ";
   private final ReloadableResourceBundleMessageSource messageSource;
 
   public ResourceAdvice(ReloadableResourceBundleMessageSource messageSource) {
@@ -45,16 +47,6 @@ public class ResourceAdvice {
     return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
   }
 
-  @ExceptionHandler(OrderException.class)
-  public ResponseEntity<ErrorResponse> handleException(OrderException e) {
-    String textMessage =
-        messageSource.getMessage("error.orderEmpty", null, LocaleContextHolder.getLocale());
-    String errorMessage = String.format("%s %s", textMessage, e.getResourceId());
-    String errorCode = String.format("%s%s", HttpStatus.BAD_REQUEST.value(), e.getResourceId());
-    ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
-    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-  }
-
   @ExceptionHandler(TagException.class)
   public ResponseEntity<ErrorResponse> handleException(TagException e) {
     String textMessage =
@@ -66,14 +58,13 @@ public class ResourceAdvice {
 
   @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
   public ResponseEntity<ErrorResponse> handleException(BindException e) {
-    StringBuilder errorMessage = new StringBuilder();
-    (e.getBindingResult().getFieldErrors())
-        .forEach(
-            error ->
-                errorMessage.append(
-                    String.format("%s: %s; ", error.getField(), error.getDefaultMessage())));
+    String errorMessage =
+        (e.getBindingResult().getFieldErrors())
+            .stream()
+                .map(error -> String.format("%s: %s", error.getField(), error.getDefaultMessage()))
+                .collect(Collectors.joining(DELIMITER));
     String errorCode = String.format("%s%s", HttpStatus.BAD_REQUEST.value(), e.getErrorCount());
-    ErrorResponse response = new ErrorResponse(errorMessage.toString(), errorCode);
+    ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 

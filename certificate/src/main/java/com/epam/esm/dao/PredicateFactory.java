@@ -1,7 +1,7 @@
 package com.epam.esm.dao;
 
-import com.epam.esm.dao.entity.Certificate;
 import com.epam.esm.dto.CertificatesRequest;
+import com.epam.esm.entity.Certificate;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
@@ -17,7 +17,7 @@ public interface PredicateFactory {
    * @param builder the builder
    * @param request the request contains sorting and filtering staff
    * @param root the root
-   * @return the list
+   * @return the list of predicates
    */
   List<Predicate> buildPredicates(
       CriteriaBuilder builder, CertificatesRequest request, Root<Certificate> root);

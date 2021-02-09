@@ -6,10 +6,10 @@ import com.epam.esm.dto.TagDto;
 public interface TagService {
 
   /**
-   * Create tag dto.
+   * Persist tag. If it is already exist (by name) returns existing tag, otherwise persist new one.
    *
    * @param tag the tag
-   * @return the tag dto
+   * @return saved tag or existing tag, if tag has already been persisted
    */
   TagDto create(TagDto tag);
 }
