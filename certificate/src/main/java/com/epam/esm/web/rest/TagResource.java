@@ -44,10 +44,10 @@ public class TagResource {
   }
 
   /**
-   * Read tag response entity.
+   * Read tag by id.
    *
-   * @param id the id
-   * @return the response entity
+   * @param id the id of tag
+   * @return the response entity of tag
    */
   @GetMapping("/{id}")
   public ResponseEntity<EntityModel<TagDto>> readTag(@PathVariable long id) {
@@ -57,10 +57,10 @@ public class TagResource {
   }
 
   /**
-   * Read tags response entity.
+   * Read tags with pagination parameters.
    *
    * @param parameter the parameter of pagination
-   * @return the response entity
+   * @return the response entity of found tags
    */
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
@@ -85,10 +85,10 @@ public class TagResource {
   }
 
   /**
-   * Create tag tag dto.
+   * Persist tag.
    *
    * @param tag the tag
-   * @return the tag dto
+   * @return saved tag
    */
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -110,9 +110,9 @@ public class TagResource {
   }
 
   /**
-   * Delete tag.
+   * Delete tag by id.
    *
-   * @param id the id
+   * @param id the id of tag
    */
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -123,8 +123,8 @@ public class TagResource {
   /**
    * Build tag links list.
    *
-   * @param id the id
-   * @return the list
+   * @param id the id of tag
+   * @return the list of links
    */
   List<Link> buildTagLinks(long id) {
     return List.of(
@@ -135,7 +135,7 @@ public class TagResource {
   /**
    * Build tags links list.
    *
-   * @return the list
+   * @return the list of links
    */
   List<Link> buildTagsLinks() {
     return List.of(

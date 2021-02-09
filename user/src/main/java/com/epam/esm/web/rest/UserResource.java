@@ -41,10 +41,10 @@ public class UserResource {
   }
 
   /**
-   * Read user response entity.
+   * Read user by id.
    *
-   * @param id the id
-   * @return the response entity
+   * @param id the id of user
+   * @return the response entity of found user
    */
   @GetMapping("/{id}")
   public ResponseEntity<EntityModel<UserWithOrdersDto>> readUser(@PathVariable long id) {
@@ -54,10 +54,10 @@ public class UserResource {
   }
 
   /**
-   * Read users response entity.
+   * Read users meet pagination parameters.
    *
    * @param parameter the parameter of pagination
-   * @return the response entity
+   * @return the response entity of found users
    */
   @GetMapping
   public ResponseEntity<EntityModel<PageData<EntityModel<UserDto>>>> readUsers(
@@ -81,9 +81,9 @@ public class UserResource {
   }
 
   /**
-   * Read most widely tag from user with highest cost orders response entity.
+   * Read most widely used tag from user with highest cost of all orders.
    *
-   * @return the response entity
+   * @return the response entity of tag
    */
   @GetMapping("/most-popular-tag")
   public ResponseEntity<TagDto> readMostWidelyTagFromUserWithHighestCostOrders() {
@@ -94,8 +94,8 @@ public class UserResource {
   /**
    * Build user links list.
    *
-   * @param id the id
-   * @return the list
+   * @param id the id of user
+   * @return the list of links
    */
   List<Link> buildUserLinks(long id) {
     return List.of(linkTo(UserResource.class).slash(id).withSelfRel());
@@ -104,7 +104,7 @@ public class UserResource {
   /**
    * Build users links list.
    *
-   * @return the list
+   * @return the list of links
    */
   List<Link> buildUsersLinks() {
     return List.of(

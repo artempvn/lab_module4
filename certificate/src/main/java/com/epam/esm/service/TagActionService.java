@@ -8,12 +8,12 @@ public interface TagActionService {
    * Is applicable boolean.
    *
    * @param tagAction the tag action
-   * @return the boolean
+   * @return is applicable tag action or not
    */
   boolean isApplicable(TagAction tagAction);
 
   /**
-   * Process action.
+   * Process action of tag action.
    *
    * @param tagAction the tag action
    */

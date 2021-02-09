@@ -47,10 +47,10 @@ public class CertificateResource {
   }
 
   /**
-   * Read certificate response entity.
+   * Read certificate by id.
    *
-   * @param id the id
-   * @return the response entity
+   * @param id the id of certificate
+   * @return the response entity with certificate
    */
   @GetMapping("/{id}")
   public ResponseEntity<EntityModel<CertificateWithTagsDto>> readCertificate(
@@ -61,11 +61,11 @@ public class CertificateResource {
   }
 
   /**
-   * Read certificates response entity.
+   * Read certificates with request parameters.
    *
    * @param request the request contains sorting and filtering staff
    * @param parameter the parameter of pagination
-   * @return the response entity
+   * @return the response entity of found certificates
    */
   @GetMapping
   public ResponseEntity<EntityModel<PageData<EntityModel<CertificateWithoutTagsDto>>>>
@@ -90,10 +90,10 @@ public class CertificateResource {
   }
 
   /**
-   * Create certificate response entity.
+   * Persist certificate.
    *
    * @param certificate the certificate
-   * @return the response entity
+   * @return the response entity of saved certificate
    */
   @PostMapping
   public ResponseEntity<CertificateWithTagsDto> createCertificate(
@@ -103,11 +103,11 @@ public class CertificateResource {
   }
 
   /**
-   * Update certificate put response entity.
+   * Update certificate with new data.
    *
-   * @param id the id
+   * @param id the id of certificate
    * @param certificate the certificate
-   * @return the response entity
+   * @return the response entity of certificate
    */
   @PutMapping("/{id}")
   public ResponseEntity<CertificateWithTagsDto> updateCertificatePut(
@@ -118,11 +118,11 @@ public class CertificateResource {
   }
 
   /**
-   * Update certificate patch response entity.
+   * Update certificate with existing field.
    *
-   * @param id the id
+   * @param id the id of certificate
    * @param certificate the certificate
-   * @return the response entity
+   * @return the response entity of certificate
    */
   @PatchMapping("/{id}")
   public ResponseEntity<CertificateWithoutTagsDto> updateCertificatePatch(
@@ -134,9 +134,9 @@ public class CertificateResource {
   }
 
   /**
-   * Delete certificate.
+   * Delete certificate by id.
    *
-   * @param id the id
+   * @param id the id of certificate
    */
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -147,8 +147,8 @@ public class CertificateResource {
   /**
    * Build certificate links list.
    *
-   * @param id the id
-   * @return the list
+   * @param id the id of certificate
+   * @return the list of links
    */
   List<Link> buildCertificateLinks(long id) {
     return List.of(
@@ -167,7 +167,7 @@ public class CertificateResource {
   /**
    * Build certificates links list.
    *
-   * @return the list
+   * @return the list of links
    */
   List<Link> buildCertificatesLinks() {
     return List.of(

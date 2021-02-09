@@ -10,7 +10,6 @@ import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
-import com.epam.esm.exception.OrderException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.service.CertificateService;
@@ -41,15 +40,11 @@ public class OrderServiceImpl implements OrderService {
   public OrderWithCertificatesWithTagsForCreationDto create(
       OrderWithCertificatesWithTagsForCreationDto order) {
     userDao
-        .readWithoutOrders(order.getUserId())
+        .read(order.getUserId())
         .orElseThrow(ResourceValidationException.validationWithUser(order.getUserId()));
 
     LocalDateTime timeNow = LocalDateTime.now();
     order.setCreateDate(timeNow);
-
-    if (order.getCertificates().isEmpty()) {
-      throw OrderException.validationWithEmptyOrder(order.getUserId()).get();
-    }
 
     List<CertificateWithTagsDto> certificates =
         order.getCertificates().stream()

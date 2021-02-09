@@ -6,10 +6,10 @@ import com.epam.esm.dto.CertificateWithTagsDto;
 public interface CertificateService {
 
   /**
-   * Create certificate dto with tags.
+   * Persist certificate with tags.
    *
    * @param certificate the certificate
-   * @return the certificate dto with tags
+   * @return saved certificate with tags
    */
   CertificateWithTagsDto create(CertificateWithTagsDto certificate);
 }

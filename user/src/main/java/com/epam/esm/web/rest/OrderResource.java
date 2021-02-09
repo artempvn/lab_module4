@@ -43,11 +43,11 @@ public class OrderResource {
   }
 
   /**
-   * Read user order response entity.
+   * Read user order by user id and order id.
    *
    * @param userId the user id
    * @param orderId the order id
-   * @return the response entity
+   * @return the response entity of found order
    */
   @GetMapping
   @RequestMapping("/{userId}/order/{orderId}")
@@ -60,11 +60,11 @@ public class OrderResource {
   }
 
   /**
-   * Read user orders response entity.
+   * Read user orders meet pagination parameters.
    *
    * @param userId the user id
    * @param parameter the parameter of pagination
-   * @return the response entity
+   * @return the response entity of found orders
    */
   @GetMapping
   @RequestMapping("/{userId}/orders")
@@ -90,11 +90,11 @@ public class OrderResource {
   }
 
   /**
-   * Create order response entity.
+   * Persist order with certificates.
    *
    * @param userId the user id
    * @param order the order
-   * @return the response entity
+   * @return the response entity of saved order
    */
   @PostMapping
   @RequestMapping("/{userId}/order")
@@ -110,8 +110,8 @@ public class OrderResource {
    * Build order links list.
    *
    * @param userId the user id
-   * @param id the id
-   * @return the list
+   * @param id the id of order
+   * @return the list of links
    */
   List<Link> buildOrderLinks(long userId, long id) {
     return List.of(
@@ -122,7 +122,7 @@ public class OrderResource {
    * Build orders links list.
    *
    * @param userId the user id
-   * @return the list
+   * @return the list of links
    */
   List<Link> buildOrdersLinks(long userId) {
     return List.of(

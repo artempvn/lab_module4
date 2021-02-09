@@ -12,41 +12,41 @@ import java.util.Optional;
 public interface TagDao {
 
   /**
-   * Create tag dto.
+   * Persist tag.
    *
    * @param tag the tag
-   * @return the tag dto
+   * @return saved tag
    */
   Tag create(Tag tag);
 
   /**
-   * Read optional.
+   * Read tag by id.
    *
-   * @param id the id
-   * @return the optional
+   * @param id the id of tag
+   * @return the optional of tag or empty optional if it's not exist
    */
   Optional<Tag> read(long id);
 
   /**
-   * Read all page data.
+   * Read all tags that meet parameter of pagination.
    *
    * @param parameter the parameter of pagination
-   * @return the page data
+   * @return the page data with found tags and page info
    */
   PageData<Tag> readAll(PaginationParameter parameter);
 
   /**
-   * Delete.
+   * Delete existing tag by id.
    *
-   * @param id the id
+   * @param id the id of tag
    */
   void delete(long id);
 
   /**
-   * Read optional.
+   * Read tag by name.
    *
-   * @param name the name
-   * @return the optional
+   * @param name the name of tag
+   * @return the optional of tag or empty optional if it's not exist
    */
   Optional<Tag> read(String name);
 }

@@ -17,7 +17,7 @@ public interface PredicateFactory {
    * @param builder the builder
    * @param request the request contains sorting and filtering staff
    * @param root the root
-   * @return the list
+   * @return the list of predicates
    */
   List<Predicate> buildPredicates(
       CriteriaBuilder builder, CertificatesRequest request, Root<Certificate> root);

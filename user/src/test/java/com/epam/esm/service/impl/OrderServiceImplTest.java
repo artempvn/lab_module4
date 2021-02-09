@@ -42,7 +42,7 @@ class OrderServiceImplTest {
     Order order = givenOrder();
     order.setId(1L);
     User user = givenUser();
-    when(userDao.readWithoutOrders(anyLong())).thenReturn(Optional.of(user));
+    when(userDao.read(anyLong())).thenReturn(Optional.of(user));
     CertificateWithTagsDto certificate = CertificateWithTagsDto.builder().id(1L).build();
     OrderWithCertificatesWithTagsForCreationDto inputOrder =
         OrderWithCertificatesWithTagsForCreationDto.builder()
@@ -62,7 +62,7 @@ class OrderServiceImplTest {
     Order order = givenOrder();
     order.setId(1L);
     User user = givenUser();
-    when(userDao.readWithoutOrders(anyLong())).thenReturn(Optional.of(user));
+    when(userDao.read(anyLong())).thenReturn(Optional.of(user));
     CertificateWithTagsDto certificate = CertificateWithTagsDto.builder().id(1L).build();
     OrderWithCertificatesWithTagsForCreationDto inputOrder =
         OrderWithCertificatesWithTagsForCreationDto.builder()

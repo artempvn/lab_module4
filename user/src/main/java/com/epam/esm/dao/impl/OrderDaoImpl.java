@@ -27,7 +27,6 @@ public class OrderDaoImpl implements OrderDao {
 
   public OrderDaoImpl(EntityManager entityManager, PaginationHandler paginationHandler) {
     this.entityManager = entityManager;
-
     this.paginationHandler = paginationHandler;
   }
 

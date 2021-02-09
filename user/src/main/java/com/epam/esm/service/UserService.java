@@ -5,30 +5,32 @@ import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.UserWithOrdersDto;
+import com.epam.esm.exception.ResourceNotFoundException;
 
 /** The interface User service. */
 public interface UserService {
 
   /**
-   * Read user dto with orders.
+   * Read user by id.
    *
-   * @param id the id
-   * @return the user dto with orders
+   * @param id the id of user
+   * @return found user
+   * @throws ResourceNotFoundException if user is not found
    */
   UserWithOrdersDto read(long id);
 
   /**
-   * Read all page data.
+   * Read all users meet pagination parameters.
    *
    * @param parameter the parameter of pagination
-   * @return the page data
+   * @return the page data with found users and page info
    */
   PageData<UserDto> readAll(PaginationParameter parameter);
 
   /**
-   * Take most widely tag from user with highest cost orders tag dto.
+   * Take most widely used tag from user with highest cost of all orders.
    *
-   * @return the tag dto
+   * @return found tag
    */
   TagDto takeMostWidelyTagFromUserWithHighestCostOrders();
 }

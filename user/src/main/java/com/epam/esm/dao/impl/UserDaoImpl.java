@@ -65,12 +65,6 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public Optional<User> readWithoutOrders(long id) {
-    Optional<User> user = Optional.ofNullable(entityManager.find(User.class, id));
-    return user;
-  }
-
-  @Override
   public PageData<User> readAll(PaginationParameter parameter) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
