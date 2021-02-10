@@ -12,13 +12,14 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.stream.Collectors;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class ResourceAdvice {
 
   public static final String DELIMITER = "; ";
@@ -29,6 +30,7 @@ public class ResourceAdvice {
   }
 
   @ExceptionHandler(ResourceValidationException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ErrorResponse> handleException(ResourceValidationException e) {
     String textMessage =
         messageSource.getMessage("error.notExist", null, LocaleContextHolder.getLocale());
@@ -39,6 +41,7 @@ public class ResourceAdvice {
   }
 
   @ExceptionHandler(ResourcesValidationException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ErrorResponse> handleException(ResourcesValidationException e) {
     String textMessage =
         messageSource.getMessage(
@@ -53,6 +56,7 @@ public class ResourceAdvice {
   }
 
   @ExceptionHandler(ResourceNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
   public ResponseEntity<ErrorResponse> handleException(ResourceNotFoundException e) {
     String textMessage =
         messageSource.getMessage("error.notExist", null, LocaleContextHolder.getLocale());
@@ -63,6 +67,7 @@ public class ResourceAdvice {
   }
 
   @ExceptionHandler(ResourceIsBoundException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ErrorResponse> handleException(ResourceIsBoundException e) {
     String textMessage =
         messageSource.getMessage("error.isBound", null, LocaleContextHolder.getLocale());
@@ -73,6 +78,7 @@ public class ResourceAdvice {
   }
 
   @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ErrorResponse> handleException(BindException e) {
     String errorMessage =
         (e.getBindingResult().getFieldErrors())
@@ -85,6 +91,7 @@ public class ResourceAdvice {
   }
 
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
   public ResponseEntity<ErrorResponse> handleException(HttpRequestMethodNotSupportedException e) {
     String errorCode = String.format("%s", HttpStatus.METHOD_NOT_ALLOWED.value());
     String textMessage =
@@ -95,6 +102,7 @@ public class ResourceAdvice {
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ErrorResponse> handleException(MethodArgumentTypeMismatchException e) {
     String textMessage =
         messageSource.getMessage(
@@ -106,6 +114,7 @@ public class ResourceAdvice {
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ErrorResponse> handleException(HttpMessageNotReadableException e) {
     String textMessage =
         messageSource.getMessage("error.notReadable", null, LocaleContextHolder.getLocale());

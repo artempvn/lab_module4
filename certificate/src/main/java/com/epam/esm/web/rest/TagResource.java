@@ -8,6 +8,7 @@ import com.epam.esm.service.TagService;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,7 +50,7 @@ public class TagResource {
    * @param id the id of tag
    * @return the response entity of tag
    */
-  @GetMapping("/{id}")
+  @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<TagDto>> readTag(@PathVariable long id) {
     EntityModel<TagDto> tag = EntityModel.of(tagService.read(id));
     tag.add(buildTagLinks(id));
@@ -62,7 +63,7 @@ public class TagResource {
    * @param parameter the parameter of pagination
    * @return the response entity of found tags
    */
-  @GetMapping
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<EntityModel<PageData<EntityModel<TagDto>>>> readTags(
       @Valid PaginationParameter parameter) {
@@ -90,7 +91,7 @@ public class TagResource {
    * @param tag the tag
    * @return saved tag
    */
-  @PostMapping
+  @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public TagDto createTag(@RequestBody @Valid TagDto tag) {
     return tagService.create(tag);
@@ -102,7 +103,7 @@ public class TagResource {
    * @param action the action
    * @return the response entity
    */
-  @PostMapping("/action")
+  @PostMapping(value = "/action", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<Void> processTagAction(@RequestBody TagAction action) {
     tagService.processTagAction(action);
@@ -114,7 +115,7 @@ public class TagResource {
    *
    * @param id the id of tag
    */
-  @DeleteMapping("/{id}")
+  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteTag(@PathVariable long id) {
     tagService.delete(id);

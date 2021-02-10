@@ -9,6 +9,7 @@ import com.epam.esm.service.UserService;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +47,7 @@ public class UserResource {
    * @param id the id of user
    * @return the response entity of found user
    */
-  @GetMapping("/{id}")
+  @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<UserWithOrdersDto>> readUser(@PathVariable long id) {
     EntityModel<UserWithOrdersDto> user = EntityModel.of(userService.read(id));
     user.add(buildUserLinks(user.getContent().getId()));
@@ -59,7 +60,7 @@ public class UserResource {
    * @param parameter the parameter of pagination
    * @return the response entity of found users
    */
-  @GetMapping
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<PageData<EntityModel<UserDto>>>> readUsers(
       @Valid PaginationParameter parameter) {
     PageData<UserDto> page = userService.readAll(parameter);
@@ -85,7 +86,7 @@ public class UserResource {
    *
    * @return the response entity of tag
    */
-  @GetMapping("/most-popular-tag")
+  @GetMapping(value = "/most-popular-tag", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TagDto> readMostWidelyTagFromUserWithHighestCostOrders() {
     TagDto tag = userService.takeMostWidelyTagFromUserWithHighestCostOrders();
     return ResponseEntity.status(HttpStatus.OK).body(tag);
