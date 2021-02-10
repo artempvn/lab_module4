@@ -9,6 +9,7 @@ import com.epam.esm.service.OrderService;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,8 +50,7 @@ public class OrderResource {
    * @param orderId the order id
    * @return the response entity of found order
    */
-  @GetMapping
-  @RequestMapping("/{userId}/order/{orderId}")
+  @GetMapping(value = "/{userId}/order/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<OrderWithCertificatesDto>> readUserOrder(
       @PathVariable long userId, @PathVariable long orderId) {
     EntityModel<OrderWithCertificatesDto> order =
@@ -66,8 +66,7 @@ public class OrderResource {
    * @param parameter the parameter of pagination
    * @return the response entity of found orders
    */
-  @GetMapping
-  @RequestMapping("/{userId}/orders")
+  @GetMapping(value = "/{userId}/orders", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<PageData<EntityModel<OrderDto>>>> readUserOrders(
       @PathVariable long userId, @Valid PaginationParameter parameter) {
     PageData<OrderDto> page = orderService.readAllByUser(userId, parameter);
@@ -96,8 +95,7 @@ public class OrderResource {
    * @param order the order
    * @return the response entity of saved order
    */
-  @PostMapping
-  @RequestMapping("/{userId}/order")
+  @PostMapping(value = "/{userId}/order", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<OrderWithCertificatesWithTagsForCreationDto> createOrder(
       @PathVariable long userId,
       @Valid @RequestBody OrderWithCertificatesWithTagsForCreationDto order) {
