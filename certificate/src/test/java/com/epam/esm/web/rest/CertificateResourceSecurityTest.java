@@ -49,34 +49,33 @@ public class CertificateResourceSecurityTest {
     Certificate certificate1 = givenExistingCertificate1();
     long id = certificateDao.create(certificate1).getId();
 
-    mockMvc.perform(get("/certificates/{id}", id)).andExpect(status().isUnauthorized());
-  }
-
-  @Test
-  @WithMockUser(roles = {"USER"})
-  void readCertificateStatusCheckAuth() throws Exception {
-    Certificate certificate1 = givenExistingCertificate1();
-    long id = certificateDao.create(certificate1).getId();
-
     mockMvc.perform(get("/certificates/{id}", id)).andExpect(status().isOk());
   }
 
-//  @Test
-//  @WithMockUser(roles = {"ADMINISTRATOR"})
-//  void deleteStatusCheckAdminAuth() throws Exception {
-//    Certificate certificate1 = givenExistingCertificate1();
-//    long id = certificateDao.create(certificate1).getId();
-//
-//    mockMvc.perform(delete("/certificates/{id}", id)).andExpect(status().isNoContent());
-//  }
-//
-//  @Test
-//  void deleteStatusUnauthorized() throws Exception {
-//    Certificate certificate1 = givenExistingCertificate1();
-//    long id = certificateDao.create(certificate1).getId();
-//
-//    mockMvc.perform(delete("/certificates/{id}", id)).andExpect(status().isUnauthorized());
-//  }
+  @Test
+  void readAllUnauthorizedStatusCheck() throws Exception {
+    Certificate certificate1 = givenExistingCertificate1();
+    long id = certificateDao.create(certificate1).getId();
+
+    mockMvc.perform(get("/certificates?page=1&size=5")).andExpect(status().isOk());
+  }
+
+  @Test
+  void deleteUnauthorizedStatusCheck() throws Exception {
+    Certificate certificate1 = givenExistingCertificate1();
+    long id = certificateDao.create(certificate1).getId();
+
+    mockMvc.perform(delete("/certificates/{id}",id)).andExpect(status().isForbidden());
+  }
+
+  @Test
+  @WithMockUser(roles = "ADMIN")
+  void deleteStatusCheckAuth() throws Exception {
+    Certificate certificate1 = givenExistingCertificate1();
+    long id = certificateDao.create(certificate1).getId();
+
+    mockMvc.perform(delete("/certificates/{id}",id)).andExpect(status().isNoContent());
+  }
 
   private static Certificate givenExistingCertificate1() {
     return Certificate.builder()

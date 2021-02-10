@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -70,7 +69,7 @@ public class CertificateResource {
    * @param parameter the parameter of pagination
    * @return the response entity of found certificates
    */
-  @GetMapping
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<PageData<EntityModel<CertificateWithoutTagsDto>>>>
       readCertificates(CertificatesRequest request, @Valid PaginationParameter parameter) {
     PageData<CertificateWithoutTagsDto> page = certificateService.readAll(request, parameter);
@@ -98,7 +97,7 @@ public class CertificateResource {
    * @param certificate the certificate
    * @return the response entity of saved certificate
    */
-  @PostMapping
+  @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CertificateWithTagsDto> createCertificate(
       @Valid @RequestBody CertificateWithTagsDto certificate) {
     CertificateWithTagsDto createdCertificate = certificateService.create(certificate);
@@ -112,7 +111,7 @@ public class CertificateResource {
    * @param certificate the certificate
    * @return the response entity of certificate
    */
-  @PutMapping("/{id}")
+  @PutMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CertificateWithTagsDto> updateCertificatePut(
       @PathVariable long id, @Valid @RequestBody CertificateWithTagsDto certificate) {
     certificate.setId(id);
@@ -127,7 +126,7 @@ public class CertificateResource {
    * @param certificate the certificate
    * @return the response entity of certificate
    */
-  @PatchMapping("/{id}")
+  @PatchMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CertificateWithoutTagsDto> updateCertificatePatch(
       @PathVariable long id, @Valid @RequestBody CertificatePatchDto certificate) {
     certificate.setId(id);
@@ -141,7 +140,7 @@ public class CertificateResource {
    *
    * @param id the id of certificate
    */
-  @DeleteMapping("/{id}")
+  @DeleteMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteCertificate(@PathVariable long id) {
     certificateService.delete(id);
