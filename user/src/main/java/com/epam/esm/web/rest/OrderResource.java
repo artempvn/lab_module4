@@ -11,6 +11,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,6 +51,7 @@ public class OrderResource {
    * @param orderId the order id
    * @return the response entity of found order
    */
+  @Secured({"ROLE_ADMIN","ROLE_USER"})
   @GetMapping(value = "/{userId}/order/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<OrderWithCertificatesDto>> readUserOrder(
       @PathVariable long userId, @PathVariable long orderId) {
@@ -66,6 +68,7 @@ public class OrderResource {
    * @param parameter the parameter of pagination
    * @return the response entity of found orders
    */
+  @Secured({"ROLE_ADMIN","ROLE_USER"})
   @GetMapping(value = "/{userId}/orders", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<PageData<EntityModel<OrderDto>>>> readUserOrders(
       @PathVariable long userId, @Valid PaginationParameter parameter) {
@@ -95,6 +98,7 @@ public class OrderResource {
    * @param order the order
    * @return the response entity of saved order
    */
+  @Secured({"ROLE_ADMIN","ROLE_USER"})
   @PostMapping(value = "/{userId}/order", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<OrderWithCertificatesWithTagsForCreationDto> createOrder(
       @PathVariable long userId,

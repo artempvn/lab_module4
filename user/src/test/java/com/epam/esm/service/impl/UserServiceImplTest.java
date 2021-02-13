@@ -8,6 +8,7 @@ import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.UserService;
 import org.junit.jupiter.api.Test;
+import org.keycloak.admin.client.Keycloak;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -23,8 +24,9 @@ class UserServiceImplTest {
 
   private static final long USER_ID = 1L;
   UserDao userDao = mock(UserDao.class);
+  Keycloak keycloak=mock(Keycloak.class);
 
-  UserService userService = new UserServiceImpl(userDao);
+  UserService userService = new UserServiceImpl(userDao, keycloak);
 
   @Test
   void read() {

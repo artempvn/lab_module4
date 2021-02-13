@@ -33,4 +33,6 @@ public interface UserService {
    * @return found tag
    */
   TagDto takeMostWidelyTagFromUserWithHighestCostOrders();
+
+  UserDto create(UserDto user);
 }

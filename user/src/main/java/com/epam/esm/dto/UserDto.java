@@ -1,12 +1,18 @@
 package com.epam.esm.dto;
 
 import com.epam.esm.entity.User;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
   private String name;
   private String surname;
+  private String login;
+  private String password;
 
   public UserDto() {}
 
@@ -54,6 +60,22 @@ public class UserDto {
 
   public void setSurname(String surname) {
     this.surname = surname;
+  }
+
+  public String getLogin() {
+    return login;
+  }
+
+  public void setLogin(String login) {
+    this.login = login;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 
   @Override

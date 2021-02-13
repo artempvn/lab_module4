@@ -27,6 +27,9 @@ public class User {
 
   @Column private String surname;
 
+  @Column(name = "foreign_id")
+  private String foreignId;
+
   @OneToMany(
       mappedBy = "user",
       fetch = FetchType.LAZY,
@@ -88,6 +91,14 @@ public class User {
 
   public void setOrders(List<Order> orders) {
     this.orders = orders;
+  }
+
+  public String getForeignId() {
+    return foreignId;
+  }
+
+  public void setForeignId(String keycloakId) {
+    this.foreignId = keycloakId;
   }
 
   @Override
