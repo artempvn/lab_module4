@@ -22,16 +22,12 @@ public class UserDto {
     this.surname = entity.getSurname();
   }
 
-  public UserDto(Long id, String name, String surname) {
-    this.id = id;
-    this.name = name;
-    this.surname = surname;
-  }
-
   private UserDto(Builder builder) {
     id = builder.id;
     name = builder.name;
     surname = builder.surname;
+    login = builder.login;
+    password = builder.password;
   }
 
   public static Builder builder() {
@@ -87,7 +83,9 @@ public class UserDto {
 
     if (id != null ? !id.equals(userDto.id) : userDto.id != null) return false;
     if (name != null ? !name.equals(userDto.name) : userDto.name != null) return false;
-    return surname != null ? surname.equals(userDto.surname) : userDto.surname == null;
+    if (surname != null ? !surname.equals(userDto.surname) : userDto.surname != null) return false;
+    if (login != null ? !login.equals(userDto.login) : userDto.login != null) return false;
+    return password != null ? password.equals(userDto.password) : userDto.password == null;
   }
 
   @Override
@@ -95,6 +93,8 @@ public class UserDto {
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (name != null ? name.hashCode() : 0);
     result = 31 * result + (surname != null ? surname.hashCode() : 0);
+    result = 31 * result + (login != null ? login.hashCode() : 0);
+    result = 31 * result + (password != null ? password.hashCode() : 0);
     return result;
   }
 
@@ -104,6 +104,8 @@ public class UserDto {
     sb.append("id=").append(id);
     sb.append(", name='").append(name).append('\'');
     sb.append(", surname='").append(surname).append('\'');
+    sb.append(", login='").append(login).append('\'');
+    sb.append(", password='").append(password).append('\'');
     sb.append('}');
     return sb.toString();
   }
@@ -112,8 +114,11 @@ public class UserDto {
     private Long id;
     private String name;
     private String surname;
+    private String login;
+    private String password;
 
-    private Builder() {}
+    private Builder() {
+    }
 
     public Builder id(Long id) {
       this.id = id;
@@ -127,6 +132,16 @@ public class UserDto {
 
     public Builder surname(String surname) {
       this.surname = surname;
+      return this;
+    }
+
+    public Builder login(String login) {
+      this.login = login;
+      return this;
+    }
+
+    public Builder password(String password) {
+      this.password = password;
       return this;
     }
 

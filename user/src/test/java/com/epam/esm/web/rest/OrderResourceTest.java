@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -32,7 +33,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("user")
 @AutoConfigureTestDatabase
 @SpringBootTest
 class OrderResourceTest {
@@ -64,6 +64,7 @@ class OrderResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void createOrderValueCheck() throws Exception {
     Order order = givenOrder();
     User user = givenUser();
@@ -79,6 +80,7 @@ class OrderResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void readUserOrder() throws Exception {
     Order order = givenOrder();
     User user = givenUser();
@@ -95,6 +97,7 @@ class OrderResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void readUserOrders() throws Exception {
     Order order = givenOrder();
     User user = givenUser();

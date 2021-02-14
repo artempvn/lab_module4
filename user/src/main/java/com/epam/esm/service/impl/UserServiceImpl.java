@@ -1,23 +1,30 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.UserDao;
+import com.epam.esm.dto.LoginData;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
+import com.epam.esm.dto.Role;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.UserWithOrdersDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.UserException;
+import com.epam.esm.exception.UserNotAuthorizedException;
+import com.epam.esm.security.SecurityHandler;
+import com.epam.esm.service.KeycloakService;
 import com.epam.esm.service.UserService;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
@@ -32,19 +39,26 @@ public class UserServiceImpl implements UserService {
   @Value("${keycloak.realm}")
   private String realm;
 
+  private final SecurityHandler securityHandler;
   private final UserDao userDao;
   private final Keycloak keycloak;
+  private final KeycloakService keycloakService;
 
-  public UserServiceImpl(UserDao userDao, Keycloak keycloak) {
+  public UserServiceImpl(SecurityHandler securityHandler, UserDao userDao, Keycloak keycloak, KeycloakService keycloakService) {
+    this.securityHandler = securityHandler;
     this.userDao = userDao;
     this.keycloak = keycloak;
+    this.keycloakService = keycloakService;
   }
 
   @Override
   public UserWithOrdersDto read(long id) {
-    Optional<User> user = userDao.read(id);
-    return user.map(UserWithOrdersDto::new)
-        .orElseThrow(ResourceNotFoundException.notFoundWithUser(id));
+    User user = userDao.read(id).orElseThrow(ResourceNotFoundException.notFoundWithUser(id));
+
+    String foreignId=user.getForeignId();
+    securityHandler.checkingAuthorization(foreignId);
+
+    return new UserWithOrdersDto(user);
   }
 
   @Override
@@ -64,38 +78,35 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDto create(UserDto userDto) {
-
     UsersResource usersResource = keycloak.realm(realm).users();
-    CredentialRepresentation credentialRepresentation =
-        createPasswordCredentials(userDto.getPassword());
-
-    UserRepresentation kcUser = new UserRepresentation();
-    kcUser.setUsername(userDto.getLogin());
-    kcUser.setCredentials(List.of(credentialRepresentation));
-    kcUser.setFirstName(userDto.getName());
-    kcUser.setLastName(userDto.getSurname());
-    kcUser.setEnabled(true);
-    kcUser.setEmailVerified(false);
+    UserRepresentation kcUser = keycloakService.createUserRepresentation(userDto);
 
     User user = new User(userDto);
     try (Response response = usersResource.create(kcUser)) {
-      Optional<String> headerLocation =
-          Optional.ofNullable(response.getHeaderString(HEADER_LOCATION));
-      String generatedUserId = headerLocation
-              .map(location -> location.substring(location.lastIndexOf(SEPARATOR) + 1))
-              .orElseThrow(UserException.loginIsNotUnique(userDto.getLogin()));
+      if (response.getStatus() == HttpStatus.CONFLICT.value()) {
+        throw UserException.loginIsNotUnique(userDto.getLogin()).get();
+      }
+      String headerLocation = response.getHeaderString(HEADER_LOCATION);
+      String generatedUserId = headerLocation.substring(headerLocation.lastIndexOf(SEPARATOR) + 1);
       user.setForeignId(generatedUserId);
+
+      RoleRepresentation savedRoleRepresentation =
+              keycloak.realm("certificates").roles().get(Role.USER.name()).toRepresentation();
+      keycloak.realm("certificates").users().get(generatedUserId).roles().realmLevel()
+              .add(List.of(savedRoleRepresentation));
     }
 
     User createdUser = userDao.create(user);
     return new UserDto(createdUser);
   }
 
-  private static CredentialRepresentation createPasswordCredentials(String password) {
-    CredentialRepresentation passwordCredentials = new CredentialRepresentation();
-    passwordCredentials.setTemporary(false);
-    passwordCredentials.setType(CredentialRepresentation.PASSWORD);
-    passwordCredentials.setValue(password);
-    return passwordCredentials;
+  @Override
+  public String login(LoginData loginData) {
+   try(Keycloak userKeycloak=keycloakService.createUserKeycloak(loginData)){
+     return userKeycloak.tokenManager().getAccessTokenString();
+   } catch (NotAuthorizedException ex){
+     throw UserNotAuthorizedException.notCorrectLoginData().get();
+   }
+
   }
 }

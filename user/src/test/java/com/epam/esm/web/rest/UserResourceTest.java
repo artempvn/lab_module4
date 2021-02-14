@@ -138,7 +138,6 @@ class UserResourceTest {
 
   @Test
   @Disabled("method uses keycloak")
-  @WithMockUser(roles = "ADMIN")
   void createUser() throws Exception {
     User user = givenUserWO1();
 

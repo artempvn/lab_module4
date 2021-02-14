@@ -18,7 +18,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@ActiveProfiles("user")
 @AutoConfigureTestDatabase
 @SpringBootTest
 class CertificateDaoImplTest {

@@ -1,23 +1,34 @@
 package com.epam.esm.config;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.OAuth2Constants;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
 @Configuration
 public class UserConfig {
 
   public static final int CONNECTION_POOL_SIZE = 10;
+
   @Value("${keycloak.auth-server-url}")
   private String serverUrl;
 
@@ -65,7 +76,19 @@ public class UserConfig {
         .username(userName)
         .password(password)
         .clientId(clientId)
-        .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(CONNECTION_POOL_SIZE).build())
+        .resteasyClient(
+            new ResteasyClientBuilder().connectionPoolSize(CONNECTION_POOL_SIZE).build())
         .build();
+  }
+
+  @Bean
+  @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
+  public AccessToken getAccessToken() {
+    HttpServletRequest request =
+        ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+    KeycloakAuthenticationToken token = (KeycloakAuthenticationToken) request.getUserPrincipal();
+    KeycloakPrincipal principal = (KeycloakPrincipal) token.getPrincipal();
+    KeycloakSecurityContext session = principal.getKeycloakSecurityContext();
+    return session.getToken();
   }
 }

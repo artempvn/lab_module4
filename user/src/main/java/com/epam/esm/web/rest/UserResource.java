@@ -1,5 +1,6 @@
 package com.epam.esm.web.rest;
 
+import com.epam.esm.dto.LoginData;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
@@ -102,6 +103,12 @@ public class UserResource {
   public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto user) {
     UserDto createdUser = userService.create(user);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+  }
+
+  @PostMapping(value = "/login",produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<String> login(@RequestBody @Valid LoginData data) {
+    String token = userService.login(data);
+    return ResponseEntity.status(HttpStatus.OK).body(token);
   }
 
   /**
