@@ -22,50 +22,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase
 @AutoConfigureMockMvc
 class UserResourceSecurityTest {
-    @Autowired MockMvc mockMvc;
-    @Autowired
-    UserDao userDao;
-    @Autowired
-    EntityManager entityManager;
-    @Autowired
-    TransactionTemplate txTemplate;
-    @Autowired
-    OrderService orderService;
+  @Autowired MockMvc mockMvc;
+  @Autowired UserDao userDao;
+  @Autowired EntityManager entityManager;
+  @Autowired TransactionTemplate txTemplate;
+  @Autowired OrderService orderService;
 
-    @AfterEach
-    void setDown() {
-        String sql =
-                "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
-                        + "DELETE FROM orders;DELETE FROM users;";
-        txTemplate.execute(status -> entityManager.createNativeQuery(sql).executeUpdate());
-    }
+  @AfterEach
+  void setDown() {
+    String sql =
+        "DELETE FROM ordered_certificates_tags;DELETE FROM ordered_tags;DELETE FROM ordered_certificates;"
+            + "DELETE FROM orders;DELETE FROM users;";
+    txTemplate.execute(status -> entityManager.createNativeQuery(sql).executeUpdate());
+  }
 
   @Test
   @WithMockUser(roles = "USER")
   void readUserAuth() throws Exception {
-        User user = givenUserWO1();
-        long userId = userDao.create(user).getId();
+    User user = givenUserWO1();
+    long userId = userDao.create(user).getId();
 
-        mockMvc
-                .perform(get("/users/{id}", userId))
-                .andExpect(status().isOk());
-    }
+    mockMvc.perform(get("/users/{id}", userId)).andExpect(status().isOk());
+  }
 
-    @Test
-    void readUserNoAuth() throws Exception {
-        User user = givenUserWO1();
-        long userId = userDao.create(user).getId();
+  @Test
+  void readUserNoAuth() throws Exception {
+    User user = givenUserWO1();
+    long userId = userDao.create(user).getId();
 
-        mockMvc
-                .perform(get("/users/{id}", userId))
-                .andExpect(status().isForbidden());
-    }
+    mockMvc.perform(get("/users/{id}", userId)).andExpect(status().isForbidden());
+  }
 
-    User givenUserWO1() {
-        User user = new User();
-        user.setName("name1");
-        user.setSurname("surname1");
-        return user;
-    }
-
+  User givenUserWO1() {
+    User user = new User();
+    user.setName("name1");
+    user.setSurname("surname1");
+    return user;
+  }
 }

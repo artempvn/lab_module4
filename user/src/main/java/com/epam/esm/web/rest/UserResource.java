@@ -51,7 +51,7 @@ public class UserResource {
    * @param id the id of user
    * @return the response entity of found user
    */
-  @Secured({"ROLE_ADMIN","ROLE_USER"})
+  @Secured({"ROLE_ADMIN", "ROLE_USER"})
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<UserWithOrdersDto>> readUser(@PathVariable long id) {
     EntityModel<UserWithOrdersDto> user = EntityModel.of(userService.read(id));
@@ -92,7 +92,7 @@ public class UserResource {
    *
    * @return the response entity of tag
    */
-  @Secured({"ROLE_ADMIN","ROLE_USER"})
+  @Secured({"ROLE_ADMIN", "ROLE_USER"})
   @GetMapping(value = "/most-popular-tag", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TagDto> readMostWidelyTagFromUserWithHighestCostOrders() {
     TagDto tag = userService.takeMostWidelyTagFromUserWithHighestCostOrders();
@@ -105,7 +105,7 @@ public class UserResource {
     return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
   }
 
-  @PostMapping(value = "/login",produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> login(@RequestBody @Valid LoginData data) {
     String token = userService.login(data);
     return ResponseEntity.status(HttpStatus.OK).body(token);

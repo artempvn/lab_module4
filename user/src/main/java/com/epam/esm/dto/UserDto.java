@@ -9,6 +9,7 @@ public class UserDto {
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
+
   private String name;
   private String surname;
   private String login;
@@ -117,8 +118,7 @@ public class UserDto {
     private String login;
     private String password;
 
-    private Builder() {
-    }
+    private Builder() {}
 
     public Builder id(Long id) {
       this.id = id;

@@ -113,7 +113,7 @@ public class CertificateResource {
    * @return the response entity of certificate
    */
   @Secured("ROLE_ADMIN")
-  @PutMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CertificateWithTagsDto> updateCertificatePut(
       @PathVariable long id, @Valid @RequestBody CertificateWithTagsDto certificate) {
     certificate.setId(id);
@@ -129,7 +129,7 @@ public class CertificateResource {
    * @return the response entity of certificate
    */
   @Secured("ROLE_ADMIN")
-  @PatchMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+  @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CertificateWithoutTagsDto> updateCertificatePatch(
       @PathVariable long id, @Valid @RequestBody CertificatePatchDto certificate) {
     certificate.setId(id);
@@ -144,7 +144,7 @@ public class CertificateResource {
    * @param id the id of certificate
    */
   @Secured("ROLE_ADMIN")
-  @DeleteMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteCertificate(@PathVariable long id) {
     certificateService.delete(id);

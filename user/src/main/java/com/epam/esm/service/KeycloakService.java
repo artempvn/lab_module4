@@ -7,7 +7,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 
 public interface KeycloakService {
 
-    UserRepresentation createUserRepresentation (UserDto user);
+  UserRepresentation createUserRepresentation(UserDto user);
 
-    Keycloak createUserKeycloak (LoginData loginData);
+  Keycloak createUserKeycloak(LoginData loginData);
 }

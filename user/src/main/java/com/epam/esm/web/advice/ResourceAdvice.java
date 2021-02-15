@@ -67,7 +67,7 @@ public class ResourceAdvice {
   @ResponseStatus(HttpStatus.CONFLICT)
   public ResponseEntity<ErrorResponse> handleException(UserException e) {
     String textMessage =
-            messageSource.getMessage("error.notUniqueLogin", null, LocaleContextHolder.getLocale());
+        messageSource.getMessage("error.notUniqueLogin", null, LocaleContextHolder.getLocale());
     String errorMessage = String.format("%s %s", textMessage, e.getUserLogin());
     String errorCode = String.format("%s", HttpStatus.CONFLICT.value());
     ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
@@ -78,7 +78,8 @@ public class ResourceAdvice {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public ResponseEntity<ErrorResponse> handleException(UserNotAuthorizedException e) {
     String textMessage =
-            messageSource.getMessage("error.notCorrectLoginData", null, LocaleContextHolder.getLocale());
+        messageSource.getMessage(
+            "error.notCorrectLoginData", null, LocaleContextHolder.getLocale());
     String errorCode = String.format("%s", HttpStatus.UNAUTHORIZED.value());
     ErrorResponse response = new ErrorResponse(textMessage, errorCode);
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
@@ -88,7 +89,7 @@ public class ResourceAdvice {
   @ResponseStatus(HttpStatus.FORBIDDEN)
   public ResponseEntity<ErrorResponse> handleException(UserForbiddenException e) {
     String textMessage =
-            messageSource.getMessage("error.forbidden", null, LocaleContextHolder.getLocale());
+        messageSource.getMessage("error.forbidden", null, LocaleContextHolder.getLocale());
     String errorMessage = String.format("%s %s", textMessage, e.getUserLogin());
     String errorCode = String.format("%s", HttpStatus.FORBIDDEN.value());
     ErrorResponse response = new ErrorResponse(errorMessage, errorCode);

@@ -25,10 +25,11 @@ class UserServiceImplTest {
 
   private static final long USER_ID = 1L;
   UserDao userDao = mock(UserDao.class);
-  Keycloak keycloak=mock(Keycloak.class);
-  KeycloakService keycloakService=mock(KeycloakService.class);
+  Keycloak keycloak = mock(Keycloak.class);
+  KeycloakService keycloakService = mock(KeycloakService.class);
 
-  UserService userService = new UserServiceImpl(securityHandler, userDao, keycloak, keycloakService);
+  UserService userService =
+      new UserServiceImpl(securityHandler, userDao, keycloak, keycloakService);
 
   @Test
   void read() {

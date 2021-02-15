@@ -51,7 +51,7 @@ public class TagResource {
    * @param id the id of tag
    * @return the response entity of tag
    */
-  @Secured({"ROLE_ADMIN","ROLE_USER"})
+  @Secured({"ROLE_ADMIN", "ROLE_USER"})
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<TagDto>> readTag(@PathVariable long id) {
     EntityModel<TagDto> tag = EntityModel.of(tagService.read(id));
@@ -65,7 +65,7 @@ public class TagResource {
    * @param parameter the parameter of pagination
    * @return the response entity of found tags
    */
-  @Secured({"ROLE_ADMIN","ROLE_USER"})
+  @Secured({"ROLE_ADMIN", "ROLE_USER"})
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<EntityModel<PageData<EntityModel<TagDto>>>> readTags(

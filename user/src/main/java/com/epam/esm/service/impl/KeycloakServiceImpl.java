@@ -1,7 +1,6 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.LoginData;
-import com.epam.esm.dto.Role;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.KeycloakService;
 import org.keycloak.OAuth2Constants;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class KeycloakServiceImpl implements KeycloakService {

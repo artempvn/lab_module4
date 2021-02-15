@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,7 +43,11 @@ public class UserServiceImpl implements UserService {
   private final Keycloak keycloak;
   private final KeycloakService keycloakService;
 
-  public UserServiceImpl(SecurityHandler securityHandler, UserDao userDao, Keycloak keycloak, KeycloakService keycloakService) {
+  public UserServiceImpl(
+      SecurityHandler securityHandler,
+      UserDao userDao,
+      Keycloak keycloak,
+      KeycloakService keycloakService) {
     this.securityHandler = securityHandler;
     this.userDao = userDao;
     this.keycloak = keycloak;
@@ -55,7 +58,7 @@ public class UserServiceImpl implements UserService {
   public UserWithOrdersDto read(long id) {
     User user = userDao.read(id).orElseThrow(ResourceNotFoundException.notFoundWithUser(id));
 
-    String foreignId=user.getForeignId();
+    String foreignId = user.getForeignId();
     securityHandler.checkingAuthorization(foreignId);
 
     return new UserWithOrdersDto(user);
@@ -91,9 +94,14 @@ public class UserServiceImpl implements UserService {
       user.setForeignId(generatedUserId);
 
       RoleRepresentation savedRoleRepresentation =
-              keycloak.realm("certificates").roles().get(Role.USER.name()).toRepresentation();
-      keycloak.realm("certificates").users().get(generatedUserId).roles().realmLevel()
-              .add(List.of(savedRoleRepresentation));
+          keycloak.realm(realm).roles().get(Role.USER.name()).toRepresentation();
+      keycloak
+          .realm(realm)
+          .users()
+          .get(generatedUserId)
+          .roles()
+          .realmLevel()
+          .add(List.of(savedRoleRepresentation));
     }
 
     User createdUser = userDao.create(user);
@@ -102,11 +110,10 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public String login(LoginData loginData) {
-   try(Keycloak userKeycloak=keycloakService.createUserKeycloak(loginData)){
-     return userKeycloak.tokenManager().getAccessTokenString();
-   } catch (NotAuthorizedException ex){
-     throw UserNotAuthorizedException.notCorrectLoginData().get();
-   }
-
+    try (Keycloak userKeycloak = keycloakService.createUserKeycloak(loginData)) {
+      return userKeycloak.tokenManager().getAccessTokenString();
+    } catch (NotAuthorizedException ex) {
+      throw UserNotAuthorizedException.notCorrectLoginData().get();
+    }
   }
 }

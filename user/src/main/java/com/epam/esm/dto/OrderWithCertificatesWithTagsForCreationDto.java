@@ -14,10 +14,13 @@ public class OrderWithCertificatesWithTagsForCreationDto {
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
+
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long userId;
+
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime createDate;
+
   @Valid @NotEmpty private List<CertificateWithTagsDto> certificates = Collections.emptyList();
 
   public OrderWithCertificatesWithTagsForCreationDto() {}

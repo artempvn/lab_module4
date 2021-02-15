@@ -112,7 +112,8 @@ public class User {
     if (id != null ? !id.equals(user.id) : user.id != null) return false;
     if (name != null ? !name.equals(user.name) : user.name != null) return false;
     if (surname != null ? !surname.equals(user.surname) : user.surname != null) return false;
-    if (foreignId != null ? !foreignId.equals(user.foreignId) : user.foreignId != null) return false;
+    if (foreignId != null ? !foreignId.equals(user.foreignId) : user.foreignId != null)
+      return false;
     return orders != null ? orders.equals(user.orders) : user.orders == null;
   }
 
@@ -145,8 +146,7 @@ public class User {
     private String foreignId;
     private List<Order> orders = Collections.emptyList();
 
-    private Builder() {
-    }
+    private Builder() {}
 
     public Builder id(Long id) {
       this.id = id;
