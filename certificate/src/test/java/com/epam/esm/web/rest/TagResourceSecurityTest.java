@@ -48,7 +48,7 @@ class TagResourceSecurityTest {
     Tag tag = givenExistingTag1();
     long id = tagDao.create(tag).getId();
 
-    mockMvc.perform(get("/tags/{id}", id)).andExpect(status().isForbidden());
+    mockMvc.perform(get("/tags/{id}", id)).andExpect(status().isUnauthorized());
   }
 
   @Test

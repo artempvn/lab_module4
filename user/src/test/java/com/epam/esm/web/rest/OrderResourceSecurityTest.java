@@ -8,6 +8,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 import com.epam.esm.service.OrderService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -42,6 +43,7 @@ class OrderResourceSecurityTest {
   }
 
   @Test
+  @Disabled("method uses keycloak")
   @WithMockUser(roles = "USER")
   void readUserOrderAuth() throws Exception {
     Order order = givenOrder();
@@ -69,7 +71,7 @@ class OrderResourceSecurityTest {
 
     mockMvc
         .perform(get("/users/{userId}/order/{orderId}", userId, orderId))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   Order givenOrder() {

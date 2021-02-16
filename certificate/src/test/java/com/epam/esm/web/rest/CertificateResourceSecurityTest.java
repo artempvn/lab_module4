@@ -55,7 +55,7 @@ class CertificateResourceSecurityTest {
     Certificate certificate1 = givenExistingCertificate1();
     long id = certificateDao.create(certificate1).getId();
 
-    mockMvc.perform(delete("/certificates/{id}", id)).andExpect(status().isForbidden());
+    mockMvc.perform(delete("/certificates/{id}", id)).andExpect(status().isUnauthorized());
   }
 
   @Test

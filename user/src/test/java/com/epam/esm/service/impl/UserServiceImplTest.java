@@ -28,8 +28,7 @@ class UserServiceImplTest {
   Keycloak keycloak = mock(Keycloak.class);
   KeycloakService keycloakService = mock(KeycloakService.class);
 
-  UserService userService =
-      new UserServiceImpl(securityHandler, userDao, keycloak, keycloakService);
+  UserService userService = new UserServiceImpl(userDao, keycloak, keycloakService);
 
   @Test
   void read() {

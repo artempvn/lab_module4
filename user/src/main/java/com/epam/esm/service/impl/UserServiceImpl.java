@@ -12,7 +12,7 @@ import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.UserException;
 import com.epam.esm.exception.UserNotAuthorizedException;
-import com.epam.esm.security.SecurityHandler;
+import com.epam.esm.security.AuthorizeAccess;
 import com.epam.esm.service.KeycloakService;
 import com.epam.esm.service.UserService;
 import org.keycloak.admin.client.Keycloak;
@@ -38,28 +38,21 @@ public class UserServiceImpl implements UserService {
   @Value("${keycloak.realm}")
   private String realm;
 
-  private final SecurityHandler securityHandler;
   private final UserDao userDao;
   private final Keycloak keycloak;
   private final KeycloakService keycloakService;
 
-  public UserServiceImpl(
-      SecurityHandler securityHandler,
-      UserDao userDao,
-      Keycloak keycloak,
-      KeycloakService keycloakService) {
-    this.securityHandler = securityHandler;
+  public UserServiceImpl(UserDao userDao, Keycloak keycloak, KeycloakService keycloakService) {
     this.userDao = userDao;
     this.keycloak = keycloak;
     this.keycloakService = keycloakService;
   }
 
   @Override
-  public UserWithOrdersDto read(long id) {
-    User user = userDao.read(id).orElseThrow(ResourceNotFoundException.notFoundWithUser(id));
-
-    String foreignId = user.getForeignId();
-    securityHandler.checkingAuthorization(foreignId);
+  @AuthorizeAccess("userId")
+  public UserWithOrdersDto read(long userId) {
+    User user =
+        userDao.read(userId).orElseThrow(ResourceNotFoundException.notFoundWithUser(userId));
 
     return new UserWithOrdersDto(user);
   }

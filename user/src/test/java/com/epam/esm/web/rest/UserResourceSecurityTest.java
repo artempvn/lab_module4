@@ -4,6 +4,7 @@ import com.epam.esm.dao.UserDao;
 import com.epam.esm.entity.User;
 import com.epam.esm.service.OrderService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -37,6 +38,7 @@ class UserResourceSecurityTest {
   }
 
   @Test
+  @Disabled("method uses keycloak")
   @WithMockUser(roles = "USER")
   void readUserAuth() throws Exception {
     User user = givenUserWO1();
@@ -50,7 +52,7 @@ class UserResourceSecurityTest {
     User user = givenUserWO1();
     long userId = userDao.create(user).getId();
 
-    mockMvc.perform(get("/users/{id}", userId)).andExpect(status().isForbidden());
+    mockMvc.perform(get("/users/{id}", userId)).andExpect(status().isUnauthorized());
   }
 
   User givenUserWO1() {

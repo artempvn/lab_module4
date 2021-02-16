@@ -12,6 +12,7 @@ import com.epam.esm.web.advice.ResourceAdvice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,7 @@ class OrderResourceTest {
   }
 
   @Test
+  @Disabled("method uses keycloak")
   @WithMockUser(roles = "ADMIN")
   void readUserOrder() throws Exception {
     Order order = givenOrder();
@@ -96,6 +98,7 @@ class OrderResourceTest {
   }
 
   @Test
+  @Disabled("method uses keycloak")
   @WithMockUser(roles = "ADMIN")
   void readUserOrders() throws Exception {
     Order order = givenOrder();
