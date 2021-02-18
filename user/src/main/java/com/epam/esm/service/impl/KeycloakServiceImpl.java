@@ -16,17 +16,21 @@ import java.util.List;
 @Service
 public class KeycloakServiceImpl implements KeycloakService {
 
-  @Value("${keycloak.auth-server-url}")
-  private String serverUrl;
+  private final String serverUrl;
+  private final String realm;
+  private final String clientId;
+  private final String secret;
 
-  @Value("${keycloak.realm}")
-  private String realm;
-
-  @Value("${keycloak.resource}")
-  private String clientId;
-
-  @Value("${keycloak.credentials.secret}")
-  private String secret;
+  public KeycloakServiceImpl(
+      @Value("${keycloak.auth-server-url}") String serverUrl,
+      @Value("${keycloak.realm}") String realm,
+      @Value("${keycloak.resource}") String clientId,
+      @Value("${keycloak.credentials.secret}") String secret) {
+    this.serverUrl = serverUrl;
+    this.realm = realm;
+    this.clientId = clientId;
+    this.secret = secret;
+  }
 
   @Override
   public UserRepresentation createUserRepresentation(UserDto user) {

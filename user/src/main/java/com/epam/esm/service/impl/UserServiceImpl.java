@@ -9,9 +9,9 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.UserWithOrdersDto;
 import com.epam.esm.entity.User;
+import com.epam.esm.exception.LoginAlreadyExistsException;
+import com.epam.esm.exception.NotAuthorizedException;
 import com.epam.esm.exception.ResourceNotFoundException;
-import com.epam.esm.exception.UserException;
-import com.epam.esm.exception.UserNotAuthorizedException;
 import com.epam.esm.security.AuthorizeAccess;
 import com.epam.esm.service.KeycloakService;
 import com.epam.esm.service.UserService;
@@ -24,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,21 +34,24 @@ public class UserServiceImpl implements UserService {
   public static final String HEADER_LOCATION = "location";
   public static final String SEPARATOR = "/";
 
-  @Value("${keycloak.realm}")
-  private String realm;
-
+  private final String realm;
   private final UserDao userDao;
   private final Keycloak keycloak;
   private final KeycloakService keycloakService;
 
-  public UserServiceImpl(UserDao userDao, Keycloak keycloak, KeycloakService keycloakService) {
+  public UserServiceImpl(
+      UserDao userDao,
+      Keycloak keycloak,
+      KeycloakService keycloakService,
+      @Value("${keycloak.realm}") String realm) {
     this.userDao = userDao;
     this.keycloak = keycloak;
     this.keycloakService = keycloakService;
+    this.realm = realm;
   }
 
   @Override
-  @AuthorizeAccess("userId")
+  @AuthorizeAccess(userIdParamName = "userId")
   public UserWithOrdersDto read(long userId) {
     User user =
         userDao.read(userId).orElseThrow(ResourceNotFoundException.notFoundWithUser(userId));
@@ -80,7 +82,7 @@ public class UserServiceImpl implements UserService {
     User user = new User(userDto);
     try (Response response = usersResource.create(kcUser)) {
       if (response.getStatus() == HttpStatus.CONFLICT.value()) {
-        throw UserException.loginIsNotUnique(userDto.getLogin()).get();
+        throw LoginAlreadyExistsException.loginIsNotUnique(userDto.getLogin());
       }
       String headerLocation = response.getHeaderString(HEADER_LOCATION);
       String generatedUserId = headerLocation.substring(headerLocation.lastIndexOf(SEPARATOR) + 1);
@@ -105,8 +107,8 @@ public class UserServiceImpl implements UserService {
   public String login(LoginData loginData) {
     try (Keycloak userKeycloak = keycloakService.createUserKeycloak(loginData)) {
       return userKeycloak.tokenManager().getAccessTokenString();
-    } catch (NotAuthorizedException ex) {
-      throw UserNotAuthorizedException.notCorrectLoginData().get();
+    } catch (javax.ws.rs.NotAuthorizedException ex) {
+      throw NotAuthorizedException.notCorrectLoginData();
     }
   }
 }

@@ -6,8 +6,9 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -17,25 +18,27 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomHttp401EntryPoint implements AuthenticationEntryPoint {
+@Component
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+
   private final ReloadableResourceBundleMessageSource messageSource;
 
-  public CustomHttp401EntryPoint(ReloadableResourceBundleMessageSource messageSource) {
+  public CustomAccessDeniedHandler(ReloadableResourceBundleMessageSource messageSource) {
     this.messageSource = messageSource;
   }
 
   @Override
-  public void commence(
+  public void handle(
       HttpServletRequest request,
       HttpServletResponse response,
-      AuthenticationException authException)
+      AccessDeniedException accessDeniedException)
       throws IOException, ServletException {
     String textMessage =
-        messageSource.getMessage("error.401", null, LocaleContextHolder.getLocale());
+        messageSource.getMessage("error.403", null, LocaleContextHolder.getLocale());
     Map<String, Object> body = new HashMap<>();
     body.put("errorMessage", textMessage);
-    body.put("errorCode", HttpStatus.UNAUTHORIZED.value());
-    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    body.put("errorCode", HttpStatus.FORBIDDEN.value());
+    response.setStatus(HttpStatus.FORBIDDEN.value());
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
     new Gson()

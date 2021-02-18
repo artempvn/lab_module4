@@ -4,8 +4,8 @@ import com.epam.esm.dao.UserDao;
 import com.epam.esm.dto.Role;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ArgumentNameException;
+import com.epam.esm.exception.ForbiddenException;
 import com.epam.esm.exception.ResourceNotFoundException;
-import com.epam.esm.exception.UserForbiddenException;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -35,14 +35,7 @@ public class AuthorizationAspect {
     Method method = signature.getMethod();
     AuthorizeAccess annotation = method.getAnnotation(AuthorizeAccess.class);
 
-    CodeSignature codeSignature = (CodeSignature) jp.getSignature();
-    String[] parameterNames = codeSignature.getParameterNames();
-    int argUserId = Arrays.asList(parameterNames).indexOf(annotation.value());
-    if (argUserId == -1) {
-      throw new ArgumentNameException("There is no argument  with such name");
-    }
-    Long userId = (Long) jp.getArgs()[argUserId];
-
+    long userId = takeUserIdFromMethodParam(jp, annotation);
     User user =
         userDao.read(userId).orElseThrow(ResourceNotFoundException.notFoundWithUser(userId));
     String foreignIdOfExistingUser = user.getForeignId();
@@ -53,7 +46,17 @@ public class AuthorizationAspect {
 
     if (!roles.contains(Role.ADMIN.name())
         && !foreignIdOfLoginUser.equals(foreignIdOfExistingUser)) {
-      throw UserForbiddenException.forbidden(accessToken.getPreferredUsername()).get();
+      throw ForbiddenException.forbidden(accessToken.getPreferredUsername());
     }
+  }
+
+  long takeUserIdFromMethodParam(JoinPoint jp, AuthorizeAccess annotation) {
+    CodeSignature codeSignature = (CodeSignature) jp.getSignature();
+    String[] parameterNames = codeSignature.getParameterNames();
+    int argUserId = Arrays.asList(parameterNames).indexOf(annotation.userIdParamName());
+    if (argUserId == -1) {
+      throw new ArgumentNameException("There is no argument  with such name");
+    }
+    return (long) jp.getArgs()[argUserId];
   }
 }

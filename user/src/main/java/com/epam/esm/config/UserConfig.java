@@ -29,20 +29,24 @@ public class UserConfig {
 
   public static final int CONNECTION_POOL_SIZE = 10;
 
-  @Value("${keycloak.auth-server-url}")
-  private String serverUrl;
+  private final String serverUrl;
+  private final String realm;
+  private final String clientId;
+  private final String userName;
+  private final String password;
 
-  @Value("${kc.realm}")
-  private String realm;
-
-  @Value("${kc.client}")
-  private String clientId;
-
-  @Value("${kc.user}")
-  private String userName;
-
-  @Value("${kc.password}")
-  private String password;
+  public UserConfig(
+      @Value("${keycloak.auth-server-url}") String serverUrl,
+      @Value("${kc.realm}") String realm,
+      @Value("${kc.client}") String clientId,
+      @Value("${kc.user}") String userName,
+      @Value("${kc.password}") String password) {
+    this.serverUrl = serverUrl;
+    this.realm = realm;
+    this.clientId = clientId;
+    this.userName = userName;
+    this.password = password;
+  }
 
   @Bean
   public LocalValidatorFactoryBean getValidator() {

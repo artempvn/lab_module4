@@ -1,12 +1,12 @@
 package com.epam.esm.web.advice;
 
 import com.epam.esm.exception.ArgumentNameException;
+import com.epam.esm.exception.ForbiddenException;
+import com.epam.esm.exception.LoginAlreadyExistsException;
+import com.epam.esm.exception.NotAuthorizedException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.exception.TagException;
-import com.epam.esm.exception.UserException;
-import com.epam.esm.exception.UserForbiddenException;
-import com.epam.esm.exception.UserNotAuthorizedException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
@@ -64,9 +64,9 @@ public class ResourceAdvice {
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(UserException.class)
+  @ExceptionHandler(LoginAlreadyExistsException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
-  public ResponseEntity<ErrorResponse> handleException(UserException e) {
+  public ResponseEntity<ErrorResponse> handleException(LoginAlreadyExistsException e) {
     String textMessage =
         messageSource.getMessage("error.notUniqueLogin", null, LocaleContextHolder.getLocale());
     String errorMessage = String.format("%s %s", textMessage, e.getUserLogin());
@@ -75,9 +75,9 @@ public class ResourceAdvice {
     return new ResponseEntity<>(response, HttpStatus.CONFLICT);
   }
 
-  @ExceptionHandler(UserNotAuthorizedException.class)
+  @ExceptionHandler(NotAuthorizedException.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  public ResponseEntity<ErrorResponse> handleException(UserNotAuthorizedException e) {
+  public ResponseEntity<ErrorResponse> handleException(NotAuthorizedException e) {
     String textMessage =
         messageSource.getMessage(
             "error.notCorrectLoginData", null, LocaleContextHolder.getLocale());
@@ -86,9 +86,9 @@ public class ResourceAdvice {
     return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
   }
 
-  @ExceptionHandler(UserForbiddenException.class)
+  @ExceptionHandler(ForbiddenException.class)
   @ResponseStatus(HttpStatus.FORBIDDEN)
-  public ResponseEntity<ErrorResponse> handleException(UserForbiddenException e) {
+  public ResponseEntity<ErrorResponse> handleException(ForbiddenException e) {
     String textMessage =
         messageSource.getMessage("error.forbidden", null, LocaleContextHolder.getLocale());
     String errorMessage = String.format("%s %s", textMessage, e.getUserLogin());

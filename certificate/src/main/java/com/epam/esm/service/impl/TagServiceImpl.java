@@ -65,7 +65,7 @@ public class TagServiceImpl implements TagService {
     try {
       tagDao.delete(id);
     } catch (DataIntegrityViolationException ex) {
-      throw ResourceIsBoundException.isBound(id).get();
+      throw ResourceIsBoundException.isBound(id);
     }
   }
 

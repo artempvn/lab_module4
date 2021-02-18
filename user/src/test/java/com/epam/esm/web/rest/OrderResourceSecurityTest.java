@@ -85,6 +85,7 @@ class OrderResourceSecurityTest {
     User user = new User();
     user.setName("name");
     user.setSurname("surname");
+    user.setForeignId("someId");
     return user;
   }
 

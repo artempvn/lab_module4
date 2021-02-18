@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  @AuthorizeAccess("userId")
+  @AuthorizeAccess(userIdParamName = "userId")
   public PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter) {
     PageData<Order> pageData = orderDao.readAllByUser(userId, parameter);
     long numberOfElements = pageData.getNumberOfElements();
@@ -69,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  @AuthorizeAccess("userId")
+  @AuthorizeAccess(userIdParamName = "userId")
   public OrderWithCertificatesDto readOrderByUser(long userId, long orderId) {
     Optional<User> user = userDao.read(userId);
     user.orElseThrow(ResourceValidationException.validationWithUser(userId));

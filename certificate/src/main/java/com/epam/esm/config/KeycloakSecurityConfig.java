@@ -1,13 +1,14 @@
 package com.epam.esm.config;
 
+import com.epam.esm.security.CustomAccessDeniedHandler;
 import com.epam.esm.security.CustomHttp401EntryPoint;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,11 +19,20 @@ import org.springframework.security.web.authentication.session.NullAuthenticated
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 @Configuration
+@ComponentScan("com.epam")
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
-  @Autowired ReloadableResourceBundleMessageSource messageSource;
+  private final CustomHttp401EntryPoint customHttp401EntryPoint;
+  private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
+  public KeycloakSecurityConfig(
+      CustomHttp401EntryPoint customHttp401EntryPoint,
+      CustomAccessDeniedHandler customAccessDeniedHandler) {
+    this.customHttp401EntryPoint = customHttp401EntryPoint;
+    this.customAccessDeniedHandler = customAccessDeniedHandler;
+  }
 
   @Autowired
   public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -52,6 +62,9 @@ public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .exceptionHandling()
-        .authenticationEntryPoint(new CustomHttp401EntryPoint(messageSource));
+        .authenticationEntryPoint(customHttp401EntryPoint)
+        .and()
+        .exceptionHandling()
+        .accessDeniedHandler(customAccessDeniedHandler);
   }
 }

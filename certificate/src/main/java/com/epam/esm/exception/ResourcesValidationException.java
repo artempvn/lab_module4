@@ -3,8 +3,6 @@ package com.epam.esm.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.function.Supplier;
-
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class ResourcesValidationException extends RuntimeException {
   private final Long tagId;
@@ -24,9 +22,9 @@ public class ResourcesValidationException extends RuntimeException {
     this.certificateId = certificateId;
   }
 
-  public static Supplier<ResourcesValidationException> withIds(Long tagId, Long certificateId) {
+  public static ResourcesValidationException withIds(Long tagId, Long certificateId) {
     String message =
         String.format("There is no tag id = %s in certificate id = %s", tagId, certificateId);
-    return () -> new ResourcesValidationException(message, tagId, certificateId);
+    return new ResourcesValidationException(message, tagId, certificateId);
   }
 }

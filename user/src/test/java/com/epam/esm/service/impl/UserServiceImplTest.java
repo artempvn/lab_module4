@@ -27,8 +27,9 @@ class UserServiceImplTest {
   UserDao userDao = mock(UserDao.class);
   Keycloak keycloak = mock(Keycloak.class);
   KeycloakService keycloakService = mock(KeycloakService.class);
+  String realm = "certificates";
 
-  UserService userService = new UserServiceImpl(userDao, keycloak, keycloakService);
+  UserService userService = new UserServiceImpl(userDao, keycloak, keycloakService, realm);
 
   @Test
   void read() {
