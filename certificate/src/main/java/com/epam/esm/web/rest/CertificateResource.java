@@ -12,6 +12,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -96,6 +97,7 @@ public class CertificateResource {
    * @param certificate the certificate
    * @return the response entity of saved certificate
    */
+  @Secured("ROLE_ADMIN")
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CertificateWithTagsDto> createCertificate(
       @Valid @RequestBody CertificateWithTagsDto certificate) {
@@ -110,6 +112,7 @@ public class CertificateResource {
    * @param certificate the certificate
    * @return the response entity of certificate
    */
+  @Secured("ROLE_ADMIN")
   @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CertificateWithTagsDto> updateCertificatePut(
       @PathVariable long id, @Valid @RequestBody CertificateWithTagsDto certificate) {
@@ -125,6 +128,7 @@ public class CertificateResource {
    * @param certificate the certificate
    * @return the response entity of certificate
    */
+  @Secured("ROLE_ADMIN")
   @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CertificateWithoutTagsDto> updateCertificatePatch(
       @PathVariable long id, @Valid @RequestBody CertificatePatchDto certificate) {
@@ -139,6 +143,7 @@ public class CertificateResource {
    *
    * @param id the id of certificate
    */
+  @Secured("ROLE_ADMIN")
   @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteCertificate(@PathVariable long id) {

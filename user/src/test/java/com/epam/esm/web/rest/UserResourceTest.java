@@ -7,15 +7,18 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.web.advice.ResourceAdvice;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -25,10 +28,10 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("user")
 @AutoConfigureTestDatabase
 @SpringBootTest
 class UserResourceTest {
@@ -60,6 +63,8 @@ class UserResourceTest {
   }
 
   @Test
+  @Disabled("method uses keycloak")
+  @WithMockUser(roles = "ADMIN")
   void readUserPositive() throws Exception {
     User user = givenUserWO1();
     long userId = userDao.create(user).getId();
@@ -73,12 +78,14 @@ class UserResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void readUserNegative() throws Exception {
 
     mockMvc.perform(get("/users/{id}", NOT_EXISTING_ID)).andExpect(status().isNotFound());
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void readUsers() throws Exception {
     User user1 = givenUserWO1();
     User user2 = givenUserWO2();
@@ -100,6 +107,7 @@ class UserResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void readMostWidelyTagFromUserWithHighestCostOrders() throws Exception {
     User userWithHighestCostOfOrders = givenUserWO1();
     long userHighestCostId = userDao.create(userWithHighestCostOfOrders).getId();
@@ -126,6 +134,20 @@ class UserResourceTest {
         .perform(get("/users/most-popular-tag"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value("tag1"));
+  }
+
+  @Test
+  @Disabled("method uses keycloak")
+  void createUser() throws Exception {
+    User user = givenUserWO1();
+
+    mockMvc
+        .perform(
+            post("/users")
+                .content(new ObjectMapper().writeValueAsString(user))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id").exists());
   }
 
   User givenUserWO1() {

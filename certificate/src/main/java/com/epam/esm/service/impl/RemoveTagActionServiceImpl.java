@@ -25,7 +25,7 @@ public class RemoveTagActionServiceImpl implements TagActionService {
     long certificateId = tagAction.getCertificateId();
     int numberOfRemovedRows = certificateDao.removeTag(tagId, certificateId);
     if (numberOfRemovedRows == 0) {
-      throw ResourcesValidationException.withIds(tagId, certificateId).get();
+      throw ResourcesValidationException.withIds(tagId, certificateId);
     }
   }
 }

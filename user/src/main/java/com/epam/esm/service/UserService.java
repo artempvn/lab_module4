@@ -1,5 +1,6 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.LoginData;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
@@ -33,4 +34,8 @@ public interface UserService {
    * @return found tag
    */
   TagDto takeMostWidelyTagFromUserWithHighestCostOrders();
+
+  UserDto create(UserDto user);
+
+  String login(LoginData loginData);
 }

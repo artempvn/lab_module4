@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManager;
@@ -25,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ActiveProfiles("certificate")
 @AutoConfigureTestDatabase
 @SpringBootTest
 class TagDaoImplTest {

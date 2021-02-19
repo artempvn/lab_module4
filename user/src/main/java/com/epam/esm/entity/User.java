@@ -27,6 +27,9 @@ public class User {
 
   @Column private String surname;
 
+  @Column(name = "foreign_id")
+  private String foreignId;
+
   @OneToMany(
       mappedBy = "user",
       fetch = FetchType.LAZY,
@@ -41,17 +44,18 @@ public class User {
     this.surname = dto.getSurname();
   }
 
-  private User(Builder builder) {
-    id = builder.id;
-    name = builder.name;
-    surname = builder.surname;
-    orders = builder.orders;
-  }
-
   public User(UserDto dto) {
     this.id = dto.getId();
     this.name = dto.getName();
     this.surname = dto.getSurname();
+  }
+
+  private User(Builder builder) {
+    id = builder.id;
+    name = builder.name;
+    surname = builder.surname;
+    foreignId = builder.foreignId;
+    orders = builder.orders;
   }
 
   public static Builder builder() {
@@ -90,6 +94,14 @@ public class User {
     this.orders = orders;
   }
 
+  public String getForeignId() {
+    return foreignId;
+  }
+
+  public void setForeignId(String keycloakId) {
+    this.foreignId = keycloakId;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -100,6 +112,8 @@ public class User {
     if (id != null ? !id.equals(user.id) : user.id != null) return false;
     if (name != null ? !name.equals(user.name) : user.name != null) return false;
     if (surname != null ? !surname.equals(user.surname) : user.surname != null) return false;
+    if (foreignId != null ? !foreignId.equals(user.foreignId) : user.foreignId != null)
+      return false;
     return orders != null ? orders.equals(user.orders) : user.orders == null;
   }
 
@@ -108,6 +122,7 @@ public class User {
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (name != null ? name.hashCode() : 0);
     result = 31 * result + (surname != null ? surname.hashCode() : 0);
+    result = 31 * result + (foreignId != null ? foreignId.hashCode() : 0);
     result = 31 * result + (orders != null ? orders.hashCode() : 0);
     return result;
   }
@@ -118,6 +133,7 @@ public class User {
     sb.append("id=").append(id);
     sb.append(", name='").append(name).append('\'');
     sb.append(", surname='").append(surname).append('\'');
+    sb.append(", foreignId='").append(foreignId).append('\'');
     sb.append(", orders=").append(orders);
     sb.append('}');
     return sb.toString();
@@ -127,6 +143,7 @@ public class User {
     private Long id;
     private String name;
     private String surname;
+    private String foreignId;
     private List<Order> orders = Collections.emptyList();
 
     private Builder() {}
@@ -143,6 +160,11 @@ public class User {
 
     public Builder surname(String surname) {
       this.surname = surname;
+      return this;
+    }
+
+    public Builder foreignId(String foreignId) {
+      this.foreignId = foreignId;
       return this;
     }
 

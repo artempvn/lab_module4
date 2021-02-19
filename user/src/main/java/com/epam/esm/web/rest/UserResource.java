@@ -1,5 +1,6 @@
 package com.epam.esm.web.rest;
 
+import com.epam.esm.dto.LoginData;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
@@ -11,8 +12,11 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,6 +51,7 @@ public class UserResource {
    * @param id the id of user
    * @return the response entity of found user
    */
+  @Secured({"ROLE_ADMIN", "ROLE_USER"})
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<UserWithOrdersDto>> readUser(@PathVariable long id) {
     EntityModel<UserWithOrdersDto> user = EntityModel.of(userService.read(id));
@@ -60,6 +65,7 @@ public class UserResource {
    * @param parameter the parameter of pagination
    * @return the response entity of found users
    */
+  @Secured({"ROLE_ADMIN"})
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<PageData<EntityModel<UserDto>>>> readUsers(
       @Valid PaginationParameter parameter) {
@@ -86,10 +92,23 @@ public class UserResource {
    *
    * @return the response entity of tag
    */
+  @Secured({"ROLE_ADMIN", "ROLE_USER"})
   @GetMapping(value = "/most-popular-tag", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<TagDto> readMostWidelyTagFromUserWithHighestCostOrders() {
     TagDto tag = userService.takeMostWidelyTagFromUserWithHighestCostOrders();
     return ResponseEntity.status(HttpStatus.OK).body(tag);
+  }
+
+  @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto user) {
+    UserDto createdUser = userService.create(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+  }
+
+  @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<String> login(@RequestBody @Valid LoginData data) {
+    String token = userService.login(data);
+    return ResponseEntity.status(HttpStatus.OK).body(token);
   }
 
   /**

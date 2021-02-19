@@ -1,5 +1,9 @@
 package com.epam.esm.web.advice;
 
+import com.epam.esm.exception.ArgumentNameException;
+import com.epam.esm.exception.ForbiddenException;
+import com.epam.esm.exception.LoginAlreadyExistsException;
+import com.epam.esm.exception.NotAuthorizedException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
 import com.epam.esm.exception.TagException;
@@ -58,6 +62,49 @@ public class ResourceAdvice {
     String errorCode = String.format("%s", HttpStatus.BAD_REQUEST.value());
     ErrorResponse response = new ErrorResponse(textMessage, errorCode);
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(LoginAlreadyExistsException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ResponseEntity<ErrorResponse> handleException(LoginAlreadyExistsException e) {
+    String textMessage =
+        messageSource.getMessage("error.notUniqueLogin", null, LocaleContextHolder.getLocale());
+    String errorMessage = String.format("%s %s", textMessage, e.getUserLogin());
+    String errorCode = String.format("%s", HttpStatus.CONFLICT.value());
+    ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
+    return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+  }
+
+  @ExceptionHandler(NotAuthorizedException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ResponseEntity<ErrorResponse> handleException(NotAuthorizedException e) {
+    String textMessage =
+        messageSource.getMessage(
+            "error.notCorrectLoginData", null, LocaleContextHolder.getLocale());
+    String errorCode = String.format("%s", HttpStatus.UNAUTHORIZED.value());
+    ErrorResponse response = new ErrorResponse(textMessage, errorCode);
+    return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(ForbiddenException.class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  public ResponseEntity<ErrorResponse> handleException(ForbiddenException e) {
+    String textMessage =
+        messageSource.getMessage("error.forbidden", null, LocaleContextHolder.getLocale());
+    String errorMessage = String.format("%s %s", textMessage, e.getUserLogin());
+    String errorCode = String.format("%s", HttpStatus.FORBIDDEN.value());
+    ErrorResponse response = new ErrorResponse(errorMessage, errorCode);
+    return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+  }
+
+  @ExceptionHandler(ArgumentNameException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseEntity<ErrorResponse> handleException(ArgumentNameException e) {
+    String textMessage =
+        messageSource.getMessage("error.argument", null, LocaleContextHolder.getLocale());
+    String errorCode = String.format("%s", HttpStatus.INTERNAL_SERVER_ERROR.value());
+    ErrorResponse response = new ErrorResponse(textMessage, errorCode);
+    return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})

@@ -1,10 +1,8 @@
 package com.epam.esm.dto;
 
-import org.springframework.hateoas.RepresentationModel;
-
 import java.util.Collection;
 
-public class PageData<T> extends RepresentationModel<PageData<T>> {
+public class PageData<T> {
   private long currentPage;
   private long numberOfElements;
   private long numberOfPages;

@@ -10,6 +10,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +51,7 @@ public class TagResource {
    * @param id the id of tag
    * @return the response entity of tag
    */
+  @Secured({"ROLE_ADMIN", "ROLE_USER"})
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<EntityModel<TagDto>> readTag(@PathVariable long id) {
     EntityModel<TagDto> tag = EntityModel.of(tagService.read(id));
@@ -63,6 +65,7 @@ public class TagResource {
    * @param parameter the parameter of pagination
    * @return the response entity of found tags
    */
+  @Secured({"ROLE_ADMIN", "ROLE_USER"})
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<EntityModel<PageData<EntityModel<TagDto>>>> readTags(
@@ -91,6 +94,7 @@ public class TagResource {
    * @param tag the tag
    * @return saved tag
    */
+  @Secured("ROLE_ADMIN")
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public TagDto createTag(@RequestBody @Valid TagDto tag) {
@@ -103,6 +107,7 @@ public class TagResource {
    * @param action the action
    * @return the response entity
    */
+  @Secured("ROLE_ADMIN")
   @PostMapping(value = "/action", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<Void> processTagAction(@RequestBody TagAction action) {
@@ -115,6 +120,7 @@ public class TagResource {
    *
    * @param id the id of tag
    */
+  @Secured("ROLE_ADMIN")
   @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteTag(@PathVariable long id) {

@@ -16,7 +16,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -30,7 +30,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("certificate")
 @AutoConfigureTestDatabase
 @SpringBootTest
 class TagResourceTest {
@@ -59,6 +58,7 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void readTagPositiveStatusCheck() throws Exception {
     Tag tag1 = givenExistingTag1();
     long tagId = tagDao.create(tag1).getId();
@@ -67,6 +67,7 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void readTagPositiveValueCheck() throws Exception {
     Tag tag1 = givenExistingTag1();
     long id = tagDao.create(tag1).getId();
@@ -78,12 +79,14 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void readTagNegativeStatusCheck() throws Exception {
 
     mockMvc.perform(get("/tags/{id}", NOT_EXISTING_ID)).andExpect(status().isNotFound());
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void readTagsStatusCheck() throws Exception {
     Tag tag1 = givenExistingTag1();
     Tag tag2 = givenExistingTag2();
@@ -94,6 +97,7 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void readTagsValueCheck() throws Exception {
     Tag tag1 = givenExistingTag1();
     Tag tag2 = givenExistingTag2();
@@ -113,6 +117,7 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void createTagStatusCheck() throws Exception {
     Tag tag1 = givenExistingTag1();
 
@@ -125,6 +130,7 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void createTagValueCheck() throws Exception {
     Tag tag1 = givenExistingTag1();
     tag1.setId(null);
@@ -139,6 +145,7 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void processTagAction() throws Exception {
     Certificate certificate1 = givenExistingCertificate1();
     long certificateId = certificateDao.create(certificate1).getId();
@@ -156,6 +163,7 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void processTagActionNegative() throws Exception {
     Certificate certificate1 = givenExistingCertificate1();
     long id = certificateDao.create(certificate1).getId();
@@ -172,6 +180,7 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void deleteTagStatusCheck() throws Exception {
     Tag tag1 = givenExistingTag1();
     long tagId = tagDao.create(tag1).getId();
@@ -180,6 +189,7 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void deleteTagStatusCheckAfterRequest() throws Exception {
     Tag tag1 = givenExistingTag1();
     long id = tagDao.create(tag1).getId();
@@ -190,6 +200,7 @@ class TagResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void deleteTagNegative() throws Exception {
 
     mockMvc.perform(delete("/tags/{id}", NOT_EXISTING_ID)).andExpect(status().isBadRequest());

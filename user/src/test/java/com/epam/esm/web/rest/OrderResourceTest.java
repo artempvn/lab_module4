@@ -12,6 +12,7 @@ import com.epam.esm.web.advice.ResourceAdvice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -32,7 +33,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("user")
 @AutoConfigureTestDatabase
 @SpringBootTest
 class OrderResourceTest {
@@ -64,6 +64,7 @@ class OrderResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void createOrderValueCheck() throws Exception {
     Order order = givenOrder();
     User user = givenUser();
@@ -79,6 +80,8 @@ class OrderResourceTest {
   }
 
   @Test
+  @Disabled("method uses keycloak")
+  @WithMockUser(roles = "ADMIN")
   void readUserOrder() throws Exception {
     Order order = givenOrder();
     User user = givenUser();
@@ -95,6 +98,8 @@ class OrderResourceTest {
   }
 
   @Test
+  @Disabled("method uses keycloak")
+  @WithMockUser(roles = "ADMIN")
   void readUserOrders() throws Exception {
     Order order = givenOrder();
     User user = givenUser();

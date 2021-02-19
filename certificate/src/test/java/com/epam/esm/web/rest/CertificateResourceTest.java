@@ -16,7 +16,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -34,9 +34,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("certificate")
-@AutoConfigureTestDatabase
 @SpringBootTest
+@AutoConfigureTestDatabase
 class CertificateResourceTest {
   public static final long NOT_EXISTING_ID = 99999L;
   MockMvc mockMvc;
@@ -45,7 +44,6 @@ class CertificateResourceTest {
   @Autowired CertificateResource certificateController;
   @Autowired EntityManager entityManager;
   @Autowired TransactionTemplate txTemplate;
-
   @Autowired ReloadableResourceBundleMessageSource messageSource;
   @Autowired LocaleResolver localeResolver;
 
@@ -164,6 +162,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void createCertificateStatusCheck() throws Exception {
     Certificate certificate1 = givenExistingCertificate1();
     certificate1.setId(null);
@@ -177,6 +176,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void createCertificateValueCheck() throws Exception {
     Certificate certificate1 = givenExistingCertificate1();
     certificate1.setId(null);
@@ -195,6 +195,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void updateCertificatePutPositiveStatusCheck() throws Exception {
     Certificate certificate = givenExistingCertificate1();
     long id = certificateDao.create(certificate).getId();
@@ -209,6 +210,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void updateCertificatePutNegativeStatusCheck() throws Exception {
     Certificate certificateUpdate = givenNewCertificateForUpdateId1();
 
@@ -221,6 +223,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void updateCertificatePutPositiveValueCheck() throws Exception {
     Certificate certificate = givenExistingCertificate1();
     long id = certificateDao.create(certificate).getId();
@@ -240,6 +243,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void updateCertificatePatchPositiveStatusCheck() throws Exception {
     Certificate certificate = givenExistingCertificate1();
     long id = certificateDao.create(certificate).getId();
@@ -255,6 +259,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void updateCertificatePatchNegativeStatusCheck() throws Exception {
     Certificate certificateUpdate = givenExistingCertificate1WT();
 
@@ -267,6 +272,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void updateCertificatePatchPositiveValueCheck() throws Exception {
     Certificate certificate = givenExistingCertificate1();
     long id = certificateDao.create(certificate).getId();
@@ -284,6 +290,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void deleteCertificateStatusCheck() throws Exception {
     Certificate certificate = givenExistingCertificate1();
     long id = certificateDao.create(certificate).getId();
@@ -292,6 +299,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void deleteCertificateValueCheck() throws Exception {
     Certificate certificate = givenExistingCertificate1();
     long id = certificateDao.create(certificate).getId();
@@ -301,6 +309,7 @@ class CertificateResourceTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void deleteCertificateNegative() throws Exception {
 
     mockMvc
