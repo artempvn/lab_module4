@@ -1,5 +1,5 @@
 rootProject.name = 'lab4'
 include 'certificate'
 include 'user'
-include 'common'
+include 'keycloak_security'
 

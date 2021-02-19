@@ -6,6 +6,8 @@ import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -44,12 +46,14 @@ public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
   }
 
   @Bean
+  @ConditionalOnMissingBean
   public KeycloakSpringBootConfigResolver keycloakConfigResolver() {
     return new KeycloakSpringBootConfigResolver();
   }
 
   @Bean
   @Override
+  @ConditionalOnMissingBean
   protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
     return new NullAuthenticatedSessionStrategy();
   }

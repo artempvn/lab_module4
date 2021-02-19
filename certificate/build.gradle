@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation project(':common')
+    implementation project(':keycloak_security')
     testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
