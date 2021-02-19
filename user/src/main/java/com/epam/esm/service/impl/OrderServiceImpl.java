@@ -12,9 +12,9 @@ import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ResourceValidationException;
-import com.epam.esm.security.AuthorizeAccess;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.service.OrderService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +58,8 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  @AuthorizeAccess(userIdParamName = "userId")
+  @PreAuthorize(
+      "hasRole('ADMIN') or @authorizationDecisionMaker.match(#userId)")
   public PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter) {
     PageData<Order> pageData = orderDao.readAllByUser(userId, parameter);
     long numberOfElements = pageData.getNumberOfElements();
@@ -69,7 +70,8 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  @AuthorizeAccess(userIdParamName = "userId")
+  @PreAuthorize(
+          "hasRole('ADMIN') or @authorizationDecisionMaker.match(#userId)")
   public OrderWithCertificatesDto readOrderByUser(long userId, long orderId) {
     Optional<User> user = userDao.read(userId);
     user.orElseThrow(ResourceValidationException.validationWithUser(userId));

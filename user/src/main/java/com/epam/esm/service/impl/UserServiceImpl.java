@@ -12,7 +12,6 @@ import com.epam.esm.entity.User;
 import com.epam.esm.exception.LoginAlreadyExistsException;
 import com.epam.esm.exception.NotAuthorizedException;
 import com.epam.esm.exception.ResourceNotFoundException;
-import com.epam.esm.security.AuthorizeAccess;
 import com.epam.esm.service.KeycloakService;
 import com.epam.esm.service.UserService;
 import org.keycloak.admin.client.Keycloak;
@@ -21,6 +20,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +51,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @AuthorizeAccess(userIdParamName = "userId")
+  @PreAuthorize(
+          "hasRole('ADMIN') or @authorizationDecisionMaker.match(#userId)")
   public UserWithOrdersDto read(long userId) {
     User user =
         userDao.read(userId).orElseThrow(ResourceNotFoundException.notFoundWithUser(userId));
