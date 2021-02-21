@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled = true,prePostEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class UserConfig {
 
   public static final int CONNECTION_POOL_SIZE = 10;

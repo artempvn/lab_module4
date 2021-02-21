@@ -65,6 +65,13 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
+  public Optional<User> readByForeignId(String foreignId) {
+    String hql = "from  User where foreignId=:foreignId";
+    Query query = entityManager.createQuery(hql).setParameter("foreignId", foreignId);
+    return query.getResultStream().findFirst();
+  }
+
+  @Override
   public PageData<User> readAll(PaginationParameter parameter) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 

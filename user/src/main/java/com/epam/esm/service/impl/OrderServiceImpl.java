@@ -38,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @PreAuthorize("hasRole('ADMIN') or @authorizationDecisionMaker.match(#order.userId)")
   public OrderWithCertificatesWithTagsForCreationDto create(
       OrderWithCertificatesWithTagsForCreationDto order) {
     userDao
@@ -58,8 +59,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  @PreAuthorize(
-      "hasRole('ADMIN') or @authorizationDecisionMaker.match(#userId)")
+  @PreAuthorize("hasRole('ADMIN') or @authorizationDecisionMaker.match(#userId)")
   public PageData<OrderDto> readAllByUser(long userId, PaginationParameter parameter) {
     PageData<Order> pageData = orderDao.readAllByUser(userId, parameter);
     long numberOfElements = pageData.getNumberOfElements();
@@ -70,8 +70,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  @PreAuthorize(
-          "hasRole('ADMIN') or @authorizationDecisionMaker.match(#userId)")
+  @PreAuthorize("hasRole('ADMIN') or @authorizationDecisionMaker.match(#userId)")
   public OrderWithCertificatesDto readOrderByUser(long userId, long orderId) {
     Optional<User> user = userDao.read(userId);
     user.orElseThrow(ResourceValidationException.validationWithUser(userId));

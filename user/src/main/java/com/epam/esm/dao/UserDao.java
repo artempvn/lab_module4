@@ -28,6 +28,14 @@ public interface UserDao {
   Optional<User> read(long id);
 
   /**
+   * Read user by foreign id.
+   *
+   * @param foreignId the foreign id of user
+   * @return the optional of user or empty optional if it's not exist
+   */
+  Optional<User> readByForeignId(String foreignId);
+
+  /**
    * Read all users meet pagination parameters.
    *
    * @param parameter the parameter of pagination
