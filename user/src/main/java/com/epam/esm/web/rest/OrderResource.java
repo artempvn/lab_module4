@@ -6,6 +6,9 @@ import com.epam.esm.dto.OrderWithCertificatesWithTagsForCreationDto;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.service.OrderService;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -24,10 +27,13 @@ import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 /** The type Order resource. */
 @RestController
 @RequestMapping("/users")
+@SecurityScheme(type = SecuritySchemeType.HTTP, scheme = "bearer", name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class OrderResource {
 
   private final OrderService orderService;
