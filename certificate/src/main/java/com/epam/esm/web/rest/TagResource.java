@@ -5,6 +5,9 @@ import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagAction;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.TagService;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -25,10 +28,13 @@ import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 /** The type Tag resource. */
 @RestController
 @RequestMapping("/tags")
+@SecurityScheme(type = SecuritySchemeType.HTTP, scheme = "bearer", name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class TagResource {
 
   private final TagService tagService;
@@ -53,6 +59,7 @@ public class TagResource {
    */
   @Secured({"ROLE_ADMIN", "ROLE_USER"})
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<EntityModel<TagDto>> readTag(@PathVariable long id) {
     EntityModel<TagDto> tag = EntityModel.of(tagService.read(id));
     tag.add(buildTagLinks(id));
