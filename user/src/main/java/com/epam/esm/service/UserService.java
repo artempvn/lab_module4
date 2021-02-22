@@ -45,11 +45,11 @@ public interface UserService {
   UserDto create(UserDto user);
 
   /**
-   * Login login with credentials (login & password).
-   * If user wasn't saved in dao database before, he will be saved.
+   * Login with credentials (login & password). User will be saved in dao database if he isn't
+   * presented there.
    *
-   * @param loginData the login data
-   * @return the login response which include access token and id of user
+   * @param loginData the login data (login & password)
+   * @return the login response which include access token and id of user from dao database
    */
   LoginResponse login(LoginData loginData);
 }

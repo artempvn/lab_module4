@@ -5,6 +5,7 @@ import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.TagException;
+import org.keycloak.representations.idm.UserRepresentation;
 
 import java.util.Optional;
 
@@ -18,6 +19,14 @@ public interface UserDao {
    * @return saved user
    */
   User create(User user);
+
+  /**
+   * Persist user.
+   *
+   * @param user the user representation
+   * @return saved user
+   */
+  User create(UserRepresentation user);
 
   /**
    * Read user by id.

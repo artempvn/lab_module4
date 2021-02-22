@@ -6,11 +6,9 @@ import com.epam.esm.exception.ResourceNotFoundException;
 import org.keycloak.representations.AccessToken;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 /** The type Security decision maker. */
-@Component("authorizationDecisionMaker")
-public class SecurityDecisionMaker {
+@Component
+public class CurrentAuthenticatedUserIdMatcher {
   private final AccessToken accessToken;
   private final UserDao userDao;
 
@@ -20,7 +18,7 @@ public class SecurityDecisionMaker {
    * @param accessToken the access token
    * @param userDao the user dao
    */
-  public SecurityDecisionMaker(AccessToken accessToken, UserDao userDao) {
+  public CurrentAuthenticatedUserIdMatcher(AccessToken accessToken, UserDao userDao) {
     this.accessToken = accessToken;
     this.userDao = userDao;
   }
@@ -34,9 +32,10 @@ public class SecurityDecisionMaker {
   public boolean match(long userId) {
     String foreignIdOfLoginUser = accessToken.getSubject();
 
-    Optional<User> user = userDao.read(userId);
     String foreignIdOfExistingUser =
-        user.map(User::getForeignId)
+        userDao
+            .read(userId)
+            .map(User::getForeignId)
             .orElseThrow(ResourceNotFoundException.notFoundWithUser(userId));
 
     return foreignIdOfLoginUser.equals(foreignIdOfExistingUser);
