@@ -9,6 +9,7 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.service.OrderService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -84,6 +85,7 @@ class UserDaoImplTest {
   }
 
   @Test
+  @Disabled("method uses keycloak")
   void takeMostWidelyTagFromUserWithHighestCostOrders() {
     User userWithHighestCostOfOrders = givenUser1WO();
     User user = givenUser2WO();

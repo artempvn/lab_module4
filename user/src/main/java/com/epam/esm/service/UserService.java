@@ -1,6 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.LoginData;
+import com.epam.esm.dto.LoginResponse;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
@@ -35,7 +36,20 @@ public interface UserService {
    */
   TagDto takeMostWidelyTagFromUserWithHighestCostOrders();
 
+  /**
+   * Save user to dao database and also to keycloak database.
+   *
+   * @param user the user
+   * @return the created user dto
+   */
   UserDto create(UserDto user);
 
-  String login(LoginData loginData);
+  /**
+   * Login with credentials (login & password). User will be saved in dao database if he isn't
+   * presented there.
+   *
+   * @param loginData the login data (login & password)
+   * @return the login response which include access token and id of user from dao database
+   */
+  LoginResponse login(LoginData loginData);
 }

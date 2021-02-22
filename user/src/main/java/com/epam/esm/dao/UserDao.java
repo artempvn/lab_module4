@@ -5,6 +5,7 @@ import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.TagException;
+import org.keycloak.representations.idm.UserRepresentation;
 
 import java.util.Optional;
 
@@ -20,12 +21,28 @@ public interface UserDao {
   User create(User user);
 
   /**
+   * Persist user.
+   *
+   * @param user the user representation
+   * @return saved user
+   */
+  User create(UserRepresentation user);
+
+  /**
    * Read user by id.
    *
    * @param id the id of user
    * @return the optional of user or empty optional if it's not exist
    */
   Optional<User> read(long id);
+
+  /**
+   * Read user by foreign id.
+   *
+   * @param foreignId the foreign id of user
+   * @return the optional of user or empty optional if it's not exist
+   */
+  Optional<User> readByForeignId(String foreignId);
 
   /**
    * Read all users meet pagination parameters.

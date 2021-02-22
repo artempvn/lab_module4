@@ -2,6 +2,7 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.dto.LoginData;
+import com.epam.esm.dto.LoginResponse;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.Role;
@@ -12,7 +13,6 @@ import com.epam.esm.entity.User;
 import com.epam.esm.exception.LoginAlreadyExistsException;
 import com.epam.esm.exception.NotAuthorizedException;
 import com.epam.esm.exception.ResourceNotFoundException;
-import com.epam.esm.security.AuthorizeAccess;
 import com.epam.esm.service.KeycloakService;
 import com.epam.esm.service.UserService;
 import org.keycloak.admin.client.Keycloak;
@@ -21,6 +21,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @AuthorizeAccess(userIdParamName = "userId")
+  @PreAuthorize("hasRole('ADMIN') or @currentAuthenticatedUserIdMatcher.match(#userId)")
   public UserWithOrdersDto read(long userId) {
     User user =
         userDao.read(userId).orElseThrow(ResourceNotFoundException.notFoundWithUser(userId));
@@ -104,9 +105,32 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public String login(LoginData loginData) {
+  public LoginResponse login(LoginData loginData) {
     try (Keycloak userKeycloak = keycloakService.createUserKeycloak(loginData)) {
-      return userKeycloak.tokenManager().getAccessTokenString();
+      LoginResponse response = new LoginResponse();
+      String accessToken = userKeycloak.tokenManager().getAccessTokenString();
+      response.setAccessToken(accessToken);
+
+      UsersResource usersResource = keycloak.realm(realm).users();
+      UserRepresentation userRepresentation =
+          usersResource.search(loginData.getLogin()).stream().findFirst().orElseThrow();
+      String foreignId = userRepresentation.getId();
+
+      boolean isUserAdmin =
+          keycloak.realm(realm).users().get(foreignId).roles().realmLevel().listAll().stream()
+              .map(RoleRepresentation::getName)
+              .anyMatch(role -> role.equals(Role.ADMIN.name()));
+
+      if (!isUserAdmin) {
+        Long userId =
+            userDao
+                .readByForeignId(foreignId)
+                .orElseGet(() -> userDao.create(userRepresentation))
+                .getId();
+        response.setId(userId);
+      }
+
+      return response;
     } catch (javax.ws.rs.NotAuthorizedException ex) {
       throw NotAuthorizedException.notCorrectLoginData();
     }

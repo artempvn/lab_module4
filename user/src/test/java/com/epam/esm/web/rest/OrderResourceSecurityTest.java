@@ -60,6 +60,7 @@ class OrderResourceSecurityTest {
   }
 
   @Test
+  @Disabled("method uses keycloak")
   void readUserOrderNoAuth() throws Exception {
     Order order = givenOrder();
     User user = givenUser();

@@ -7,6 +7,7 @@ import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.TagException;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,8 +61,25 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
+  public User create(UserRepresentation userRepresentation) {
+    String name = userRepresentation.getFirstName();
+    String surname = userRepresentation.getLastName();
+    String foreignId = userRepresentation.getId();
+    User user = User.builder().name(name).surname(surname).foreignId(foreignId).build();
+    entityManager.persist(user);
+    return user;
+  }
+
+  @Override
   public Optional<User> read(long id) {
     return Optional.ofNullable(entityManager.find(User.class, id));
+  }
+
+  @Override
+  public Optional<User> readByForeignId(String foreignId) {
+    String hql = "from  User where foreignId=:foreignId";
+    Query query = entityManager.createQuery(hql).setParameter("foreignId", foreignId);
+    return query.getResultStream().findFirst();
   }
 
   @Override

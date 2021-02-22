@@ -1,6 +1,7 @@
 package com.epam.esm.web.rest;
 
 import com.epam.esm.dto.LoginData;
+import com.epam.esm.dto.LoginResponse;
 import com.epam.esm.dto.PageData;
 import com.epam.esm.dto.PaginationParameter;
 import com.epam.esm.dto.TagDto;
@@ -99,16 +100,28 @@ public class UserResource {
     return ResponseEntity.status(HttpStatus.OK).body(tag);
   }
 
+  /**
+   * Save user.
+   *
+   * @param user the user data
+   * @return the response of created user
+   */
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto user) {
     UserDto createdUser = userService.create(user);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
   }
 
+  /**
+   * Login user with login and password.
+   *
+   * @param data login and password
+   * @return the response entity with access token and user id
+   */
   @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> login(@RequestBody @Valid LoginData data) {
-    String token = userService.login(data);
-    return ResponseEntity.status(HttpStatus.OK).body(token);
+  public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginData data) {
+    LoginResponse response = userService.login(data);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   /**
