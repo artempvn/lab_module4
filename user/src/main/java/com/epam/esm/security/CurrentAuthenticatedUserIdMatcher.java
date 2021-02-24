@@ -6,14 +6,14 @@ import com.epam.esm.exception.ResourceNotFoundException;
 import org.keycloak.representations.AccessToken;
 import org.springframework.stereotype.Component;
 
-/** The type Security decision maker. */
+/** The type CurrentAuthenticatedUserIdMatcher. */
 @Component
 public class CurrentAuthenticatedUserIdMatcher {
   private final AccessToken accessToken;
   private final UserDao userDao;
 
   /**
-   * Instantiates a new Security decision maker.
+   * Instantiates a new Current authenticated userId matcher.
    *
    * @param accessToken the access token
    * @param userDao the user dao
@@ -24,7 +24,7 @@ public class CurrentAuthenticatedUserIdMatcher {
   }
 
   /**
-   * Comparing foreign ids of users.
+   * Comparing foreign ids of users, e.g. github id.
    *
    * @param userId the user id
    * @return the result of comparing foreign id of presented user with foreign id of logged user
