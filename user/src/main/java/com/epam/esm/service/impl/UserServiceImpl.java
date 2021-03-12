@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
       }
       String headerLocation = response.getHeaderString(HEADER_LOCATION);
       String generatedUserId = headerLocation.substring(headerLocation.lastIndexOf(SEPARATOR) + 1);
-      user.setForeignId(generatedUserId);
+      user.setForeignId(userDto.getLogin());
 
       RoleRepresentation savedRoleRepresentation =
           keycloak.realm(realm).roles().get(Role.USER.name()).toRepresentation();
@@ -124,7 +124,7 @@ public class UserServiceImpl implements UserService {
       if (!isUserAdmin) {
         Long userId =
             userDao
-                .readByForeignId(foreignId)
+                .readByForeignId(loginData.getLogin())
                 .orElseGet(() -> userDao.create(userRepresentation))
                 .getId();
         response.setId(userId);

@@ -46,7 +46,7 @@ public interface UserService {
 
   /**
    * Login with credentials (login & password). User will be saved in dao database if he isn't
-   * presented there.
+   * presented there (if there is no such login there).
    *
    * @param loginData the login data (login & password)
    * @return the login response which include access token and id of user from dao database

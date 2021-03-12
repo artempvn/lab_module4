@@ -24,13 +24,13 @@ public class CurrentAuthenticatedUserIdMatcher {
   }
 
   /**
-   * Comparing foreign ids of users, e.g. github id.
+   * Comparing foreign ids of users, e.g. github login.
    *
    * @param userId the user id
    * @return the result of comparing foreign id of presented user with foreign id of logged user
    */
   public boolean match(long userId) {
-    String foreignIdOfLoginUser = accessToken.getSubject();
+    String foreignIdOfLoginUser = accessToken.getPreferredUsername();
 
     String foreignIdOfExistingUser =
         userDao
