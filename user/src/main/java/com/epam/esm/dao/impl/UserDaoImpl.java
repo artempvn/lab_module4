@@ -64,7 +64,7 @@ public class UserDaoImpl implements UserDao {
   public User create(UserRepresentation userRepresentation) {
     String name = userRepresentation.getFirstName();
     String surname = userRepresentation.getLastName();
-    String foreignId = userRepresentation.getId();
+    String foreignId = userRepresentation.getUsername();
     User user = User.builder().name(name).surname(surname).foreignId(foreignId).build();
     entityManager.persist(user);
     return user;
